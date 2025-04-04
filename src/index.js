@@ -1,0 +1,29 @@
+import express from 'express';
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import bodyParser from 'body-parser'; // Optional, as express.json() might suffice
+import userRoutes from './Routes/UserRoutes.mjs';
+
+dotenv.config();
+
+const app = express();
+const port = process.env.PORT || 8009;
+
+app.use(express.json());
+
+// Connect to MongoDB using the correct MONGO_URL environment variable
+mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => {
+        console.log('Connected to MongoDB');
+    })
+    .catch((error) => {
+        console.error('Error connecting to MongoDB:', error);
+    });
+
+// Use user routes
+app.use('/api', userRoutes);
+
+// Start the server
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+});
