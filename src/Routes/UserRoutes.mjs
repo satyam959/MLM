@@ -11,12 +11,12 @@ router.post('/register', UserController.registerUser);
 router.post('/login', UserController.loginUser);
 
 // Admin route to get all users
-router.get('/', UserController.getAllUsers);
+router.get('/getAlluser', UserController.getAllUsers);
 
 // Route to update user by ID
-router.put('/:userId', UserController.updateUser);
+router.put('/updateByUserId/:userId', UserController.updateUser);
 
 // Route to delete user by ID
-router.delete('/:userId', UserController.deleteUser);
+router.delete('/deleteByUserId/:userId', UserController.deleteUser);
 
 export default router;
