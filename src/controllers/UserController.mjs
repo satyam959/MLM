@@ -1,14 +1,21 @@
 // Controllers/UserController.mjs
 import UserRepository from '../Repositories/UserRepository.mjs';
+import jwt from 'jsonwebtoken'; // Import jsonwebtoken
 
 class UserController {
   // User Registration
-  static async registerUser(req, res) {
+  async registerUser(req, res) {
     const { name, fullName, email, phone, address, password, role } = req.body;
-    
+
     const newUser = { name, fullName, email, phone, address, password, role };
 
     try {
+      // Check if the email already exists
+      const existingUser = await UserRepository.findUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ message: 'Email already exists' });
+      }
+
       const user = await UserRepository.createUser(newUser);
       res.status(201).json({ message: 'User registered successfully', user });
     } catch (error) {
@@ -17,7 +24,7 @@ class UserController {
   }
 
   // User Login
-  static async loginUser(req, res) {
+  async loginUser(req, res) {
     const { email, password } = req.body;
 
     try {
@@ -31,9 +38,20 @@ class UserController {
         return res.status(400).json({ message: 'Invalid credentials' });
       }
 
+      // Generate a JWT token
+      const payload = {
+        userId: user._id,  // Include user ID in payload (or any other information you need)
+        name: user.name,
+        role: user.role,
+      };
+
+      // Sign the token (expires in 1 hour)
+      const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '9h' });
+
       res.status(200).json({
         message: 'Login successful',
-        user: { email: user.email, name: user.name },
+        token, // Send token back to the user
+        user: { email: user.email, name: user.name, role: user.role },
       });
     } catch (error) {
       res.status(500).json({
@@ -44,7 +62,7 @@ class UserController {
   }
 
   // Get all users (Admin only)
-  static async getAllUsers(req, res) {
+  async getAllUsers(req, res) {
     try {
       const users = await UserRepository.getAllUsers();
       res.status(200).json({ users });
@@ -54,7 +72,7 @@ class UserController {
   }
 
   // Update user by ID
-  static async updateUser(req, res) {
+  async updateUser(req, res) {
     const { userId } = req.params;
     const updateData = req.body;
 
@@ -70,7 +88,7 @@ class UserController {
   }
 
   // Delete user by ID
-  static async deleteUser(req, res) {
+  async deleteUser(req, res) {
     const { userId } = req.params;
 
     try {
@@ -85,4 +103,4 @@ class UserController {
   }
 }
 
-export default UserController;
+export default new UserController();
