@@ -10,7 +10,7 @@ router.get('/', ServiceController.getAll);
 router.get('/:id', ServiceController.getById);
 
 // Create a new service
-router.post('/create', ServiceController.create);
+router.post('/createService', ServiceController.create);
 
 // Update a service by ID
 router.put('/:id', ServiceController.update);

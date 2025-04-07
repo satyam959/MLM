@@ -28,6 +28,8 @@ class ServiceController {
         'Mobile Recharge', 'DTH', 'Fastag', 'Electricity Bill', 'Gas Piped Bill',
         'Water Bill', 'Loan & EMI', 'LIC/Insurance', 'Broadband'
       ];
+
+      console.log("Hi");
       if (!allowedServices.includes(service.type)) {
         return res.status(400).json({ message: 'Invalid service type' });
       }

@@ -8,6 +8,11 @@ const roleSchema = new mongoose.Schema(
       unique: true,     
       trim: true        
     },
+    status: {
+      type: String,
+      enum: ['active', 'inactive'], // Specify valid statuses
+      default: 'active'              // Set default status
+    },
   },
   { timestamps: true }   // Automatically adds 'createdAt' and 'updatedAt' fields
 );

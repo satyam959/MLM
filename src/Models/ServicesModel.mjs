@@ -63,6 +63,11 @@ const serviceSchema = new mongoose.Schema({
       return this.type === 'Broadband'; // Only required for Broadband
     }
   },
+  status: {
+    type: String,
+    enum: ['pending', 'completed', 'failed', 'in-progress'],
+    default: 'pending' // Default status is 'pending'
+  }
 }, {
   timestamps: true // This will add createdAt and updatedAt timestamps
 });

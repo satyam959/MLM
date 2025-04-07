@@ -45,6 +45,11 @@ const userSchema = new mongoose.Schema({
     // enum: ['Admin', 'User'],  // Limit the role to 'Admin' or 'User'
     default: '',  // Default role is User
   },
+  status: {
+    type: String,
+    enum: ['active', 'inactive', 'suspended', 'pending'],  // Define possible statuses
+    default: 'pending',  // Default status is 'pending'
+  },
 });
 
 // Methods and middleware
