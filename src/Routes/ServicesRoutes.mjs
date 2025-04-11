@@ -4,7 +4,7 @@ import ServiceController from '../controllers/ServicesController.mjs';
 const router = express.Router();
 
 // Get all services
-router.get('/', ServiceController.getAll);
+router.get('/getAllService', ServiceController.getAll);
 
 // Get a service by ID
 router.get('/:id', ServiceController.getById);

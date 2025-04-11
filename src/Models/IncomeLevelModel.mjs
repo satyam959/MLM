@@ -14,14 +14,15 @@ const IncomeLevelSchema = new mongoose.Schema({
     required: true, // Ensure that the total field is always provided
   },
   status: {
-    type: String,
-    enum: ['active', 'inactive', 'pending'], // Valid status values
-    default: 'active', // Default status value
+    type: Boolean,  // Corrected type to Boolean (not 'boolean' or 'boolean' from 'webidl-conversions')
+    default: true,   // Default to true
   },
   level: {
     type: Number,
     required: true, // Ensure that the level field is always provided
   },
+   incomeId: { type: Number, default: () => Math.floor(100000 + Math.random() * 900000), unique: true },
+
 }, {
   timestamps: true, // Automatically adds createdAt and updatedAt fields
 });

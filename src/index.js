@@ -6,6 +6,11 @@ import userRoutes from './Routes/UserRoutes.mjs';
 import royaltyRoutes from './Routes/royaltyRoutes.mjs';
 import permissionRoutes from './Routes/permissionRoutes.mjs';
 import rankRoutes from './Routes/RankRoutes.mjs';
+import userRoutes from './Routes/UserRoutes.mjs'; 
+import roleRoutes from './Routes/RoleRoutes.mjs'; 
+import incomeLeveleRoutes from './Routes/IncomeLevelRoutes.mjs'
+import servicesRoutes from './Routes/ServicesRoutes.mjs'; 
+
 
 dotenv.config();
 
@@ -28,6 +33,12 @@ app.use('/api', userRoutes);
 app.use('/api', royaltyRoutes);
 app.use('/api', permissionRoutes);
 app.use('/api', rankRoutes);
+// Define the routes for user, role, and service management
+
+app.use('/api', roleRoutes);    // Role routes
+app.use('/api', servicesRoutes); // Service routes (this is where servicesRoutes should be imported)
+app.use('/api1', incomeLeveleRoutes);
+
 // Start the server
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);

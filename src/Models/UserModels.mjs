@@ -1,4 +1,3 @@
-// Models/UserModels.mjs
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
@@ -42,13 +41,12 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    // enum: ['Admin', 'User'],  // Limit the role to 'Admin' or 'User'
+    // enum: ['Admin', 'User'],  // Uncomment this line if you want to restrict roles
     default: '',  // Default role is User
   },
   status: {
-    type: String,
-    enum: ['active', 'inactive', 'suspended', 'pending'],  // Define possible statuses
-    default: 'pending',  // Default status is 'pending'
+    type: Boolean, // Corrected to Boolean (capital B)
+    default: true, // Default status is true
   },
 });
 
