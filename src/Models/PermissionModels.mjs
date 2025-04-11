@@ -10,7 +10,7 @@ const permissionSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      required: true,  // Ensures 'description' is required
+      required: true,  // Ensures 'description' is required     
     },
   },
   {
