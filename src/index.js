@@ -35,7 +35,6 @@ app.use('/api', permissionRoutes);
 app.use('/api', rankRoutes);
 // Define the routes for user, role, and service management
 
-
 // Define the routes for user, role, and service management
 app.use('/api', userRoutes);    // User routes
 app.use('/api', roleRoutes);    // Role routes
