@@ -15,9 +15,17 @@ class IncomeLevelRepository {
   }
 
   // Get all income levels
-  static async findAll() {
+  static async findAllIncomeRecord() {
+    console.log("hi")
     try {
+      // Find all income levels from the database
       const levels = await IncomeLevel.find();
+
+      // If no levels are found, return an empty array or throw an error
+      if (!levels || levels.length === 0) {
+        return [];
+      }
+
       return levels;
     } catch (error) {
       console.error('Error fetching income levels:', error);
@@ -25,12 +33,18 @@ class IncomeLevelRepository {
     }
   }
 
+
   // Find an income level by ID
   static async findById(id) {
     try {
+      // Validate if the ID is valid
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        throw new Error('Invalid ID format');
+      }
+
       const level = await IncomeLevel.findById(id);
       if (!level) {
-        throw new Error('Income level not found');
+        throw new Error(`Income level with ID ${id} not found`);
       }
       return level;
     } catch (error) {
@@ -42,9 +56,14 @@ class IncomeLevelRepository {
   // Update an income level by ID
   static async update(id, data) {
     try {
+      // Validate if the ID is valid
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        throw new Error('Invalid ID format');
+      }
+
       const updatedLevel = await IncomeLevel.findByIdAndUpdate(id, data, { new: true });
       if (!updatedLevel) {
-        throw new Error('Income level not found for update');
+        throw new Error(`Income level with ID ${id} not found for update`);
       }
       return updatedLevel;
     } catch (error) {
@@ -56,9 +75,14 @@ class IncomeLevelRepository {
   // Delete an income level by ID
   static async delete(id) {
     try {
+      // Validate if the ID is valid
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        throw new Error('Invalid ID format');
+      }
+
       const deletedLevel = await IncomeLevel.findByIdAndDelete(id);
       if (!deletedLevel) {
-        throw new Error('Income level not found for deletion');
+        throw new Error(`Income level with ID ${id} not found for deletion`);
       }
       return deletedLevel;
     } catch (error) {

@@ -64,12 +64,15 @@ const serviceSchema = new mongoose.Schema({
     }
   },
   status: {
-    type: String,
-    enum: ['pending', 'completed', 'failed', 'in-progress'],
-    default: 'pending' // Default status is 'pending'
-  }
-}, {
-  timestamps: true // This will add createdAt and updatedAt timestamps
+    type: Boolean, // Corrected to Boolean type (capital B)
+    default: true // Default status is true
+  },
+  ServiceId: { type: Number, default: () => Math.floor(100000 + Math.random() * 900000), unique: true },
+
+  
+},
+ {
+  timestamps: true // Automatically adds 'createdAt' and 'updatedAt' fields
 });
 
 const Service = mongoose.model('Service', serviceSchema);
