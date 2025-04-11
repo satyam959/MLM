@@ -2,7 +2,6 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser'; // Optional, as express.json() might suffice
-import userRoutes from './Routes/UserRoutes.mjs';
 import royaltyRoutes from './Routes/royaltyRoutes.mjs';
 import permissionRoutes from './Routes/permissionRoutes.mjs';
 import rankRoutes from './Routes/RankRoutes.mjs';
@@ -35,6 +34,8 @@ app.use('/api', permissionRoutes);
 app.use('/api', rankRoutes);
 // Define the routes for user, role, and service management
 
+
+// Define the routes for user, role, and service management
 app.use('/api', roleRoutes);    // Role routes
 app.use('/api', servicesRoutes); // Service routes (this is where servicesRoutes should be imported)
 app.use('/api1', incomeLeveleRoutes);
