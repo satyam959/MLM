@@ -9,7 +9,12 @@ class UserRepository {
       if (existingUser) {
         throw new Error('Email is already in use');
       }
-      
+
+      // Generate a referral code if it's not provided
+      if (!userData.referralCode) {
+        userData.referralCode = generateReferralCode();
+      }
+
       // Create a new user instance
       const user = new UserModel(userData);
 
@@ -44,6 +49,14 @@ class UserRepository {
   // Update user details
   static async updateUser(userId, updateData) {
     try {
+      // If you want to update the referral code, ensure it's unique
+      if (updateData.referralCode) {
+        const existingReferral = await UserModel.findOne({ referralCode: updateData.referralCode });
+        if (existingReferral) {
+          throw new Error('Referral code must be unique');
+        }
+      }
+
       // Update the user by ID with the provided data
       const updatedUser = await UserModel.findByIdAndUpdate(userId, updateData, { new: true });
       if (!updatedUser) {
@@ -80,5 +93,19 @@ class UserRepository {
     }
   }
 }
+
+function generateReferralCode() {
+  // Generate a random 8-character long referral code
+  let referralCode = Math.random().toString(36).substr(2, 8).toUpperCase();
+
+  // Ensure the referral code has exactly 8 characters (if the random string is too short)
+  while (referralCode.length < 8) {
+    referralCode = Math.random().toString(36).substr(2, 8).toUpperCase();
+  }
+
+  // Return the referral code
+  return referralCode;
+}
+ 
 
 export default UserRepository;

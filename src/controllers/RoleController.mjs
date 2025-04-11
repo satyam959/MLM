@@ -35,7 +35,7 @@ class RoleController {
   // Get a role by ID
   async getRoleById(req, res) {
     try {
-      const role = await roleRepository.getRoleById(req.params.id);
+      const role = await roleRepository.getRoleById(req.params.roleId);
       res.status(200).json(role); // Return the role
     } catch (err) {
       res.status(400).json({ error: err.message });
