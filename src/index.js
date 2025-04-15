@@ -11,7 +11,8 @@ import incomeLeveleRoutes from './Routes/IncomeLevelRoutes.mjs'
 import servicesRoutes from './Routes/ServicesRoutes.mjs'; 
 import RolePermissionRoutes from './Routes/RolePermissionRoutes.mjs'
 import RewardsRoutes from './Routes/RewardsRoutes.mjs';
-import TypeIncome from './Routes/TypeIncomeRoutes.mjs'
+import TypeIncome from './Routes/TypeIncomeRoutes.mjs';
+import TransactionRoutes from './Routes/TransactionRoutes.mjs'
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true, useUnifiedTopol
 app.use('/api', royaltyRoutes);
 app.use('/api', permissionRoutes);
 app.use('/api', rankRoutes);
+app.use('/api',TransactionRoutes);
 // Define the routes for user, role, and service management
 
 // Define the routes for user, role, and service management
