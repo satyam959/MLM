@@ -1,34 +1,53 @@
-import Service from '../Models/ServicesModel.mjs';
+import Service from '../Models/ServicesModel.mjs';  // Importing the Service model
 
-class ServicesRepositories {
+class ServiceRepository {
 
-// Create a new service
-async create(serviceData) {
-    const newService = new Service(serviceData);
-    return await newService.save(); // Saves the new service to the database
+  // Method to create a new Service
+  async create(serviceData) {
+    try {
+      const service = new Service(serviceData);
+      await service.save();
+      return service;
+    } catch (error) {
+      throw new Error('Error creating service');
+    }
   }
 
-  // Get all services
+  // Method to fetch all services
   async getAll() {
-    return await Service.find(); // Retrieves all services from the database
+    try {
+      return await Service.find();
+    } catch (error) {
+      throw new Error('Error fetching services');
+    }
   }
 
-  // Get a service by ID
-  async getById(id) {
-    return await Service.findById(id); // Retrieves a service by its unique ID
+  // Method to get a service by ID
+  async getById(serviceId) {
+    try {
+      return await Service.findById(serviceId);
+    } catch (error) {
+      throw new Error('Error fetching service');
+    }
   }
 
-  
-
-  // Update a service
-  async update(id, serviceData) {
-    return await Service.findByIdAndUpdate(id, serviceData, { new: true }); // Updates the service and returns the updated document
+  // Method to update a service by ID
+  async update(serviceId, updatedData) {
+    try {
+      return await Service.findByIdAndUpdate(serviceId, updatedData, { new: true });
+    } catch (error) {
+      throw new Error('Error updating service');
+    }
   }
 
-  // Delete a service
-  async delete(id) {
-    return await Service.findByIdAndDelete(id); // Deletes the service by its ID
+  // Method to delete a service by ID
+  async delete(serviceId) {
+    try {
+      return await Service.findByIdAndDelete(serviceId);
+    } catch (error) {
+      throw new Error('Error deleting service');
+    }
   }
 }
 
-export default new ServicesRepositories();
+export default new ServiceRepository();

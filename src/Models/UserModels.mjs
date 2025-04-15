@@ -54,6 +54,11 @@ const userSchema = new mongoose.Schema({
     unique: true, // Ensure that the referral code is unique
     default: '', // Default referral code value
   },
+  userId: {
+    type: Number,
+    default: () => Math.floor(100000 + Math.random() * 900000),
+    unique: true,
+  },
 });
 
 // Methods and middleware
