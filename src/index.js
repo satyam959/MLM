@@ -6,16 +6,14 @@ import royaltyRoutes from './Routes/royaltyRoutes.mjs';
 import permissionRoutes from './Routes/permissionRoutes.mjs';
 import rankRoutes from './Routes/RankRoutes.mjs';
 import userRoutes from './Routes/UserRoutes.mjs'; 
-import roleRoutes from './Routes/RoleRoutes.mjs'; 
+// import roleRoutes from './Routes/RoleRoutes.mjs'; 
+
 import incomeLeveleRoutes from './Routes/IncomeLevelRoutes.mjs'
 import servicesRoutes from './Routes/ServicesRoutes.mjs'; 
 import RolePermissionRoutes from './Routes/RolePermissionRoutes.mjs'
 import RewardsRoutes from './Routes/RewardsRoutes.mjs';
-import TypeIncome from './Routes/TypeIncomeRoutes.mjs';
+import TypeIncomeRoutes from './Routes/TypeIncomeRoutes.mjs';
 import TransactionRoutes from './Routes/TransactionRoutes.mjs'
-
-import RoleRoutes from './Routes/RoleRoutes.mjs'
-import WalletRoutes from './Routes/WalletRoutes.mjs'
 import RoleRoutes from './Routes/RoleRoutes.mjs'
 import WalletRoutes from './Routes/WalletRoutes.mjs'
 
@@ -46,10 +44,11 @@ app.use('/api',TransactionRoutes);
 app.use('/api', userRoutes);    // User routes
 app.use('/api', RoleRoutes);    // Role routes
 app.use('/api', servicesRoutes); // Service routes (this is where servicesRoutes should be imported)
-app.use('/api1', incomeLeveleRoutes);
+app.use('/api2', incomeLeveleRoutes);
 app.use('/api',RolePermissionRoutes)
 app.use('/api',RewardsRoutes)
-app.use('/api',TypeIncome)
+app.use('/api3',TypeIncomeRoutes)
+app.use('/api',WalletRoutes)
 // Start the server
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);

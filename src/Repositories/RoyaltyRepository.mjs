@@ -1,55 +1,26 @@
+import RoyaltyModel from '../Models/RoyaltyModel.mjs';
 
+const RoyaltyRepository = {
+  async find() {
+    return await RoyaltyModel.find();
+  },
 
-import royaltyRanks from '../Models/RoyaltyModel.mjs';
+  async findById(id) {
+    return await RoyaltyModel.findById(id);
+  },
 
-class RoyaltyRepository {
-  constructor() {
-    this.data = Array.isArray(royaltyRanks) ? [...royaltyRanks] : [];
-  }
+  async create(data) {
+    const royalty = new RoyaltyModel(data);
+    return await royalty.save();
+  },
 
-  async getAll() {
-    return this.data.map(({ id, dailyRoyalty }) => ({ id, dailyRoyalty }));
-  }
-
-  async getById(id) {
-    const item = this.data.find(item => item.id === id);
-    return item || null;
-  }
-
-  async create({ rank, dailyRoyalty, status }) {
-    const newId = this.data.length > 0
-      ? Math.max(...this.data.map(item => item.id)) + 1
-      : 1;
-
-    const newItem = {
-      id: newId,
-      rank,
-      dailyRoyalty,
-      status: status || 'active'
-    };
-
-    this.data.push(newItem);
-    return newItem;
-  }
-
-  async update(id, { rank, dailyRoyalty, status }) {
-    const index = this.data.findIndex(item => item.id === id);
-    if (index === -1) return null;
-
-    if (rank !== undefined) this.data[index].rank = rank;
-    if (dailyRoyalty !== undefined) this.data[index].dailyRoyalty = dailyRoyalty;
-    if (status !== undefined) this.data[index].status = status;
-
-    return this.data[index];
-  }
+  async update(id, data) {
+    return await RoyaltyModel.findByIdAndUpdate(id, data, { new: true });
+  },
 
   async delete(id) {
-    const index = this.data.findIndex(item => item.id === id);
-    if (index === -1) return null;
-
-    const deleted = this.data.splice(index, 1)[0];
-    return deleted;
+    return await RoyaltyModel.findByIdAndDelete(id);
   }
-}
+};
 
-export default new RoyaltyRepository();
+export default RoyaltyRepository;

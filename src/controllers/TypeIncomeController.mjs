@@ -1,15 +1,29 @@
-import TypeIncome from '../Models/TypeIncomeModels.mjs'
+import TypeIncome from '../Repositories/TypeIncomeRepositories.mjs'
 
 class TypeIncomeController {
-
-    // Create a new TypeIncome
+    // ✅ Create a new TypeIncome (save even if duplicate)
     async createTypeIncome(req, res) {
         try {
-            const newIncome = new TypeIncome(req.body);
-            const savedIncome = await newIncome.save();
-            res.status(201).json(savedIncome);
+            const { incomeType } = req.body;
+
+            // Check for existing entry with the same incomeType
+            const existingIncome = await TypeIncome.findOneByType(incomeType);
+
+            // Save the new income regardless of duplication
+            const newIncome = await TypeIncome.create(req.body);
+
+            if (existingIncome) {
+                
+            }
+
+            res.status(201).json({
+                message: 'TypeIncome created successfully',
+                // isDuplicate: false,
+                data: newIncome
+            });
+
         } catch (error) {
-            console.error('Error creating TypeIncome:', error); // Log the error for debugging
+            console.error('Error creating TypeIncome:', error);
             res.status(400).json({ message: error.message });
         }
     }
