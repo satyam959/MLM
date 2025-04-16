@@ -1,27 +1,26 @@
-import Permission from '../Models/PermissionModels.mjs';
+import PermissionModel from '../Models/PermissionModels.mjs';
 
-class PermissionRepository {
-   async createPermission(data) {
-    const permission = new Permission(data);
-    await permission.save();
-    return permission;
+const PermissionRepository = {
+  async find() {
+    return await PermissionModel.find();
+  },
+
+  async findById(id) {
+    return await PermissionModel.findById(id);
+  },
+
+  async create(data) {
+    const permission = new PermissionModel(data);
+    return await permission.save();
+  },
+
+  async update(id, data) {
+    return await PermissionModel.findByIdAndUpdate(id, data, { new: true });
+  },
+
+  async delete(id) {
+    return await PermissionModel.findByIdAndDelete(id);
   }
+};
 
-   async getAllPermissions() {
-    return Permission.find();
-  }
-
-  async getPermissionById(permissionId) {
-    return Permission.findOne({ permissionId: permissionId }); // Now querying by the custom field
-  }
-
-   async updatePermission(permissionId, data) {
-    return Permission.findByIdAndUpdate(permissionId,  data, { new: true });
-  }
-
-   async deletePermission(permissionId) {
-    return Permission.findByIdAndDelete(permissionId);
-  }
-}
-
-export default new PermissionRepository();
+export default PermissionRepository;

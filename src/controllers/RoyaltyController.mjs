@@ -1,4 +1,5 @@
-import RoyaltyRepository from '../Repositories/RoyaltyRepository.mjs';
+import RoyaltyModel from '../Repositories/RoyaltyRepository.mjs';
+
 
 class RoyaltyController {
   // Create a new royalty
