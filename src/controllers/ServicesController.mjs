@@ -189,6 +189,7 @@
 // export default new ServiceController();
 
 import ServiceRepository from '../Repositories/ServicesRepositories.mjs';
+import mongoose from 'mongoose';
 
 class ServiceController {
   //  Create a new Service with duplicate check
@@ -254,14 +255,14 @@ class ServiceController {
     }
   }
 
-  //  Update a specific service by ID
+  // ✅ Update a specific service by custom ID
   async updateService(req, res) {
-    const { id } = req.params;
+    const { serviceId } = req.params;
     const { serviceType, status, description } = req.body;
-
+console.log(req.body)
     try {
       const updatedService = await ServiceRepository.findByIdAndUpdate(
-        id,
+        serviceId,
         { serviceType, status, description },
         { new: true }
       );
@@ -282,13 +283,13 @@ class ServiceController {
     }
   }
 
-  //  Delete a service
+  // ✅ Delete a service by custom ID
   async deleteService(req, res) {
-    const { id } = req.params;
+    const { serviceId } = req.params;
 
     try {
-      const deletedService = await ServiceRepository.findByIdAndDelete(id);
-
+      const deletedService = await ServiceRepository.findByIdAndDelete(serviceId);
+      
       if (!deletedService) {
         return res.status(404).json({ message: 'Service not found' });
       }

@@ -72,22 +72,22 @@ const ServiceRepository = {
     return await Service.find();
   },
 
-  // ✅ Get a service by ID
-  async findById(id) {
-    return await Service.findById(id);
+  // ✅ Get a service by MongoDB ObjectId (if still used)
+  async findById(serviceId) {
+    return await Service.findById(serviceId);
   },
 
-  // ✅ Update a service by ID
-  async findByIdAndUpdate(id, updateData, options = {}) {
-    return await Service.findByIdAndUpdate(id, updateData, options);
+  async findByIdAndUpdate(serviceId, updateData, options = {}) {
+    console.log(updateData);
+    return await Service.findOneAndUpdate({ serviceId: Number(serviceId) }, updateData, options);
   },
-
-  // ✅ Delete a service by ID
-  async findByIdAndDelete(id) {
-    return await Service.findByIdAndDelete(id);
+  
+  async findByIdAndDelete(serviceId) {
+    return await Service.findOneAndDelete({ serviceId: Number(serviceId) });
   },
+  
 
-  // ✅ Check if serviceType already exists
+  
   async findOneByType(serviceType) {
     return await Service.findOne({ serviceType });
   }
