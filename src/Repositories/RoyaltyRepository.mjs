@@ -1,53 +1,71 @@
-import RoyaltyModel from '../Models/RoyaltyModel.mjs';
+// src/repositories/RoyaltyRepository.mjs
+
+import Royalty from '../models/RoyaltyModel.mjs'; // Adjust path if needed
 
 class RoyaltyRepository {
-  constructor() {
-    this.data = Array.isArray(royaltyRanks) ? [...royaltyRanks] : [];
+  // Create a new royalty record
+  static async create(data) {
+    try {
+      const royalty = new Royalty(data);
+      await royalty.save();
+      return royalty;
+    } catch (error) {
+      console.error('Error creating royalty:', error);
+      throw new Error('Error creating royalty: ' + error.message);
+    }
   }
 
-  async getAll() {
-    return this.data.map(({ id, dailyRoyalty }) => ({ id, dailyRoyalty }));
+  // Get all royalty records
+  static async findAll() {
+    try {
+      return await Royalty.find();
+    } catch (error) {
+      console.error('Error fetching royalty records:', error);
+      throw new Error('Error fetching royalty records: ' + error.message);
+    }
   }
 
-  async getById(id) {
-    const item = this.data.find(item => item.id === id);
-    return item || null;
+  // Find a royalty record by ID
+  static async findById(id) {
+    try {
+      const royalty = await Royalty.findById(id);
+      if (!royalty) {
+        throw new Error('Royalty record not found');
+      }
+      return royalty;
+    } catch (error) {
+      console.error('Error finding royalty by ID:', error);
+      throw new Error('Error finding royalty: ' + error.message);
+    }
   }
 
-  async create({ rank, dailyRoyalty, status }) {
-    const newId = this.data.length > 0
-      ? Math.max(...this.data.map(item => item.id)) + 1
-      : 1;
-
-    const newItem = {
-      id: newId,
-      rank,
-      dailyRoyalty,
-      status: status || 'active'
-    };
-
-    this.data.push(newItem);
-    return newItem;
+  // Update a royalty record by ID
+  static async update(id, data) {
+    try {
+      const updated = await Royalty.findByIdAndUpdate(id, data, { new: true });
+      if (!updated) {
+        throw new Error('Royalty record not found for update');
+      }
+      return updated;
+    } catch (error) {
+      console.error('Error updating royalty:', error);
+      throw new Error('Error updating royalty: ' + error.message);
+    }
   }
 
-  async update(id, { rank, dailyRoyalty, status }) {
-    const index = this.data.findIndex(item => item.id === id);
-    if (index === -1) return null;
-
-    if (rank !== undefined) this.data[index].rank = rank;
-    if (dailyRoyalty !== undefined) this.data[index].dailyRoyalty = dailyRoyalty;
-    if (status !== undefined) this.data[index].status = status;
-
-    return this.data[index];
+  // Delete a royalty record by ID
+  static async delete(id) {
+    try {
+      const deleted = await Royalty.findByIdAndDelete(id);
+      if (!deleted) {
+        throw new Error('Royalty record not found for deletion');
+      }
+      return deleted;
+    } catch (error) {
+      console.error('Error deleting royalty:', error);
+      throw new Error('Error deleting royalty: ' + error.message);
+    }
   }
-
-  async delete(id) {
-    const index = this.data.findIndex(item => item.id === id);
-    if (index === -1) return null;
-
-    const deleted = this.data.splice(index, 1)[0];
-    return deleted;
-  }
-};
+}
 
 export default RoyaltyRepository;
