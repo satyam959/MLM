@@ -1,4 +1,4 @@
-import RoyaltyModel from '../Models/RoyaltyModel.mjs';
+import RoyaltyModel from '../Repositories/RoyaltyRepository.mjs';
 
 class RoyaltyController {
   // GET all

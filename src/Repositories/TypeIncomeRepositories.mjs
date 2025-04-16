@@ -1,32 +1,37 @@
 import TypeIncome from '../Models/TypeIncomeModels.mjs';
 
-class TypeIncomeRepository {
+const TypeIncomeRepository = {
+  // Create new income type
+  async create(data) {
+    const newType = new TypeIncome(data);
+    return await newType.save();
+  },
 
-    // Create a new TypeIncome
-    async create(data) {
-        const newIncome = new TypeIncome(data);
-        return await newIncome.save();
-    }
+  // Find all
+  async find() {
+    return await TypeIncome.find();
+  },
 
-    // Get all TypeIncomes
-    async getAll() {
-        return await TypeIncome.find();
-    }
+  //  Find by ID
+  async findById(id) {
+    return await TypeIncome.findById(id);
+  },
 
-    // Get a TypeIncome by ID
-    async getById(id) {
-        return await TypeIncome.findById(id);
-    }
+  //  Update by ID
+  async findByIdAndUpdate(id, updateData, options = {}) {
+    return await TypeIncome.findByIdAndUpdate(id, updateData, options);
+  },
 
-    // Update a TypeIncome by ID
-    async updateById(id, data) {
-        return await TypeIncome.findByIdAndUpdate(id, data, { new: true });
-    }
+  //  Delete by ID
+  async findByIdAndDelete(id) {
+    return await TypeIncome.findByIdAndDelete(id);
+  },
 
-    // Delete a TypeIncome by ID
-    async deleteById(id) {
-        return await TypeIncome.findByIdAndDelete(id);
-    }
-}
+  //  Find by incomeType
+  async findOneByType(incomeType) {
+    return await TypeIncome.findOne({ incomeType });
+  }
 
-export default new TypeIncomeRepository();
+};
+
+export default TypeIncomeRepository;
