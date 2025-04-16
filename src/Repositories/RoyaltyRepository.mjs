@@ -1,54 +1,56 @@
-
-
-import royaltyRanks from '../Models/RoyaltyModel.mjs';
+import Royalty from '../models/RoyaltyModel.mjs';
 
 class RoyaltyRepository {
-  constructor() {
-    this.data = Array.isArray(royaltyRanks) ? [...royaltyRanks] : [];
+  // Create a new royalty
+  async create(data) {
+    try {
+      const royalty = new Royalty(data);
+      return await royalty.save();
+    } catch (error) {
+      throw new Error(`Failed to create royalty: ${error.message}`);
+    }
   }
 
-  async getAll() {
-    return this.data.map(({ id, dailyRoyalty }) => ({ id, dailyRoyalty }));
+  // Get all royalties
+  async findAll() {
+    try {
+      return await Royalty.find();
+    } catch (error) {
+      throw new Error(`Failed to fetch royalties: ${error.message}`);
+    }
   }
 
-  async getById(id) {
-    const item = this.data.find(item => item.id === id);
-    return item || null;
+  // Get royalty by ID
+  async findById(id) {
+    try {
+      const royalty = await Royalty.findById(id);
+      if (!royalty) throw new Error('Royalty not found');
+      return royalty;
+    } catch (error) {
+      throw new Error(`Failed to fetch royalty: ${error.message}`);
+    }
   }
 
-  async create({ rank, dailyRoyalty, status }) {
-    const newId = this.data.length > 0
-      ? Math.max(...this.data.map(item => item.id)) + 1
-      : 1;
-
-    const newItem = {
-      id: newId,
-      rank,
-      dailyRoyalty,
-      status: status || 'active'
-    };
-
-    this.data.push(newItem);
-    return newItem;
+  // Update royalty
+  async update(id, data) {
+    try {
+      const updated = await Royalty.findByIdAndUpdate(id, data, { new: true });
+      if (!updated) throw new Error('Royalty not found');
+      return updated;
+    } catch (error) {
+      throw new Error(`Failed to update royalty: ${error.message}`);
+    }
   }
 
-  async update(id, { rank, dailyRoyalty, status }) {
-    const index = this.data.findIndex(item => item.id === id);
-    if (index === -1) return null;
-
-    if (rank !== undefined) this.data[index].rank = rank;
-    if (dailyRoyalty !== undefined) this.data[index].dailyRoyalty = dailyRoyalty;
-    if (status !== undefined) this.data[index].status = status;
-
-    return this.data[index];
-  }
-
+  // Delete royalty
   async delete(id) {
-    const index = this.data.findIndex(item => item.id === id);
-    if (index === -1) return null;
-
-    const deleted = this.data.splice(index, 1)[0];
-    return deleted;
+    try {
+      const deleted = await Royalty.findByIdAndDelete(id);
+      if (!deleted) throw new Error('Royalty not found');
+      return deleted;
+    } catch (error) {
+      throw new Error(`Failed to delete royalty: ${error.message}`);
+    }
   }
 }
 

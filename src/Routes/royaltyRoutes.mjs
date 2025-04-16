@@ -3,10 +3,11 @@ import RoyaltyController from '../controllers/RoyaltyController.mjs';
 
 const router = express.Router();
 
-router.get('/getAllRoyalty', RoyaltyController.getAll);
-router.get('/getRoyaltyById/:id', RoyaltyController.getById);
-router.post('/createRoyalty', RoyaltyController.create);
-router.put('/updateRoyalty/:id', RoyaltyController.update);
-router.delete('/deleteRoyalty/:id', RoyaltyController.delete);
+// Routes for royalty
+router.post('/createRoyalty', RoyaltyController.create);          // Create a new royalty
+router.get('/getAllRoyalty', RoyaltyController.findAll);          // Get all royalties
+router.get('/getRoyaltyById:id', RoyaltyController.findById);      // Get royalty by ID
+router.put('/updateRoyaltyById:id', RoyaltyController.update);        // Update royalty
+router.delete('/deleteRoyaltyById:id', RoyaltyController.delete);     // Delete royalty
 
 export default router;

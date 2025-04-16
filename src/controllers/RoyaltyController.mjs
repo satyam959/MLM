@@ -1,64 +1,55 @@
-import RoyaltyModel from '../Models/RoyaltyModel.mjs';
+import RoyaltyRepository from '../Repositories/RoyaltyRepository.mjs';
 
 class RoyaltyController {
-  // GET all
-  async getAll(req, res) {
+  // Create a new royalty
+  static async create(req, res) {
     try {
-      const data = await RoyaltyModel.find();
-      res.json(data);
-    } catch (err) {
-      res.status(500).json({ message: 'Server Error', error: err.message });
+      const newRoyalty = await RoyaltyRepository.create(req.body);
+      res.status(201).json(newRoyalty);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
     }
   }
 
-  // GET by ID
-  async getById(req, res) {
+  // Get all royalties
+  static async findAll(req, res) {
     try {
-      const data = await RoyaltyModel.findById(req.params.id);
-      if (!data) return res.status(404).json({ message: 'Rank not found' });
-      res.json(data);
-    } catch (err) {
-      res.status(500).json({ message: 'Server Error', error: err.message });
+      const royalties = await RoyaltyRepository.findAll();
+      res.status(200).json(royalties);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
   }
 
-  // CREATE
-  async create(req, res) {
+  // Get a royalty by ID
+  static async findById(req, res) {
     try {
-      const { rank, dailyRoyalty,  } = req.body;
-      if (!rank || dailyRoyalty == null) {
-        return res.status(400).json({ message: 'rank and dailyRoyalty are required' });
-      }
-
-      const newRoyalty = new RoyaltyModel({ rank, dailyRoyalty,  });
-      const saved = await newRoyalty.save();
-      res.status(201).json(saved);
-    } catch (err) {
-      res.status(500).json({ message: 'Server Error', error: err.message });
+      const royalty = await RoyaltyRepository.findById(req.params.id);
+      res.status(200).json(royalty);
+    } catch (error) {
+      res.status(404).json({ error: error.message });
     }
   }
 
-  // UPDATE
-  async update(req, res) {
+  // Update a royalty
+  static async update(req, res) {
     try {
-      const updated = await RoyaltyModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
-      if (!updated) return res.status(404).json({ message: 'Rank not found' });
-      res.json(updated);
-    } catch (err) {
-      res.status(500).json({ message: 'Server Error', error: err.message });
+      const updatedRoyalty = await RoyaltyRepository.update(req.params.id, req.body);
+      res.status(200).json(updatedRoyalty);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
     }
   }
 
-  // DELETE
-  async delete(req, res) {
+  // Delete a royalty
+  static async delete(req, res) {
     try {
-      const deleted = await RoyaltyModel.findByIdAndDelete(req.params.id);
-      if (!deleted) return res.status(404).json({ message: 'Rank not found' });
-      res.json({ message: 'Deleted successfully', data: deleted });
-    } catch (err) {
-      res.status(500).json({ message: 'Server Error', error: err.message });
+      const deletedRoyalty = await RoyaltyRepository.delete(req.params.id);
+      res.status(200).json(deletedRoyalty);
+    } catch (error) {
+      res.status(404).json({ error: error.message });
     }
   }
 }
 
-export default new RoyaltyController();
+export default RoyaltyController;
