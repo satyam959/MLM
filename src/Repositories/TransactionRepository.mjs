@@ -24,10 +24,10 @@ class TransactionRepository {
     }
   }
 
-  // Find transaction by ID          
-  static async findById(id) {
+  // Find transaction by ID
+  static async findById(transactionId) {
     try {
-      const transaction = await Transaction.findById(id);
+      const transaction = await Transaction.findById(transactionId);
       if (!transaction) {
         throw new Error('Transaction not found');
       }
@@ -39,9 +39,9 @@ class TransactionRepository {
   }
 
   // Update a transaction by ID
-  static async update(id, data) {
+  static async update(transactionId, data) {
     try {
-      const updated = await Transaction.findByIdAndUpdate(id, data, { new: true });
+      const updated = await Transaction.findByIdAndUpdate(transactionId, data, { new: true });
       if (!updated) {
         throw new Error('Transaction not found for update');
       }
@@ -53,9 +53,9 @@ class TransactionRepository {
   }
 
   // Delete a transaction by ID
-  static async delete(id) {
+  static async delete(transactionId) {
     try {
-      const deleted = await Transaction.findByIdAndDelete(id);
+      const deleted = await Transaction.findByIdAndDelete(transactionId);
       if (!deleted) {
         throw new Error('Transaction not found for deletion');
       }

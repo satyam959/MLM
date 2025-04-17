@@ -148,7 +148,7 @@ class WalletController {
   // Get wallet by ID
   static async getById(req, res) {
     try {
-      const wallet = await WalletRepository.findById(req.params.id);
+      const wallet = await WalletRepository.findById(req.params.walletId);
       if (!wallet) {
         return res.status(404).json({ message: 'Wallet not found' });
       }
@@ -171,7 +171,7 @@ class WalletController {
         return res.status(400).json({ message: 'Valid balance is required for update' });
       }
 
-      const updated = await WalletRepository.update(req.params.id, { balance: parsedBalance });
+      const updated = await WalletRepository.update(req.params.walletId, { balance: parsedBalance });
 
       if (!updated) {
         return res.status(404).json({ message: 'Wallet not found' });
@@ -192,7 +192,7 @@ class WalletController {
   // Delete wallet
   static async delete(req, res) {
     try {
-      const deleted = await WalletRepository.delete(req.params.id);
+      const deleted = await WalletRepository.delete(req.params.walletId);
 
       if (!deleted) {
         return res.status(404).json({ message: 'Wallet not found' });
