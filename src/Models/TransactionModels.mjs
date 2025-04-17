@@ -19,11 +19,6 @@ const transactionSchema = new mongoose.Schema({
         enum: ['pending', 'success', 'failed'],
         default: 'pending'
     },
-    transactionType: {
-        type: String,
-        enum: ['credit', 'debit'],
-        required: true
-      },
     transactionId: {
         type: String,
         default: () => uuidv4(), 
