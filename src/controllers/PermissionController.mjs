@@ -34,10 +34,10 @@ class PermissionController {
   }
 
   static async updatePermission(req, res) {
-    const { id } = req.params;
+    const { permissionId } = req.params;
     const { name, description } = req.body;
     try {
-      const updatedPermission = await PermissionRepository.update(id, { name, description });
+      const updatedPermission = await PermissionRepository.update(permissionId, { name, description });
       if (!updatedPermission) {
         return res.status(404).json({ message: 'Permission not found' });
       }
@@ -48,9 +48,9 @@ class PermissionController {
   }
 
   static async deletePermission(req, res) {
-    const { id } = req.params;
+    const { permissionId } = req.params;
     try {
-      const deletedPermission = await PermissionRepository.delete(id);
+      const deletedPermission = await PermissionRepository.delete(permissionId);
       if (!deletedPermission) {
         return res.status(404).json({ message: 'Permission not found' });
       }

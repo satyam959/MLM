@@ -1,4 +1,4 @@
-import RankRepository from '../repositories/RankRepository.mjs';
+import RankRepository from '../Repositories/RankRepository.mjs';
 
 class RankController {
   // Create a new rank
@@ -44,7 +44,7 @@ class RankController {
   // Update a rank
   static async update(req, res) {
     try {
-      const updatedRank = await RankRepository.update(req.params.id, req.body);
+      const updatedRank = await RankRepository.update(req.params.rankId, req.body);
       res.status(200).json(updatedRank);
     } catch (error) {
       res.status(400).json({ error: error.message });
@@ -54,7 +54,7 @@ class RankController {
   // Delete a rank
   static async delete(req, res) {
     try {
-      const deletedRank = await RankRepository.delete(req.params.id);
+      const deletedRank = await RankRepository.delete(req.params.rankId);
       res.status(200).json(deletedRank);
     } catch (error) {
       res.status(404).json({ error: error.message });

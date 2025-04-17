@@ -18,13 +18,13 @@ class RewardRepository {
   }
 
   // Update reward by ID
-  async update(id, data) {
+  async update(rewardId, data) {
     return await Reward.findByIdAndUpdate(id, data, { new: true });
   }
 
   // Delete reward by ID
-  async remove(id) {
-    return await Reward.findByIdAndDelete(id);
+  async remove(rewardId) {
+    return await Reward.findByIdAndDelete(rewardId);
   }
 }
 

@@ -21,7 +21,7 @@ const IncomeLevelSchema = new mongoose.Schema({
     type: Number,
     required: true, // Ensure that the level field is always provided
   },
-   incomeId: { type: Number, default: () => Math.floor(100000 + Math.random() * 900000), unique: true },
+   incomeLevelId: { type: Number, default: () => Math.floor(100000 + Math.random() * 900000), unique: true },
 
 }, {
   timestamps: true, // Automatically adds createdAt and updatedAt fields

@@ -54,14 +54,14 @@ class IncomeLevelRepository {
   }
 
   // Update an income level by ID
-  static async update(id, data) {
+  static async update(incomeLevelId, data) {
     try {
       // Validate if the ID is valid
-      if (!mongoose.Types.ObjectId.isValid(id)) {
+      if (!mongoose.Types.ObjectId.isValid(incomeLevelId)) {
         throw new Error('Invalid ID format');
       }
 
-      const updatedLevel = await IncomeLevel.findByIdAndUpdate(id, data, { new: true });
+      const updatedLevel = await IncomeLevel.findByIdAndUpdate(incomeLevelId, data, { new: true });
       if (!updatedLevel) {
         throw new Error(`Income level with ID ${id} not found for update`);
       }
@@ -73,14 +73,14 @@ class IncomeLevelRepository {
   }
 
   // Delete an income level by ID
-  static async delete(id) {
+  static async delete(incomeLevelId) {
     try {
       // Validate if the ID is valid
-      if (!mongoose.Types.ObjectId.isValid(id)) {
+      if (!mongoose.Types.ObjectId.isValid(incomeLevelId)) {
         throw new Error('Invalid ID format');
       }
 
-      const deletedLevel = await IncomeLevel.findByIdAndDelete(id);
+      const deletedLevel = await IncomeLevel.findByIdAndDelete(incomeLevelId);
       if (!deletedLevel) {
         throw new Error(`Income level with ID ${id} not found for deletion`);
       }

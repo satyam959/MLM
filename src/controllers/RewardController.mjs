@@ -40,13 +40,13 @@ async create(req, res) {
   // Update a reward by ID
   async update(req, res) {
     try {
-      const reward = await rewardRepo.update(req.params.id, req.body);
+      const reward = await rewardRepo.update(req.params.rewardId, req.body);
       if (!reward) {
         return res.status(404).json({ message: 'Reward not found' });
       }
       res.status(200).json(reward);
     } catch (error) {
-      console.error(`Error updating reward with ID ${req.params.id}:`, error);
+      console.error(`Error updating reward with ID ${req.params.rewardId}:`, error);
       res.status(400).json({ message: 'Failed to update reward', error: error.message });
     }
   }
@@ -54,13 +54,13 @@ async create(req, res) {
   // Delete a reward by ID
   async delete(req, res) {
     try {
-      const reward = await rewardRepo.remove(req.params.id);
+      const reward = await rewardRepo.remove(req.params.rewardId);
       if (!reward) {
         return res.status(404).json({ message: 'Reward not found' });
       }
       res.status(200).json({ message: 'Reward deleted successfully' });
     } catch (error) {
-      console.error(`Error deleting reward with ID ${req.params.id}:`, error);
+      console.error(`Error deleting reward with ID ${req.params.rewardId}:`, error);
       res.status(500).json({ message: 'Failed to delete reward', error: error.message });
     }
   }

@@ -1,6 +1,6 @@
 // src/repositories/RoyaltyRepository.mjs
 
-import Royalty from '../models/RoyaltyModel.mjs'; // Adjust path if needed
+import Royalty from '../Models/RoyaltyModel.mjs'; // Adjust path if needed
 
 class RoyaltyRepository {
   // Create a new royalty record
@@ -40,9 +40,9 @@ class RoyaltyRepository {
   }
 
   // Update a royalty record by ID
-  static async update(id, data) {
+  static async update(royaltyId, data) {
     try {
-      const updated = await Royalty.findByIdAndUpdate(id, data, { new: true });
+      const updated = await Royalty.findByIdAndUpdate(royaltyId, data, { new: true });
       if (!updated) {
         throw new Error('Royalty record not found for update');
       }
@@ -54,9 +54,9 @@ class RoyaltyRepository {
   }
 
   // Delete a royalty record by ID
-  static async delete(id) {
+  static async delete(royaltyId) {
     try {
-      const deleted = await Royalty.findByIdAndDelete(id);
+      const deleted = await Royalty.findByIdAndDelete(royaltyId);
       if (!deleted) {
         throw new Error('Royalty record not found for deletion');
       }

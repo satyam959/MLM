@@ -24,7 +24,7 @@ class RankRepository {
   }
 
   // Find a rank by ID
-  static async findById(id) {
+  static async findById(rankId) {
     try {
       const rank = await Rank.findById(id);
       if (!rank) {
@@ -52,9 +52,9 @@ class RankRepository {
   }
 
   // Update a rank by ID
-  static async update(id, data) {
+  static async update(rankId, data) {
     try {
-      const updated = await Rank.findByIdAndUpdate(id, data, { new: true });
+      const updated = await Rank.findByIdAndUpdate(rankId, data, { new: true });
       if (!updated) {
         throw new Error('Rank not found for update');
       }
@@ -66,9 +66,9 @@ class RankRepository {
   }
 
   // Delete a rank by ID
-  static async delete(id) {
+  static async delete(rankId) {
     try {
-      const deleted = await Rank.findByIdAndDelete(id);
+      const deleted = await Rank.findByIdAndDelete(rankId);
       if (!deleted) {
         throw new Error('Rank not found for deletion');
       }

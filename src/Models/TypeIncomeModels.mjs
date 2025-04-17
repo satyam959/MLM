@@ -5,7 +5,7 @@ const TypeIncomeSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    incomeId: {
+    incomeTypeId: {
         type: Number,
         default: () => Math.floor(100000 + Math.random() * 900000),
         unique: true

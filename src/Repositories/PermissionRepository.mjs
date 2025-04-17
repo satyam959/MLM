@@ -14,12 +14,12 @@ const PermissionRepository = {
     return await permission.save();
   },
 
-  async update(id, data) {
-    return await PermissionModel.findByIdAndUpdate(id, data, { new: true });
+  async update(permissionId, data) {
+    return await PermissionModel.findByIdAndUpdate(permissionId, data, { new: true });
   },
 
-  async delete(id) {
-    return await PermissionModel.findByIdAndDelete(id);
+  async delete(permissionId) {
+    return await PermissionModel.findByIdAndDelete(permissionId);
   }
 };
 
