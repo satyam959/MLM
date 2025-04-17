@@ -24,7 +24,7 @@ class TransactionController {
   // Get a transaction by ID
   static async findById(req, res) {
     try {
-      const transaction = await TransactionRepository.findById(req.params.id);
+      const transaction = await TransactionRepository.findById(req.params.transactionId);
       res.status(200).json(transaction);
     } catch (error) {
       res.status(404).json({ error: error.message });
@@ -34,7 +34,7 @@ class TransactionController {
   // Update a transaction
   static async update(req, res) {
     try {
-      const updatedTransaction = await TransactionRepository.update(req.params.id, req.body);
+      const updatedTransaction = await TransactionRepository.update(req.params.transactionId, req.body);
       res.status(200).json(updatedTransaction);
     } catch (error) {
       res.status(400).json({ error: error.message });
@@ -44,7 +44,7 @@ class TransactionController {
   // Delete a transaction
   static async delete(req, res) {
     try {
-      const deletedTransaction = await TransactionRepository.delete(req.params.id);
+      const deletedTransaction = await TransactionRepository.delete(req.params.transactionId);
       res.status(200).json(deletedTransaction);
     } catch (error) {
       res.status(404).json({ error: error.message });

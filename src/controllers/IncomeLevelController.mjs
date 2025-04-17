@@ -70,7 +70,7 @@ class IncomeLevelController {
     async update(req, res) {
         try {
             const { income, team, status, level } = req.body;
-            const { incomeLevelId} = req.params;
+            const { incomeId} = req.params;
 
             // Ensure all required fields are provided
             if (!income || !team || !status || level === undefined || level === null) {
@@ -79,7 +79,7 @@ class IncomeLevelController {
 
             const total = income * team;
 
-            const updatedIncomeLevel = await IncomeLevelRepository.update(incomeLevelId, { income, team, status, total, level });
+            const updatedIncomeLevel = await IncomeLevelRepository.update(incomeId, { income, team, status, total, level });
 
             if (!updatedIncomeLevel) return res.status(404).json({ message: 'Income Level not found' });
 
@@ -93,7 +93,7 @@ class IncomeLevelController {
     // Delete income level by ID
     async delete(req, res) {
         try {
-            const deletedIncomeLevel = await IncomeLevelRepository.delete(req.params.incomeLevelId);
+            const deletedIncomeLevel = await IncomeLevelRepository.delete(req.params.incomeId);
             if (!deletedIncomeLevel) return res.status(404).json({ message: 'Income Level not found' });
             res.json({ message: 'Income Level deleted successfully' });
         } catch (error) {

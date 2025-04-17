@@ -5,8 +5,8 @@ const WalletRepository = {
     return await Wallet.find();
   },
 
-  async findById(id) {
-    return await Wallet.findById(id);
+  async findById(walletId) {
+    return await Wallet.findById(walletId);
   },
 
   async create(data) {
@@ -14,12 +14,12 @@ const WalletRepository = {
     return await wallet.save();
   },
 
-  async update(id, data) {
-    return await Wallet.findByIdAndUpdate(id, data, { new: true });
+  async update(walletId, data) {
+    return await Wallet.findByIdAndUpdate(walletId, data, { new: true });
   },
 
-  async delete(id) {
-    return await Wallet.findByIdAndDelete(id);
+  async delete(walletId) {
+    return await Wallet.findByIdAndDelete(walletId);
   }
 };
 

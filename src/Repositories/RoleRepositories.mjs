@@ -47,10 +47,10 @@ class RoleRepository {
   }
 
   // Update a role by ID
-  async updateRoleById(id, name, permissions = []) {
+  async updateRoleById(roleId, name, permissions = []) {
     try {
       const updatedRole = await Role.findByIdAndUpdate(
-        id, 
+        roleId, 
         { name, permissions },  // Update name and permissions
         { new: true }  // Return the updated role
       );
@@ -64,9 +64,9 @@ class RoleRepository {
   }
 
   // Delete a role by ID
-  async deleteRoleById(id) {
+  async deleteRoleById(roleId) {
     try {
-      const deletedRole = await Role.findByIdAndDelete(id);
+      const deletedRole = await Role.findByIdAndDelete(roleId);
       if (!deletedRole) {
         throw new Error('Role not found');
       }

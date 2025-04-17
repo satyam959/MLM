@@ -42,7 +42,7 @@ class TypeIncomeController {
     // Get a specific TypeIncome by ID
     async getTypeIncomeById(req, res) {
         try {
-            const income = await TypeIncome.findById(req.params.id);
+            const income = await TypeIncome.findById(req.params.incomeId);
             if (!income) {
                 return res.status(404).json({ message: 'TypeIncome not found' });
             }
@@ -56,7 +56,7 @@ class TypeIncomeController {
     // Update a TypeIncome by ID
     async updateTypeIncome(req, res) {
         try {
-            const updatedIncome = await TypeIncome.findByIdAndUpdate(req.params.incomeTypeId, req.body, { new: true });
+            const updatedIncome = await TypeIncome.findByIdAndUpdate(req.params.incomeId, req.body, { new: true });
             if (!updatedIncome) {
                 return res.status(404).json({ message: 'TypeIncome not found' });
             }
@@ -70,7 +70,7 @@ class TypeIncomeController {
     // Delete a TypeIncome by ID
     async deleteTypeIncome(req, res) {
         try {
-            const deletedIncome = await TypeIncome.findByIdAndDelete(req.params.incomeTypeId);
+            const deletedIncome = await TypeIncome.findByIdAndDelete(req.params.incomeId);
             if (!deletedIncome) {
                 return res.status(404).json({ message: 'TypeIncome not found' });
             }

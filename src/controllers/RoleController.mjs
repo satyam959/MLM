@@ -51,7 +51,7 @@ class RoleController {
         return res.status(400).json({ error: 'Role name is required' });
       }
 
-      const updatedRole = await roleRepository.updateRoleById(req.params.id, name);
+      const updatedRole = await roleRepository.updateRoleById(req.params.roleId, name);
       res.status(200).json(updatedRole); // Return the updated role
     } catch (err) {
       res.status(400).json({ error: err.message });
@@ -61,7 +61,7 @@ class RoleController {
   // Delete a role by ID
   async deleteRole(req, res) {
     try {
-      const deletedRole = await roleRepository.deleteRoleById(req.params.id);
+      const deletedRole = await roleRepository.deleteRoleById(req.params.roleId);
       res.status(200).json({ message: 'Role deleted successfully', role: deletedRole });
     } catch (err) {
       res.status(400).json({ error: err.message });

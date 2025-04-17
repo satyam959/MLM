@@ -13,23 +13,23 @@ const TypeIncomeRepository = {
   },
 
   //  Find by ID
-  async findById(id) {
-    return await TypeIncome.findById(id);
+  async findById(incomeId) {
+    return await TypeIncome.findById(incomeId);
   },
 
   //  Update by ID
-  async findByIdAndUpdate(incomeTypeId, updateData, options = {}) {
-    return await TypeIncome.findByIdAndUpdate(incomeTypeId, updateData, options);
+  async findByIdAndUpdate(incomeId, updateData, options = {}) {
+    return await TypeIncome.findByIdAndUpdate(incomeId, updateData, options);
   },
 
   //  Delete by ID
-  async findByIdAndDelete(id) {
-    return await TypeIncome.findByIdAndDelete(incomeTypeId);
+  async findByIdAndDelete(incomeId) {
+    return await TypeIncome.findByIdAndDelete(incomeId);
   },
 
   //  Find by incomeType
-  async findOneByType(incomeTypeId) {
-    return await TypeIncome.findOne({ incomeTypeId});
+  async findOneByType(incomeId) {
+    return await TypeIncome.findOne({ incomeId});
   }
 
 };

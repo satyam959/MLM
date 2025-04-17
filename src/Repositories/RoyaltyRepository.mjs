@@ -26,9 +26,9 @@ class RoyaltyRepository {
   }
 
   // Find a royalty record by ID
-  static async findById(id) {
+  static async findById(royaltyId) {
     try {
-      const royalty = await Royalty.findById(id);
+      const royalty = await Royalty.findById(royaltyId);
       if (!royalty) {
         throw new Error('Royalty record not found');
       }

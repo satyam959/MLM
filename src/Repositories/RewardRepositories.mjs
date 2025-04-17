@@ -7,8 +7,8 @@ class RewardRepository {
   }
 
   // Get reward by ID
-  async getById(id) {
-    return await Reward.findById(id);
+  async getById(rewardId) {
+    return await Reward.findById(rewardId);
   }
 
   // Create new reward
@@ -19,7 +19,7 @@ class RewardRepository {
 
   // Update reward by ID
   async update(rewardId, data) {
-    return await Reward.findByIdAndUpdate(id, data, { new: true });
+    return await Reward.findByIdAndUpdate(rewardId, data, { new: true });
   }
 
   // Delete reward by ID
