@@ -13,7 +13,8 @@ class TransactionRepository {
     }
   }
 
-  // Get all transactions
+  // Get all transactions      
+
   static async findAll() {
     try {
       return await Transaction.find();
@@ -23,7 +24,7 @@ class TransactionRepository {
     }
   }
 
-  // Find transaction by ID
+  // Find transaction by ID          
   static async findById(id) {
     try {
       const transaction = await Transaction.findById(id);

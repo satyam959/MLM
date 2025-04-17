@@ -18,10 +18,10 @@ class TransactionController {
       res.status(200).json(transactions);
     } catch (error) {
       res.status(500).json({ error: error.message });
-    }
+    } 
   }
 
-  // Get a transaction by ID
+  // Get a transaction by ID   
   static async findById(req, res) {
     try {
       const transaction = await TransactionRepository.findById(req.params.id);
