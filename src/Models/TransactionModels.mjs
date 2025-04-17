@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import { v4 as uuidv4 } from 'uuid';
 
 const transactionSchema = new mongoose.Schema({
     linkableId: {
@@ -23,17 +22,18 @@ const transactionSchema = new mongoose.Schema({
         type: String,
         enum: ['credit', 'debit'],
         required: true
-      },
+    },
     transactionId: {
-        type: String,
-        default: () => uuidv4(), 
+        type: Number,
+        default: () => Math.floor(100000 + Math.random() * 900000), // 6-digit number
         unique: true
     },
-    response: { type: mongoose.Schema.Types.Mixed },
+    response: { 
+        type: String 
+    }
 }, {
     timestamps: true,
 });
-
 
 const Transaction = mongoose.model('Transaction', transactionSchema);
 
