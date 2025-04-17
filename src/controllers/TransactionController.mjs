@@ -2,13 +2,17 @@ import TransactionRepository from '../Repositories/TransactionRepository.mjs';
 
 class TransactionController {
   // Create a new transaction
-  static async create(req, res) {
-    try {
-      const newTransaction = await TransactionRepository.create(req.body);
-      res.status(201).json(newTransaction);
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
+static async create(req, res) {
+  try {
+    const newTransaction = await TransactionRepository.create(req.body);
+    res.status(201).json({
+      message: 'Transaction successfully created',
+      data: newTransaction
+    });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+
   }
 
   // Get all transactions
