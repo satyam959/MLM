@@ -114,8 +114,8 @@ import mongoose from 'mongoose';
 class UserController {
   // User Registration
   async registerUser(req, res) {
-    const { name, fullName, email, phone, address, password, role } = req.body;
-    const newUser = { name, fullName, email, phone, address, password, role };
+    const { name, fullName, email, phone, address, password, role,companyName } = req.body;
+    const newUser = { name, fullName, email, phone, address, password, role,companyName };
 
     try {
       const existingUser = await UserRepository.findUserByEmail(email);
@@ -203,67 +203,64 @@ class UserController {
       res.status(500).json({ message: 'Error deleting user', error: error.message });
     }
   }
+ // Get user profile by userId
+async getUserProfile(req, res) {
+  const { userId } = req.params;
 
-
-
-  async createProfile(req, res) {
-    const {userId} = req.params.userId?.trim();
-    const profileData = req.body;
-
-    try {
-      const user = await UserRepository.findUserByUserId(userId);
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-
-      const updatedUser = await UserRepository.updateUserByUserId(userId, profileData);
-      res.status(201).json({ message: 'Profile created successfully', profile: updatedUser });
-    } catch (error) {
-      res.status(500).json({ message: 'Error creating profile', error: error.message });
+  try {
+    const user = await UserRepository.findUserByUserId(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
     }
+
+    // Exclude password before returning
+    const { password, ...safeUserData } = user.toObject();
+
+    res.status(200).json({
+      message: 'User profile fetched successfully',
+      user: safeUserData
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Error fetching user profile',
+      error: error.message
+    });
   }
+}
 
-  
+// Update user profile by userId
+async updateProfile(req, res) {
+  const { userId } = req.params;
+  const updateData = req.body;
 
-
-  // Edit Profile
-  async editProfile(req, res) {
-    const { userId } = req.params;
-    const updatedProfile = req.body;
-
-    try {
-      const user = await UserRepository.updateUser(userId, updatedProfile);
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-
-      res.status(200).json({ message: 'Profile updated successfully', profile: user });
-    } catch (error) {
-      res.status(500).json({ message: 'Error updating profile', error: error.message });
+  try {
+    const updatedUser = await UserRepository.updateUserByUserId(userId, updateData);
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
     }
+
+    const { password, ...safeUserData } = updatedUser.toObject();
+    res.status(200).json({ message: 'Profile updated successfully', user: safeUserData });
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating profile', error: error.message });
   }
+}
+// Delete user profile by userId
+async deleteProfile(req, res) {
+  const { userId } = req.params;
 
-  // Delete Profile (clear user info but keep account)
-  async deleteProfile(req, res) {
-    const { userId } = req.params;
-
-    const emptyProfile = {
-      fullName: '',
-      phone: '',
-      address: '',
-    };
-
-    try {
-      const user = await UserRepository.updateUser(userId, emptyProfile);
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-
-      res.status(200).json({ message: 'Profile deleted successfully' });
-    } catch (error) {
-      res.status(500).json({ message: 'Error deleting profile', error: error.message });
+  try {
+    const deletedUser = await UserRepository.deleteUserByUserId(userId);
+    if (!deletedUser) {
+      return res.status(404).json({ message: 'User not found' });
     }
+
+    res.status(200).json({ message: 'Profile deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error deleting profile', error: error.message });
   }
+}
+
 }
 
 export default new UserController();

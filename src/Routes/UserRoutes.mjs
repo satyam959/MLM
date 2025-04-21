@@ -1,6 +1,6 @@
 // Routes/userRoutes.mjs
 import express from 'express';
-import UserController from '../Controllers/UserController.mjs';
+import UserController from '../controllers/UserController.mjs';
 
 const router = express.Router();
 
@@ -19,8 +19,14 @@ router.put('/updateByUserId/:userId', UserController.updateUser);
 // Route to delete user by ID
 router.delete('/deleteByUserId/:userId', UserController.deleteUser);
 
-// Route for Create Profile
-router.post('/createProfile/:userId', UserController.createProfile);
+// Route for Get Profile
+router.get('/getProfile/:userId', UserController.getUserProfile);
+
+// Update Profile
+router.put('/updateProfile/:userId', UserController.updateProfile);
+
+//Delete Profile
+router.delete('/deleteProfile/:userId', UserController.deleteProfile);
 
 
 export default router;
