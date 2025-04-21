@@ -19,4 +19,8 @@ router.put('/updateByUserId/:userId', UserController.updateUser);
 // Route to delete user by ID
 router.delete('/deleteByUserId/:userId', UserController.deleteUser);
 
+// Route for Create Profile
+router.post('/createProfile/:userId', UserController.createProfile);
+
+
 export default router;

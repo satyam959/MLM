@@ -36,15 +36,11 @@ class UserRepository {
     }
   }
 
-  // Find a user by ID
-  static async findUserById(userId) {
-    try {
-      return await UserModel.findById(userId);
-    } catch (error) {
-      console.error('Error finding user by ID:', error.message);
-      throw new Error(`Failed to find user by ID: ${error.message}`);
-    }
-  }
+
+//  async updateUserByUserId(userId, updateData) {
+//    return await User.findOneAndUpdate({ userId: userId }, updateData, { new: true });
+//  }
+
 
   // Update user details
   static async updateUser(userId, updateData) {
@@ -92,7 +88,28 @@ class UserRepository {
       throw new Error(`Failed to fetch users: ${error.message}`);
     }
   }
-}
+
+
+  static async findUserByUserId(userId) {
+    try {
+      return await UserModel.findOne({ userId: userId }); // assuming userId is a custom field
+    } catch (error) {
+      console.error('Error finding user by userId:', error.message);
+      throw new Error(`Failed to find user by userId: ${error.message}`);
+    }
+  }
+  
+  static async updateUserByUserId(userId, updateData) {
+    try {
+      return await UserModel.findOneAndUpdate({ userId: userId }, updateData, { new: true });
+    } catch (error) {
+      console.error('Error updating user by userId:', error.message);
+      throw new Error(`Failed to update user by userId: ${error.message}`);
+    }
+  }
+}  
+
+
 
 function generateReferralCode() {
   // Generate a random 8-character long referral code
@@ -106,6 +123,7 @@ function generateReferralCode() {
   // Return the referral code
   return referralCode;
 }
+
  
 
 export default UserRepository;
