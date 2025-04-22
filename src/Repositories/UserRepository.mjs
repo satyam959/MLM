@@ -98,6 +98,15 @@ class UserRepository {
       throw new Error(`Failed to find user by userId: ${error.message}`);
     }
   }
+  // Find a user by referral code
+  static async findUserByReferralCode(referralCode) {
+    try {
+      return await UserModel.findOne({ referralCode });
+    } catch (error) {
+      console.error('Error finding user by referral code:', error.message);
+      throw new Error(`Failed to find user by referral code: ${error.message}`);
+    }
+  }
   
   static async updateUserByUserId(userId, updateData) {
     try {
@@ -112,8 +121,6 @@ class UserRepository {
   }
 }
 
-
-
 function generateReferralCode() {
   // Generate a random 8-character long referral code
   let referralCode = Math.random().toString(36).substr(2, 8).toUpperCase();
@@ -125,7 +132,9 @@ function generateReferralCode() {
 
   // Return the referral code
   return referralCode;
+
 }
+
 
  
 

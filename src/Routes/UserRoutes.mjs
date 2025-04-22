@@ -28,5 +28,9 @@ router.put('/updateProfile/:userId', UserController.updateProfile);
 //Delete Profile
 router.delete('/deleteProfile/:userId', UserController.deleteProfile);
 
+//Get user by referralCode
+router.get('/getReferral/:referralCode', UserController.getUserByReferralCode);
+
+
 
 export default router;

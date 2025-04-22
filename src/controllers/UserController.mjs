@@ -173,21 +173,22 @@ class UserController {
     }
   }
 
-  // Update user by ID
-  async updateUser(req, res) {
-    const { userId } = req.params;
-    const updateData = req.body;
+  // Update user by userId (custom field)
+async updateUser(req, res) {
+  const { userId } = req.params;
+  const updateData = req.body;
 
-    try {
-      const updatedUser = await UserRepository.updateUser(userId, updateData);
-      if (!updatedUser) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-      res.status(200).json({ message: 'User updated successfully', updatedUser });
-    } catch (error) {
-      res.status(500).json({ message: 'Error updating user', error: error.message });
+  try {
+    const updatedUser = await UserRepository.updateUserByUserId(userId, updateData);
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
     }
+    res.status(200).json({ message: 'User updated successfully', updatedUser });
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating user', error: error.message });
   }
+}
+
 
   // Delete user by ID
   async deleteUser(req, res) {
@@ -258,6 +259,26 @@ async deleteProfile(req, res) {
     res.status(200).json({ message: 'Profile deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Error deleting profile', error: error.message });
+  }
+}
+
+
+async getUserByReferralCode(req, res) {
+  const { referralCode } = req.params;
+
+  try {
+    const user = await UserRepository.findUserByReferralCode(referralCode);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found with this referral code' });
+    }
+
+    const { password, ...safeUserData } = user.toObject();
+    res.status(200).json({
+      message: 'User fetched successfully by referral code',
+      user: safeUserData
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching user by referral code', error: error.message });
   }
 }
 
