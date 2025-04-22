@@ -18,14 +18,11 @@ const transactionSchema = new mongoose.Schema({
         enum: ['pending', 'success', 'failed'],
         default: 'pending'
     },
-<<<<<<< HEAD
-=======
     transactionType: {
         type: String,
         enum: ['credit', 'debit'],
         required: true
     },
->>>>>>> d63d6cfb5c8d2b0207bd66b274796c3ac361309d
     transactionId: {
         type: Number,
         default: () => Math.floor(100000 + Math.random() * 900000), // 6-digit number
