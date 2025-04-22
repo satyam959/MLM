@@ -16,6 +16,7 @@ import TypeIncomeRoutes from './Routes/TypeIncomeRoutes.mjs';
 import TransactionRoutes from './Routes/TransactionRoutes.mjs'
 import RoleRoutes from './Routes/RoleRoutes.mjs'
 import WalletRoutes from './Routes/WalletRoutes.mjs'
+import BankRoutes from './Routes/BankAccountRoutes.mjs'
 
 dotenv.config();
 
@@ -49,6 +50,7 @@ app.use('/api',RolePermissionRoutes)
 app.use('/api',RewardsRoutes)
 app.use('/api3',TypeIncomeRoutes)
 app.use('/api',WalletRoutes)
+app.use('/api',BankRoutes)
 // Start the server
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
