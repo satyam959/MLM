@@ -190,20 +190,21 @@ async updateUser(req, res) {
 }
 
 
-  // Delete user by ID
-  async deleteUser(req, res) {
-    const { userId } = req.params;
+  // Delete user by custom userId
+async deleteUser(req, res) {
+  const { userId } = req.params;
 
-    try {
-      const deletedUser = await UserRepository.deleteUser(userId);
-      if (!deletedUser) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-      res.status(200).json({ message: 'User deleted successfully' });
-    } catch (error) {
-      res.status(500).json({ message: 'Error deleting user', error: error.message });
+  try {
+    const deletedUser = await UserRepository.deleteUserByUserId(userId);
+    if (!deletedUser) {
+      return res.status(404).json({ message: 'User not found' });
     }
+    res.status(200).json({ message: 'User deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error deleting user', error: error.message });
   }
+}
+
  // Get user profile by userId
 async getUserProfile(req, res) {
   const { userId } = req.params;
