@@ -45,19 +45,23 @@ const userSchema = new mongoose.Schema({
     default: '',  // Default role is User
   },
   status: {
-    type: Boolean, // Corrected to Boolean (capital B)
-    default: true, // Default status is true
+    type: Boolean, 
+    default: true, 
   },
   referralCode: {
     type: String,
-    required: false, // Make it optional unless you want to enforce that all users must have one
-    unique: true, // Ensure that the referral code is unique
-    default: '', // Default referral code value
+    required: false, 
+    unique: true, 
+    default: '', 
   },
   userId: {
     type: Number,
     default: () => Math.floor(100000 + Math.random() * 900000),
     unique: true,
+  },
+  companyName: {
+    type: String,
+    required: true,
   },
 });
 
@@ -76,14 +80,13 @@ userSchema.pre('save', async function (next) {
   }
   // Generate a unique referral code if it's not set
   if (!this.referralCode) {
-    this.referralCode = generateReferralCode(); // Add your referral code generation logic here
+    this.referralCode = generateReferralCode(); 
   }
   next();
 });
 
 function generateReferralCode() {
-  // Implement a function that generates a unique referral code, for example:
-  return Math.random().toString(36).substr(2, 8).toUpperCase(); // Generates a random string of 8 characters
+  return Math.random().toString(36).substr(2, 8).toUpperCase(); 
 }
 
 const UserModel = mongoose.model('User', userSchema);

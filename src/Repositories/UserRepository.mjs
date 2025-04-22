@@ -107,7 +107,10 @@ class UserRepository {
       throw new Error(`Failed to update user by userId: ${error.message}`);
     }
   }
-}  
+  static async deleteUserByUserId(userId) {
+    return await UserModel.findOneAndDelete({ userId });
+  }
+}
 
 
 
