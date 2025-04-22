@@ -9,11 +9,14 @@ const rewardSchema = new mongoose.Schema({
     type: Boolean,
     default: true  // By default, the status is 'active' (true)
   },
-  rewardId: { type: Number, default: () => Math.floor(100000 + Math.random() * 900000), unique: true },
 
-});
-
-{ timestamps: true }   // Automatically adds 'createdAt' and 'updatedAt' fields
+  // Ensure rewardId is generated correctly
+  rewardId: { 
+    type: Number, 
+    default: () => Math.floor(100000 + Math.random() * 900000), 
+    unique: true 
+  },
+}, { timestamps: true });
 
 const Reward = mongoose.model('Reward', rewardSchema);
 export default Reward;

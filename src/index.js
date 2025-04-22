@@ -47,7 +47,7 @@ app.use('/api', RoleRoutes);    // Role routes
 app.use('/api', servicesRoutes); // Service routes (this is where servicesRoutes should be imported)
 app.use('/api2', incomeLeveleRoutes);
 app.use('/api',RolePermissionRoutes)
-app.use('/api',RewardsRoutes)
+app.use('/api5',RewardsRoutes)
 app.use('/api3',TypeIncomeRoutes)
 app.use('/api',WalletRoutes)
 app.use('/api',BankRoutes)

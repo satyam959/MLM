@@ -1,80 +1,49 @@
 import Role from '../Models/RoleModels.mjs';
-import RolePermission from '../Models/RolePermissionModel.mjs';
 
-class RoleRepository {
+const roleRepository = {
   // Create a new role
   async createRole(name, permissions = []) {
-    try {
-      // Check if the role already exists
-      const existingRole = await Role.findOne({ name });
-      if (existingRole) {
-        throw new Error('Role already exists');
-      }
-
-      // Create a new role with permissions (optional)
-      const newRole = new Role({
-        name,
-        permissions,  // Permissions array can be passed here
-      });
-
-      await newRole.save();
-      return newRole;
-    } catch (error) {
-      throw new Error(`Error creating role: ${error.message}`);
-    }
-  }
+    const newRole = new Role({
+      name,
+      permissions,
+    });
+    return await newRole.save();
+  },
 
   // Get all roles
   async getAllRoles() {
-    try {
-      return await Role.find();
-    } catch (error) {
-      throw new Error(`Error fetching roles: ${error.message}`);
-    }
-  }
+    return await Role.find();
+  },
 
-  // Get a role by ID
+  // Get a role by custom roleId
   async getRoleById(roleId) {
-    try {
- const role = await Role.findOne({ roleId: Number(roleId) });
-      if (!role) {
-        throw new Error('Role not found');
-      }
-      return role;
-    } catch (error) {
-      throw new Error(`Error fetching role by ID: ${error.message}`);
+    const parsedId = parseInt(roleId);
+    if (isNaN(parsedId)) {
+      throw new Error('Invalid roleId');
     }
-  }
+    return await Role.findOne({ roleId: parsedId });
+  },
 
-  // Update a role by ID
-  async updateRoleById(roleId, name, permissions = []) {
-    try {
-      const updatedRole = await Role.findByIdAndUpdate(
-        roleId, 
-        { name, permissions },  // Update name and permissions
-        { new: true }  // Return the updated role
-      );
-      if (!updatedRole) {
-        throw new Error('Role not found');
-      }
-      return updatedRole;
-    } catch (error) {
-      throw new Error(`Error updating role: ${error.message}`);
+  // Update a role by custom roleId
+  async updateRole(roleId, updateData) {
+    const parsedId = parseInt(roleId);
+    if (isNaN(parsedId)) {
+      throw new Error('Invalid roleId');
     }
-  }
+    return await Role.findOneAndUpdate({ roleId: parsedId }, updateData, {
+      new: true,
+      runValidators: true,
+    });
+  },
 
-  // Delete a role by ID
-  async deleteRoleById(roleId) {
-    try {
-      const deletedRole = await Role.findByIdAndDelete(roleId);
-      if (!deletedRole) {
-        throw new Error('Role not found');
-      }
-      return deletedRole;
-    } catch (error) {
-      throw new Error(`Error deleting role: ${error.message}`);
+  // Delete a role by custom roleId
+  async deleteRole(roleId) {
+    const parsedId = parseInt(roleId);
+    if (isNaN(parsedId)) {
+      throw new Error('Invalid roleId');
     }
+    return await Role.findOneAndDelete({ roleId: parsedId });
   }
-}
+};
 
-export default new RoleRepository();
+export default roleRepository;
