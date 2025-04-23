@@ -7,15 +7,15 @@ const router = express.Router();
 router.post('/createBankAccount', BankController.createBank);
 
 // Get all bank accounts
-router.get('/', BankController.getAllBanks);
+router.get('/getAllBanks', BankController.getAllBanks);
 
 // Get a bank account by userId
-router.get('/:userId', BankController.getBankById);
+router.get('/getBankById/:userId', BankController.getBankById);
 
 // Update a bank account by userId
-router.put('/:userId', BankController.updateBank);
+router.put('/updateBank/:userId', BankController.updateBank);
 
 // Delete a bank account by userId
-router.delete('/:userId', BankController.deleteBank);
+router.delete('/deleteBank/:userId', BankController.deleteBank);
 
 export default router;
