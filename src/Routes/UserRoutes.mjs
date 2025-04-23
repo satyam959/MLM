@@ -11,7 +11,7 @@ router.post('/register', UserController.registerUser);
 router.post('/login', UserController.loginUser);
 
 // Admin route to get all users
-router.get('/getAlluser', UserController.getAllUsers);
+router.get('/getAllusers', UserController.getAllUsers);
 
 // Route to update user by ID
 router.put('/updateByUserId/:userId', UserController.updateUser);
