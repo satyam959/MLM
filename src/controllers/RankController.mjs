@@ -41,25 +41,50 @@ class RankController {
 //     }
 //   }
 
-  // Update a rank
-  static async update(req, res) {
-    try {
-      const updatedRank = await RankRepository.update(req.params.rankId, req.body);
-      res.status(200).json(updatedRank);
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
-  }
+  /// Update a rank
+static async update(req, res) {
+  try {
+    const updatedRank = await RankRepository.update(req.params.rankId, req.body);
 
-  // Delete a rank
-  static async delete(req, res) {
-    try {
-      const deletedRank = await RankRepository.delete(req.params.rankId);
-      res.status(200).json(deletedRank);
-    } catch (error) {
-      res.status(404).json({ error: error.message });
+    if (!updatedRank) {
+      return res.status(404).json({
+        message: 'Rank not found. Update failed.',
+      });
     }
+
+    res.status(200).json({
+      message: 'Rank updated successfully.',
+      data: updatedRank,
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: 'Failed to update rank.',
+      error: error.message,
+    });
   }
+}
+
+// Delete a rank
+static async delete(req, res) {
+  try {
+    const deletedRank = await RankRepository.delete(req.params.rankId);
+
+    if (!deletedRank) {
+      return res.status(404).json({
+        message: 'Rank not found. Deletion failed.',
+      });
+    }
+
+    res.status(200).json({
+      message: 'Rank deleted successfully.',
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Failed to delete rank.',
+      error: error.message,
+    });
+  }
+}
 }
 
 export default RankController;

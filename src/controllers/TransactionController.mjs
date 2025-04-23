@@ -36,24 +36,49 @@ static async create(req, res) {
   }
 
   // Update a transaction
-  static async update(req, res) {
-    try {
-      const updatedTransaction = await TransactionRepository.update(req.params.transactionId, req.body);
-      res.status(200).json(updatedTransaction);
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
-  }
+static async update(req, res) {
+  try {
+    const updatedTransaction = await TransactionRepository.update(req.params.transactionId, req.body);
 
-  // Delete a transaction
-  static async delete(req, res) {
-    try {
-      const deletedTransaction = await TransactionRepository.delete(req.params.transactionId);
-      res.status(200).json(deletedTransaction);
-    } catch (error) {
-      res.status(404).json({ error: error.message });
+    if (!updatedTransaction) {
+      return res.status(404).json({
+        message: 'Transaction not found. Update failed.',
+      });
     }
+
+    res.status(200).json({
+      message: 'Transaction updated successfully.',
+      data: updatedTransaction,
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: 'Failed to update transaction.',
+      error: error.message,
+    });
   }
+}
+
+// Delete a transaction
+static async delete(req, res) {
+  try {
+    const deletedTransaction = await TransactionRepository.delete(req.params.transactionId);
+
+    if (!deletedTransaction) {
+      return res.status(404).json({
+        message: 'Transaction not found. Deletion failed.',
+      });
+    }
+
+    res.status(200).json({
+      message: 'Transaction deleted successfully.',
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Failed to delete transaction.',
+      error: error.message,
+    });
+  }
+}
 }
 
 export default TransactionController;
