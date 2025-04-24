@@ -36,30 +36,59 @@ mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true, useUnifiedTopol
         console.error('Error connecting to MongoDB:', error);
     });
 
+// // User Management Routes
+// app.use('/api', userRoutes);
+// app.use('/api', RoleRoutes);    
+// app.use('/api', RolePermissionRoutes);
+
+// // Financial Routes
+// app.use('/api', TransactionRoutes);
+// app.use('/api', WalletRoutes);
+// app.use('/api', BankRoutes);
+// app.use('/api', incomeLeveleRoutes);
+// app.use('/api', TypeIncomeRoutes);
+
+// // Plan Management Routes
+// app.use('/api', PlanRoutes);
+
+// // UserPlan Routes
+// app.use('/api', UserPlanRoutes);
+
+// // Service and Rewards Routes
+// app.use('/api', servicesRoutes);
+// app.use('/api', RewardsRoutes);
+
+// // Permissions and Ranking
+// app.use('/api', permissionRoutes);
+// app.use('/api', rankRoutes);
+// app.use('/api', royaltyRoutes);
 // User Management Routes
-app.use('/api', userRoutes);
-app.use('/api', RoleRoutes);    
-app.use('/api', RolePermissionRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/roles', RoleRoutes);    
+app.use('/api/role-permissions', RolePermissionRoutes);
 
 // Financial Routes
-app.use('/api', TransactionRoutes);
-app.use('/api', WalletRoutes);
-app.use('/api', BankRoutes);
-app.use('/api', incomeLeveleRoutes);
-app.use('/api', TypeIncomeRoutes);
+app.use('/api/transactions', TransactionRoutes);
+app.use('/api/wallets', WalletRoutes);
+app.use('/api/banks', BankRoutes);
+app.use('/api/income-levels', incomeLeveleRoutes);
+app.use('/api/income-types', TypeIncomeRoutes);
 
 // Plan Management Routes
-app.use('/api', PlanRoutes);
-app.use('/api', UserPlanRoutes);
+app.use('/api/plans', PlanRoutes);
+
+// User Plan Routes
+app.use('/api/user-plans', UserPlanRoutes);
 
 // Service and Rewards Routes
-app.use('/api', servicesRoutes);
-app.use('/api', RewardsRoutes);
+app.use('/api/services', servicesRoutes);
+app.use('/api/rewards', RewardsRoutes);
 
 // Permissions and Ranking
-app.use('/api', permissionRoutes);
-app.use('/api', rankRoutes);
-app.use('/api', royaltyRoutes);
+app.use('/api/permissions', permissionRoutes);
+app.use('/api/ranks', rankRoutes);
+app.use('/api/royalties', royaltyRoutes);
+
 
 
 

@@ -7,7 +7,7 @@ const router = express.Router();
 router.post('/createUserplans', userPlanController.create);
 
 // Get all user plans
-router.get('/userplans', userPlanController.getAll);
+router.get('/getAlluserplans', userPlanController.getAll);
 
 // Get user plan by userId
 router.get('/userplans/:userId', userPlanController.getById);
