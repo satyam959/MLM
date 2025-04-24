@@ -17,6 +17,8 @@ import TransactionRoutes from './Routes/TransactionRoutes.mjs'
 import RoleRoutes from './Routes/RoleRoutes.mjs'
 import WalletRoutes from './Routes/WalletRoutes.mjs'
 import BankRoutes from './Routes/BankAccountRoutes.mjs'
+import PlanRoutes from './Routes/PlanRoutes.mjs'
+import UserPlanRoutes from './Routes/UserPlanRoutes.mjs'
 
 dotenv.config();
 
@@ -42,15 +44,20 @@ app.use('/api',TransactionRoutes);
 // Define the routes for user, role, and service management
 
 // Define the routes for user, role, and service management
-app.use('/api9', userRoutes);    // User routes
+app.use('/api', userRoutes);    // User routes
 app.use('/api', RoleRoutes);    // Role routes
 app.use('/api', servicesRoutes); // Service routes (this is where servicesRoutes should be imported)
-app.use('/api2', incomeLeveleRoutes);
+app.use('/api', incomeLeveleRoutes);
 app.use('/api',RolePermissionRoutes)
-app.use('/api5',RewardsRoutes)
-app.use('/api3',TypeIncomeRoutes)
+app.use('/api',RewardsRoutes)
+app.use('/api',TypeIncomeRoutes)
 app.use('/api',WalletRoutes)
 app.use('/api',BankRoutes)
+app.use('/api',PlanRoutes)
+app.use('/api',UserPlanRoutes)
+
+
+
 // Start the server
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
