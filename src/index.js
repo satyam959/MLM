@@ -36,25 +36,30 @@ mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true, useUnifiedTopol
         console.error('Error connecting to MongoDB:', error);
     });
 
-// Use user routes
-app.use('/api', royaltyRoutes);
+// User Management Routes
+app.use('/api', userRoutes);
+app.use('/api', RoleRoutes);    
+app.use('/api', RolePermissionRoutes);
+
+// Financial Routes
+app.use('/api', TransactionRoutes);
+app.use('/api', WalletRoutes);
+app.use('/api', BankRoutes);
+app.use('/api', incomeLeveleRoutes);
+app.use('/api', TypeIncomeRoutes);
+
+// Plan Management Routes
+app.use('/api', PlanRoutes);
+app.use('/api', UserPlanRoutes);
+
+// Service and Rewards Routes
+app.use('/api', servicesRoutes);
+app.use('/api', RewardsRoutes);
+
+// Permissions and Ranking
 app.use('/api', permissionRoutes);
 app.use('/api', rankRoutes);
-app.use('/api',TransactionRoutes);
-// Define the routes for user, role, and service management
-
-// Define the routes for user, role, and service management
-app.use('/api', userRoutes);    // User routes
-app.use('/api', RoleRoutes);    // Role routes
-app.use('/api', servicesRoutes); // Service routes (this is where servicesRoutes should be imported)
-app.use('/api', incomeLeveleRoutes);
-app.use('/api',RolePermissionRoutes)
-app.use('/api',RewardsRoutes)
-app.use('/api',TypeIncomeRoutes)
-app.use('/api',WalletRoutes)
-app.use('/api',BankRoutes)
-app.use('/api',PlanRoutes)
-app.use('/api',UserPlanRoutes)
+app.use('/api', royaltyRoutes);
 
 
 
