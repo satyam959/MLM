@@ -31,6 +31,12 @@ router.delete('/deleteProfile/:userId', UserController.deleteProfile);
 //Get user by referralCode
 router.get('/getReferral/:referralCode', UserController.getUserByReferralCode);
 
+//  get user upline
+router.get('/getUserUpline/:userId', UserController.getUserUpline);
+
+// get user downline
+router.get('/getUserDownline/:userId', UserController.getUserDownline);
+
 
 
 export default router;

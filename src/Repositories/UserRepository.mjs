@@ -9,23 +9,24 @@ class UserRepository {
       if (existingUser) {
         throw new Error('Email is already in use');
       }
-
+  
       // Generate a referral code if it's not provided
       if (!userData.referralCode) {
         userData.referralCode = generateReferralCode();
       }
-
-      // Create a new user instance
-      const user = new UserModel(userData);
-
+  
+      // Create the user instance (don't override referredBy if it exists)
+      const newUser = new UserModel(userData);
+  
       // Save the new user to the database
-      return await user.save();
+      return await newUser.save();
+      
     } catch (error) {
-      console.error('Error creating user:', error.message); // Log the error
+      console.error('Error creating user:', error.message);
       throw new Error(`User creation failed: ${error.message}`);
     }
   }
-
+  
   // Find a user by email
   static async findUserByEmail(email) {
     try {
@@ -119,6 +120,27 @@ class UserRepository {
   static async deleteUserByUserId(userId) {
     return await UserModel.findOneAndDelete({ userId });
   }
+
+  static async getUserUplines(userId, hierarchy) {
+    try {
+      const uplines = await UserModel.find({ userId: { $in: hierarchy } }).select('name');
+      return uplines;
+    } catch (error) {
+      console.error('Error fetching upline names:', error.message);
+      throw new Error(`Error fetching upline names: ${error.message}`);
+    }
+  }
+
+  static async getUserDownlines(userId, hierarchy) {
+    try {
+      const downlines = await UserModel.find({ hierarchy: userId }).select('name');
+      return downlines;
+    } catch (error) {
+      console.error('Error fetching downline :', error.message);
+      throw new Error(`Error fetching downline : ${error.message}`);
+    }
+  }
+  
 }
 
 function generateReferralCode() {
@@ -134,8 +156,5 @@ function generateReferralCode() {
   return referralCode;
 
 }
-
-
- 
 
 export default UserRepository;

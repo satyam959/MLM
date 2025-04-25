@@ -7,7 +7,7 @@ const router = express.Router();
 router.get('/all', IncomeLevelController.getAllIncome);
 router.get('/:id', IncomeLevelController.getById);
 router.post('/createIncomeLevel', IncomeLevelController.create);
-router.put('/:id', IncomeLevelController.update);
-router.delete('/:id', IncomeLevelController.delete);
+router.put('/update/:incomeId', IncomeLevelController.update);
+router.delete('/delete/:id', IncomeLevelController.delete);
 
 export default router;
