@@ -121,6 +121,7 @@
 
 import TypeIncomeRepository from '../Repositories/TypeIncomeRepositories.mjs';
 // import TypeIncome from '../Repositories/TypeIncomeRepositories.mjs'; // Correct path
+import mongoose from 'mongoose';
 
 class TypeIncomeController {
     
@@ -184,33 +185,61 @@ class TypeIncomeController {
         }
     }
 
-    // Update a TypeIncome by ID
+    
+
     async updateTypeIncome(req, res) {
         try {
-            const updatedIncome = await TypeIncome.findByIdAndUpdate(req.params.incomeId, req.body, { new: true });
-            if (!updatedIncome) {
-                return res.status(404).json({ message: 'TypeIncome not found' });
-            }
-            res.status(200).json(updatedIncome);
+          const { incomeId } = req.params;
+          const { incomeType } = req.body;
+      
+          if (!incomeType || typeof incomeType !== 'string') {
+            return res.status(400).json({ message: 'incomeType is required and must be a valid string.' });
+          }
+      
+          const updatedIncome = await TypeIncomeRepository.updateByIncomeId(
+            incomeId,
+            { incomeType },
+            { new: true }
+          );
+      
+          if (!updatedIncome) {
+            return res.status(404).json({ message: 'TypeIncome not found' });
+          }
+      
+          res.status(200).json({
+            message: 'TypeIncome updated successfully',
+            data: updatedIncome
+          });
         } catch (error) {
-            console.error('Error updating TypeIncome:', error);
-            res.status(400).json({ message: error.message });
+          console.error('Error updating TypeIncome:', error);
+          res.status(400).json({ message: error.message });
         }
-    }
+      }
+      
+    
+  
 
-    // Delete a TypeIncome by ID
+    /// Delete TypeIncome
     async deleteTypeIncome(req, res) {
         try {
-            const deletedIncome = await TypeIncome.findByIdAndDelete(req.params.incomeId);
-            if (!deletedIncome) {
-                return res.status(404).json({ message: 'TypeIncome not found' });
-            }
-            res.status(200).json({ message: 'TypeIncome deleted successfully' });
+          const { incomeId } = req.params;
+      
+          const deletedIncome = await TypeIncomeRepository.deleteByIncomeId(incomeId);
+      
+          if (!deletedIncome) {
+            return res.status(404).json({ message: 'TypeIncome not found' });
+          }
+      
+          res.status(200).json({
+            message: 'TypeIncome deleted successfully'
+          });
         } catch (error) {
-            console.error('Error deleting TypeIncome:', error);
-            res.status(400).json({ message: error.message });
+          console.error('Error deleting TypeIncome:', error);
+          res.status(400).json({ message: error.message });
         }
-    }
+      }
+      
+  
 }
 
 export default new TypeIncomeController();
