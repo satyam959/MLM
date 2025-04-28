@@ -1,22 +1,34 @@
 import mongoose from 'mongoose';
 
 const rewardSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  reward: { type: String, required: true },
-  value: { type: String },
-
+  rank: {
+    type: String,
+    required: true,  
+  },
+  equivalentRank: {
+    type: String,
+    required: true,  
+  },
+  benefits: {
+    type: String,
+    required: true,  
+  },
   status: {
-    type: Boolean,
-    default: true  // By default, the status is 'active' (true)
+    type: String,
+    enum: ['active', 'inactive'],
+    default: 'active' 
   },
 
-  // Ensure rewardId is generated correctly
+
+  
   rewardId: { 
-    type: Number, 
+    type: String, 
     default: () => Math.floor(100000 + Math.random() * 900000), 
-    unique: true 
+    unique: true ,
+    required: true,
   },
 }, { timestamps: true });
 
 const Reward = mongoose.model('Reward', rewardSchema);
+
 export default Reward;

@@ -84,6 +84,7 @@ app.use('/api/user-plans', UserPlanRoutes);
 app.use('/api/services', servicesRoutes);
 app.use('/api/rewards', RewardsRoutes);
 
+
 // Permissions and Ranking
 app.use('/api/permissions', permissionRoutes);
 app.use('/api/ranks', rankRoutes);
