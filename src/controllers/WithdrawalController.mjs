@@ -2,33 +2,33 @@ import WalletRepository from '../Repositories/WalletRepositories.mjs';
 
 class WithdrawalController {
 
-  // Deposit amount to Wallet
-  async deposit(req, res) {
-    try {
-      const { walletId, amount } = req.body;
-
-      if (!walletId || !amount) {
-        return res.status(400).json({ message: 'walletId and amount are required.' });
+    async deposit(req, res) {
+        try {
+          const { walletId, amount } = req.body;
+      
+          if (!walletId || typeof amount !== 'number') {
+            return res.status(400).json({ message: 'walletId and numeric amount are required.' });
+          }
+      
+          let wallet = await WalletRepository.findByWalletId(walletId);
+      
+          if (!wallet) {
+            wallet = await WalletRepository.createWallet({ walletId, balance: 0 });
+          }
+      
+          const newBalance = Number(wallet.balance) + Number(amount);
+      
+          const updatedWallet = await WalletRepository.updateBalance(walletId, newBalance);
+      
+          res.status(200).json({
+            message: 'Amount deposited successfully.',
+            wallet: updatedWallet,
+          });
+        } catch (error) {
+          res.status(500).json({ message: error.message });
+        }
       }
-
-      let wallet = await WalletRepository.findByWalletId(walletId);
-
-      if (!wallet) {
-       
-        wallet = await WalletRepository.createWallet({ walletId, balance: 0 });
-      }
-
-      const newBalance = wallet.balance + amount;
-      const updatedWallet = await WalletRepository.updateBalance(walletId, newBalance);
-
-      res.status(200).json({
-        message: 'Amount deposited successfully.',
-        wallet: updatedWallet,
-      });
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  }
+      
 
   // Withdraw amount from Wallet
   async withdraw(req, res) {

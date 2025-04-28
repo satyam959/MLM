@@ -55,9 +55,9 @@ const WalletRepository = {
   },
 
   async createWallet(walletData) {
-    return await Wallet.create(walletData);     // ✅ WalletModel → Wallet
+    const wallet = new Wallet(walletData);
+    return await wallet.save();
   },
-
   async updateBalance(walletId, newBalance) {
     return await Wallet.findOneAndUpdate(       // ✅ WalletModel → Wallet
       { walletId },
