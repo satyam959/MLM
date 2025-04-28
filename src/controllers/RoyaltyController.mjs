@@ -25,14 +25,21 @@ class RoyaltyController {
   
 
   // Get all Royalties
-  static async getAllRoyalties(req, res) {
-    try {
-      const royalties = await RoyaltyRepository.getAllRoyalties();
-      res.status(200).json(royalties);
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
+static async getAllRoyalties(req, res) {
+  try {
+    const royalties = await RoyaltyRepository.getAllRoyalties();
+    res.status(200).json({
+      message: 'Royalties fetched successfully',
+      data: royalties
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Error fetching royalties',
+      error: error.message
+    });
   }
+}
+
 
   // Get Royalty by ID (royaltyId)
   static async getRoyaltyById(req, res) {
@@ -55,18 +62,29 @@ class RoyaltyController {
       const { royaltyId } = req.params; // royaltyId is passed as a string or number
       const { rank, dailyRoyalty, status } = req.body;
   
-      // Find the royalty by the custom royaltyId
-      const updatedRoyalty = await RoyaltyRepository.updateRoyaltyById(royaltyId, { rank, dailyRoyalty, status });
+      // Update the royalty by the custom royaltyId
+      const updatedRoyalty = await RoyaltyRepository.updateRoyaltyById(royaltyId, {
+        rank,
+        dailyRoyalty,
+        status
+      });
   
       if (!updatedRoyalty) {
         return res.status(404).json({ message: 'Royalty not found' });
       }
   
-      res.status(200).json(updatedRoyalty);
+      res.status(200).json({
+        message: 'Royalty updated successfully',
+        data: updatedRoyalty
+      });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      res.status(500).json({
+        message: 'Error updating royalty',
+        error: error.message
+      });
     }
   }
+  
   
 
 static async deleteRoyaltyById(req, res) {
