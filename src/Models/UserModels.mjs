@@ -276,7 +276,15 @@ const userSchema = new mongoose.Schema({
   hierarchy:{
     type: [Number],
     default: null
-  }
+  },
+  lavel:{
+    type:Number,
+    default:null
+  },
+  membership:{
+    type:Number,
+    default:0
+  },
 
 });
 

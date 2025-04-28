@@ -1,89 +1,110 @@
 import RoyaltyRepository from '../Repositories/RoyaltyRepository.mjs';
 
-
 class RoyaltyController {
- // Create a new royalty
-static async create(req, res) {
-  try {
-    const newRoyalty = await RoyaltyRepository.create(req.body);
-
-    res.status(201).json({
-      message: 'Royalty created successfully.',
-      data: newRoyalty,
-    });
-  } catch (error) {
-    res.status(400).json({
-      message: 'Failed to create royalty.',
-      error: error.message,
-    });
-  }
-}
-
-
-  // Get all royalties
-  static async findAll(req, res) {
+  
+  // Create a new Royalty
+  static async createRoyalty(req, res) {
     try {
-      const royalties = await RoyaltyRepository.findAll();
-      res.status(200).json(royalties);
+      const { rank, dailyRoyalty, status } = req.body;
+  
+      // Create the new royalty document
+      const newRoyalty = await RoyaltyRepository.createRoyalty({ rank, dailyRoyalty, status });
+  
+      // Return the response with the created royalty document
+      res.status(201).json({
+        message: 'Royalty created successfully',
+        royalty: newRoyalty
+      });
     } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  }
-
-  // Get a royalty by ID
-  static async findById(req, res) {
-    try {
-      const royalty = await RoyaltyRepository.findById(req.params.id);
-      res.status(200).json(royalty);
-    } catch (error) {
-      res.status(404).json({ error: error.message });
-    }
-  }
-
-  // Update a royalty
-static async update(req, res) {
-  try {
-    const updatedRoyalty = await RoyaltyRepository.update(req.params.royaltyId, req.body);
-
-    if (!updatedRoyalty) {
-      return res.status(404).json({
-        message: 'Royalty not found. Update failed.',
+      // Return the error message if something goes wrong
+      res.status(500).json({
+        message: `Error creating royalty: ${error.message}`
       });
     }
-
-    res.status(200).json({
-      message: 'Royalty updated successfully.',
-      data: updatedRoyalty,
-    });
-  } catch (error) {
-    res.status(400).json({
-      message: 'Failed to update royalty.',
-      error: error.message,
-    });
   }
-}
+  
 
-// Delete a royalty
-static async delete(req, res) {
+  // Get all Royalties
+static async getAllRoyalties(req, res) {
   try {
-    const deletedRoyalty = await RoyaltyRepository.delete(req.params.royaltyId);
-
-    if (!deletedRoyalty) {
-      return res.status(404).json({
-        message: 'Royalty not found. Deletion failed.',
-      });
-    }
-
+    const royalties = await RoyaltyRepository.getAllRoyalties();
     res.status(200).json({
-      message: 'Royalty deleted successfully.',
+      message: 'Royalties fetched successfully',
+      data: royalties
     });
   } catch (error) {
     res.status(500).json({
-      message: 'Failed to delete royalty.',
-      error: error.message,
+      message: 'Error fetching royalties',
+      error: error.message
     });
   }
 }
+
+
+  // Get Royalty by ID (royaltyId)
+  static async getRoyaltyById(req, res) {
+    try {
+      const { royaltyId } = req.params;
+      const royalty = await RoyaltyRepository.getRoyaltyById(royaltyId);
+      
+      if (!royalty) {
+        return res.status(404).json({ message: 'Royalty not found' });
+      }
+
+      res.status(200).json(royalty);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  static async updateRoyaltyById(req, res) {
+    try {
+      const { royaltyId } = req.params; // royaltyId is passed as a string or number
+      const { rank, dailyRoyalty, status } = req.body;
+  
+      // Update the royalty by the custom royaltyId
+      const updatedRoyalty = await RoyaltyRepository.updateRoyaltyById(royaltyId, {
+        rank,
+        dailyRoyalty,
+        status
+      });
+  
+      if (!updatedRoyalty) {
+        return res.status(404).json({ message: 'Royalty not found' });
+      }
+  
+      res.status(200).json({
+        message: 'Royalty updated successfully',
+        data: updatedRoyalty
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: 'Error updating royalty',
+        error: error.message
+      });
+    }
+  }
+  
+  
+
+static async deleteRoyaltyById(req, res) {
+  try {
+    const { royaltyId } = req.params; // royaltyId is passed as a string or number
+
+    // Delete royalty by custom royaltyId
+    const result = await RoyaltyRepository.deleteRoyaltyById(royaltyId);
+
+    if (!result) {
+      return res.status(404).json({ message: 'Royalty not found' });
+    }
+
+    res.status(200).json({ message: 'Royalty deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
+
 }
 
 export default RoyaltyController;
