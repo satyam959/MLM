@@ -19,7 +19,7 @@ import WalletRoutes from './Routes/WalletRoutes.mjs'
 import BankRoutes from './Routes/BankAccountRoutes.mjs'
 import PlanRoutes from './Routes/PlanRoutes.mjs'
 import UserPlanRoutes from './Routes/UserPlanRoutes.mjs'
-
+import WithdrawalRoutes from './Routes/WithdrawalRoutes.mjs'
 dotenv.config();
 
 const app = express();
@@ -88,7 +88,7 @@ app.use('/api/rewards', RewardsRoutes);
 app.use('/api/permissions', permissionRoutes);
 app.use('/api/ranks', rankRoutes);
 app.use('/api/royalties', royaltyRoutes);
-
+app.use('/api/Withdrawal', WithdrawalRoutes);
 
 
 

@@ -160,16 +160,16 @@ class TypeIncomeController {
   }
 
 
-    // Get all TypeIncomes
-    async getAllTypeIncomes(req, res) {
-        try {
-            const incomes = await TypeIncome.find();
-            res.status(200).json(incomes);
-        } catch (error) {
-            console.error('Error fetching all TypeIncomes:', error);
-            res.status(400).json({ message: error.message });
-        }
+  async getAllTypeIncomes(req, res) {
+    try {
+      const incomes = await TypeIncomeRepository.findAll();
+      res.status(200).json(incomes);
+    } catch (error) {
+      console.error('Error fetching all TypeIncomes:', error);
+      res.status(400).json({ message: error.message });
     }
+  }
+  
 
     // Get a specific TypeIncome by ID
     async getTypeIncomeById(req, res) {

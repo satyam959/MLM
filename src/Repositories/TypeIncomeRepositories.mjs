@@ -121,6 +121,15 @@ const TypeIncomeRepository = {
       throw new Error(`Error fetching all TypeIncomes: ${error.message}`);
     }
   },
+  // Find all TypeIncome entries
+async findAll() {
+  try {
+    return await TypeIncome.find();
+  } catch (error) {
+    throw new Error(`Error fetching all TypeIncomes: ${error.message}`);
+  }
+},
+
 
   // Find by MongoDB ObjectId (optional, still useful)
   async findById(objectId) {
