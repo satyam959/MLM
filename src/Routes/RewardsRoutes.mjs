@@ -33,14 +33,16 @@
 
 
   
-
-import express from 'express';
 import RewardController from '../controllers/RewardController.mjs';
+import express from 'express';
 
 const router = express.Router();
 
-router.post('/create', RewardController.createReward);
-router.get('/reward', RewardController.getAllRewards);
-router.get('/rewardBy/:id', RewardController.getRewardById);
+router.post('/createReward', RewardController.createReward);
+router.get('/rewardAll', RewardController.getAllRewards);
+router.get('/reward/:rewardId', RewardController.getById);
+router.put('/updateReward/:rewardId', RewardController.updateReward);
+router.delete('/deleteReward/:rewardId', RewardController.deleteReward);
 
 export default router;
+

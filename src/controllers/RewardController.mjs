@@ -228,32 +228,44 @@
 import RewardRepositories from '../Repositories/RewardRepositories.mjs';
 
 class RewardController {
-  static async createReward(req, res) {
-    try {
-      const { rank, equivalentRank, benefits } = req.body;
+ // Create a reward
+static async createReward(req, res) {
+  try {
+    const { rank, equivalentRank, benefits } = req.body;
 
-      if (!rank || !equivalentRank || !benefits) {
-        return res.status(400).json({ message: 'rank, equivalentRank, and benefits are required.' });
-      }
-
-      const reward = await RewardRepositories.createReward({ rank, equivalentRank, benefits });
-      res.status(201).json(reward);
-    } catch (error) {
-      console.error('Error creating reward:', error);
-      res.status(500).json({ message: 'Failed to create reward', error: error.message });
+    if (!rank || !equivalentRank || !benefits) {
+      return res.status(400).json({ message: 'rank, equivalentRank, and benefits are required.' });
     }
-  }
 
-  static async getAllRewards(req, res) {
-    try {
-      const rewards = await RewardRepositories.getAllRewards();
-      res.status(200).json(rewards);
-    } catch (error) {
-      console.error('Error fetching rewards:', error);
-      res.status(500).json({ message: 'Failed to fetch rewards', error: error.message });
-    }
-  }
+    const reward = await RewardRepositories.createReward({ rank, equivalentRank, benefits });
 
+    res.status(201).json({
+      message: 'Reward created successfully!',
+      data: reward,
+    });
+  } catch (error) {
+    console.error('Error creating reward:', error);
+    res.status(500).json({ message: 'Failed to create reward', error: error.message });
+  }
+}
+
+
+  // Get all rewards
+static async getAllRewards(req, res) {
+  try {
+    const rewards = await RewardRepositories.getAllRewards();
+    res.status(200).json({
+      message: 'Rewards fetched successfully!',
+      data: rewards,
+    });
+  } catch (error) {
+    console.error('Error fetching rewards:', error);
+    res.status(500).json({ message: 'Failed to fetch rewards', error: error.message });
+  }
+}
+
+
+  // Get reward by ID
   static async getById(req, res) {
     try {
       const reward = await RewardRepositories.findByRewardId(req.params.rewardId);
@@ -262,66 +274,58 @@ class RewardController {
         return res.status(404).json({ message: 'Reward not found' });
       }
 
-      res.status(200).json(reward);  // Return the found reward
+      res.status(200).json(reward);
     } catch (error) {
       console.error('Error fetching reward:', error);
       res.status(500).json({ message: 'Failed to fetch reward', error: error.message });
     }
   }
 
-
+ // Update reward by ID
 static async updateReward(req, res) {
   try {
     const { rank, equivalentRank, benefits } = req.body;
-    const { rewardId } = req.params; // Get the rewardId from the route params
+    const { rewardId } = req.params;
 
-    // Ensure the reward exists before updating
     const reward = await RewardRepositories.findByRewardId(rewardId);
-    
+
     if (!reward) {
       return res.status(404).json({ message: 'Reward not found' });
     }
 
-    // Update the reward
     reward.rank = rank || reward.rank;
     reward.equivalentRank = equivalentRank || reward.equivalentRank;
     reward.benefits = benefits || reward.benefits;
 
-    // Save the updated reward
     await reward.save();
-    
-    res.status(200).json(reward);  // Return the updated reward
+
+    res.status(200).json({
+      message: 'Reward updated successfully!',
+      data: reward,
+    });
   } catch (error) {
     console.error('Error updating reward:', error);
     res.status(500).json({ message: 'Failed to update reward', error: error.message });
   }
 }
-}
-class RewardController {
-  // Delete a reward by rewardId
+
   static async deleteReward(req, res) {
     try {
-      const { rewardId } = req.params;  // Get the rewardId from the route params
+      const { rewardId } = req.params;  // Get rewardId from the route parameters
 
-      // Check if the reward exists
+      // Find reward by rewardId
       const reward = await RewardRepositories.findByRewardId(rewardId);
-      
       if (!reward) {
         return res.status(404).json({ message: 'Reward not found' });
       }
 
-      // Delete the reward
-      await reward.remove();
-      
-      res.status(200).json({ message: 'Reward deleted successfully' });  // Return success message
+      // Delete the reward from database
+      await RewardRepositories.deleteReward(rewardId);
+      res.status(200).json({ message: 'Reward deleted successfully' });
     } catch (error) {
       console.error('Error deleting reward:', error);
       res.status(500).json({ message: 'Failed to delete reward', error: error.message });
     }
   }
 }
-
-
-
-
-export default RewardController;
+export default RewardController
