@@ -16,7 +16,7 @@ router.get('/rolespermissions/:roleId/:permissionId', RolePermissionController.g
 router.put('/updatePermissionForRole/:roleId', RolePermissionController.updatePermissionForRole);
 
 // Remove a permission from a role by roleId and permissionId
-router.delete('/removePermissionFromRole/:roleId/:permissionId', RolePermissionController.removePermissionFromRole);
+router.post('/removePermission/:roleId', RolePermissionController.removePermissionFromRole);
 
 //GetAll RolePermissions
 router.get('/getAllRolePermissions', RolePermissionController.getAllRolePermissions);
