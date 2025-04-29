@@ -198,8 +198,21 @@
 
 // export default UserModel;
 
+
+
+
+///////////////////////////
+
+
+
+
+
+
+
+
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+// import env from 'env';
 
 // Define generateReferralCode before the schema
 function generateReferralCode() {
@@ -259,7 +272,7 @@ const userSchema = new mongoose.Schema({
     default: generateReferralCode, 
   },
   referredBy: {
-    type: String,
+    type: Number,
     ref: 'User',
     default: null
   },
@@ -277,9 +290,9 @@ const userSchema = new mongoose.Schema({
     type: [Number],
     default: null
   },
-  lavel:{
+  level:{
     type:Number,
-    default:null
+    default:0
   },
   membership:{
     type:Number,
@@ -302,6 +315,46 @@ userSchema.pre('save', async function (next) {
     this.password = await bcrypt.hash(this.password, 10);
   }
   next();
+});
+
+userSchema.post('save', async function (doc, next) {
+  try {
+    if (doc.referredBy) {
+
+      const User = mongoose.model('User');
+      const directReferrals = await User.countDocuments({ referredBy: doc.referredBy });
+      let levelValue = 0
+      const levels = {
+        5: 1, // team 2 → level 1
+        25: 2, // team 3 → level 2
+        125: 3,  // team 5 → level 4
+        625: 4,
+        3125: 5,
+        15625: 6,
+        78125: 7,
+      };
+      if (directReferrals in levels) {
+        levelValue =  levels[directReferrals];
+      } else {
+        levelValue = 0;
+      }
+      console.log(levelValue)
+      console.log("levelValue -- ", levelValue);
+      console.log(`Parent ${doc.referredBy} has ${directReferrals} direct referrals`);
+      console.log("directReferrals -- ", directReferrals);
+
+        await User.updateOne(
+          { userId: doc.referredBy },
+          { level: levelValue }
+        );
+        console.log(`Level updated for parent ${doc.referredBy}`);
+    
+    }
+    next();
+  } catch (err) {
+    console.error('Error in post-save hook:', err);
+    next(err);
+  }
 });
 
 const UserModel = mongoose.model('User', userSchema);
