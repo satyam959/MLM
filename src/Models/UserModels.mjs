@@ -220,10 +220,7 @@ function generateReferralCode() {
 }
 
 const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-  },
+  
   fullName: {
     type: String,
     required: true,
@@ -325,7 +322,7 @@ userSchema.post('save', async function (doc, next) {
       const directReferrals = await User.countDocuments({ referredBy: doc.referredBy });
       let levelValue = 0
       const levels = {
-        5: 1, 
+        2: 1, 
         25: 2, 
         125: 3,  
         625: 4,

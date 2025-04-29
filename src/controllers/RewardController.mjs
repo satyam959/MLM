@@ -231,13 +231,15 @@ class RewardController {
  // Create a reward
 static async createReward(req, res) {
   try {
-    const { rank, equivalentRank, benefits } = req.body;
+    const { rank, equivalentRank, benefits , rankId,dailyRoyalty} = req.body;
+    
 
-    if (!rank || !equivalentRank || !benefits) {
-      return res.status(400).json({ message: 'rank, equivalentRank, and benefits are required.' });
+    if (!rank || !equivalentRank || !benefits || !rankId) {
+      return res.status(400).json({ message: 'rank, equivalentRank, benefits, and rankId are required.' });
     }
-
-    const reward = await RewardRepositories.createReward({ rank, equivalentRank, benefits });
+    
+console.log(req.body)
+    const reward = await RewardRepositories.createReward({ dailyRoyalty,rank, equivalentRank, benefits ,rankId});
 
     res.status(201).json({
       message: 'Reward created successfully!',

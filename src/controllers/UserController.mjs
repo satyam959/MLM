@@ -205,7 +205,6 @@ class UserController {
   
   async registerUser(req, res) {
     const {
-      name,
       fullName,
       email,
       phone,
@@ -245,7 +244,6 @@ class UserController {
   
       // Prepare new user data
       const newUserData = {
-        name,
         fullName,
         email,
         phone,

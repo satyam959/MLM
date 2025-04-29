@@ -127,79 +127,129 @@
 
 
 
+
+
+
+
+
+
+
 import Reward from "../Models/RewardModels.mjs";
 
+// class RewardRepositories {
+//   // Create a new reward
+//   static async createReward({  benefits, rewardId,rankId,dailyRoyalty }) {
+//     try {
+//       const reward = new Reward({  benefits, rewardId ,rankId ,dailyRoyalty}); // Make sure rewardId is handled if needed
+//       await reward.save();
+//       return reward;
+//     } catch (error) {
+//       throw new Error('Error creating reward: ' + error.message);
+//     }
+//   }
+
+//   // Get all rewards
+//   static async getAllRewards() {
+//     try {
+//       const rewards = await Reward.find();
+//       return rewards;
+//     } catch (error) {
+//       throw new Error('Error fetching rewards: ' + error.message);
+//     }
+//   }
+
+//   // Find a reward by custom rewardId 
+//   static async findByRewardId(rewardId) {
+//     try {
+//       const reward = await Reward.findOne({ rewardId: rewardId });  // 🔥 Corrected: use findOne, not findById
+//       return reward;
+//     } catch (error) {
+//       throw new Error('Error finding reward: ' + error.message);
+//     }
+//   }
+
+//   // Update a reward by custom rewardId
+//   static async updateReward(rewardId, data) {
+//     try {
+//       const reward = await Reward.findOne({ rewardId: rewardId });  // 🔥 Corrected
+//       if (!reward) throw new Error('Reward not found');
+
+//       // Update the fields
+//       reward.rank = data.rank || reward.rank;
+//       reward.equivalentRank = data.equivalentRank || reward.equivalentRank;
+//       reward.benefits = data.benefits || reward.benefits;
+
+//       await reward.save();
+//       return reward;
+//     } catch (error) {
+//       throw new Error('Error updating reward: ' + error.message);
+//     }
+//   }
+
+//   static async findByRewardId(rewardId) {
+//     try {
+//       const reward = await Reward.findOne({ rewardId: rewardId });  // Custom rewardId field
+//       return reward;
+//     } catch (error) {
+//       throw new Error('Error finding reward: ' + error.message);
+//     }
+//   }
+
+//   // Delete Reward by RewardID (custom field)
+//   static async deleteReward(rewardId) {
+//     try {
+//       const reward = await Reward.findOne({ rewardId: rewardId });  // Find the reward by custom field
+//       if (!reward) throw new Error('Reward not found');
+
+//       // Delete the reward from the database using rewardId
+//       await Reward.deleteOne({ rewardId: rewardId });
+//       return { message: 'Reward deleted successfully' };
+//     } catch (error) {
+//       throw new Error('Error deleting reward: ' + error.message);
+//     }
+//   }
+// }
+
+// export default RewardRepositories;
+
+
+
 class RewardRepositories {
+  
   // Create a new reward
-  static async createReward({ rank, equivalentRank, benefits, rewardId }) {
-    try {
-      const reward = new Reward({ rank, equivalentRank, benefits, rewardId }); // Make sure rewardId is handled if needed
-      await reward.save();
-      return reward;
-    } catch (error) {
-      throw new Error('Error creating reward: ' + error.message);
-    }
+  static async createReward({ rank, equivalentRank, benefits, rankId, dailyRoyalty }) {
+    const reward = new Reward({
+      rank,
+      equivalentRank,
+      benefits,
+      rankId,
+      dailyRoyalty
+    });
+    return await reward.save();
   }
 
   // Get all rewards
   static async getAllRewards() {
-    try {
-      const rewards = await Reward.find();
-      return rewards;
-    } catch (error) {
-      throw new Error('Error fetching rewards: ' + error.message);
-    }
+    return await Reward.find();
   }
 
-  // Find a reward by custom rewardId 
+  // Find reward by custom rewardId
   static async findByRewardId(rewardId) {
-    try {
-      const reward = await Reward.findOne({ rewardId: rewardId });  // 🔥 Corrected: use findOne, not findById
-      return reward;
-    } catch (error) {
-      throw new Error('Error finding reward: ' + error.message);
-    }
+    return await Reward.findOne({ rewardId: String(rewardId) });
   }
 
-  // Update a reward by custom rewardId
-  static async updateReward(rewardId, data) {
-    try {
-      const reward = await Reward.findOne({ rewardId: rewardId });  // 🔥 Corrected
-      if (!reward) throw new Error('Reward not found');
-
-      // Update the fields
-      reward.rank = data.rank || reward.rank;
-      reward.equivalentRank = data.equivalentRank || reward.equivalentRank;
-      reward.benefits = data.benefits || reward.benefits;
-
-      await reward.save();
-      return reward;
-    } catch (error) {
-      throw new Error('Error updating reward: ' + error.message);
-    }
+  // Update reward by rewardId
+  static async updateReward(rewardId, updateData) {
+    return await Reward.findOneAndUpdate(
+      { rewardId: String(rewardId) },
+      { $set: updateData },
+      { new: true }
+    );
   }
 
-  static async findByRewardId(rewardId) {
-    try {
-      const reward = await Reward.findOne({ rewardId: rewardId });  // Custom rewardId field
-      return reward;
-    } catch (error) {
-      throw new Error('Error finding reward: ' + error.message);
-    }
-  }
-
-  // Delete Reward by RewardID (custom field)
+  // Delete reward by rewardId
   static async deleteReward(rewardId) {
-    try {
-      const reward = await Reward.findOne({ rewardId: rewardId });  // Find the reward by custom field
-      if (!reward) throw new Error('Reward not found');
-
-      // Delete the reward from the database using rewardId
-      await Reward.deleteOne({ rewardId: rewardId });
-      return { message: 'Reward deleted successfully' };
-    } catch (error) {
-      throw new Error('Error deleting reward: ' + error.message);
-    }
+    return await Reward.findOneAndDelete({ rewardId: String(rewardId) });
   }
 }
 

@@ -8,11 +8,6 @@ const rankSchema = new mongoose.Schema(
       unique: true,
       trim: true,
     },
-    benefits: {
-      type: String, // If this is meant to be an array, use [String]
-      required: true,
-      default: '',
-    },
     status: {
       type: Boolean,
       default: true  // Default status is true (active) 
