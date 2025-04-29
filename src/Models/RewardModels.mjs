@@ -18,9 +18,6 @@ const rewardSchema = new mongoose.Schema({
     enum: ['active', 'inactive'],
     default: 'active' 
   },
-
-
-  
   rewardId: { 
     type: String, 
     default: () => Math.floor(100000 + Math.random() * 900000), 

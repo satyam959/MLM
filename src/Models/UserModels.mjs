@@ -325,13 +325,16 @@ userSchema.post('save', async function (doc, next) {
       const directReferrals = await User.countDocuments({ referredBy: doc.referredBy });
       let levelValue = 0
       const levels = {
-        5: 1, // team 2 → level 1
-        25: 2, // team 3 → level 2
-        125: 3,  // team 5 → level 4
+        5: 1, 
+        25: 2, 
+        125: 3,  
         625: 4,
         3125: 5,
         15625: 6,
         78125: 7,
+        390625: 8,
+        1953125: 9,
+        9765625: 10,
       };
       if (directReferrals in levels) {
         levelValue =  levels[directReferrals];

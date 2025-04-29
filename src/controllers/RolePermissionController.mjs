@@ -316,59 +316,117 @@ class RolePermissionController {
     }
   }
 
-  // Update permissionIds assigned to a role
-  async updatePermissionForRole(req, res) {
-    try {
-      const { roleId } = req.params;
-      const { permissionIds } = req.body;
+  // Update all permissions for a role by roleId
+async updatePermissionForRole(req, res) {
+  try {
+    const { roleId } = req.params;
+    const { permissionIds } = req.body;
 
-      if (!Array.isArray(permissionIds) || permissionIds.length === 0) {
-        return res.status(400).json({ error: 'permissionIds (array) are required' });
-      }
-
-      const areValidPermissions = permissionIds.every(id => typeof id === 'number' && !isNaN(id));
-      if (!areValidPermissions) {
-        return res.status(400).json({ error: 'All permissionIds must be valid numbers' });
-      }
-
-      const updated = await RolePermission.findOneAndUpdate(
-        { roleId },
-        { $set: { permissionId: permissionIds } },
-        { new: true }
-      );
-
-      if (!updated) {
-        return res.status(404).json({ error: 'RolePermission mapping not found' });
-      }
-
-      res.status(200).json({ message: 'Permissions updated successfully', data: updated });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Server error: ' + err.message });
+    // Validate input
+    if (!Array.isArray(permissionIds) || permissionIds.length === 0) {
+      return res.status(400).json({ error: 'permissionIds (non-empty array) is required' });
     }
-  }
 
-  // Remove a permissionId from a role
-  async removePermissionFromRole(req, res) {
-    try {
-      const { roleId, permissionId } = req.params;
-
-      const mapping = await RolePermission.findOne({ roleId });
-      if (!mapping) {
-        return res.status(404).json({ error: 'RolePermission mapping not found' });
-      }
-
-      const updatedPermissions = mapping.permissionId.filter(id => id !== Number(permissionId));
-
-      mapping.permissionId = updatedPermissions;
-      await mapping.save();
-
-      res.status(200).json({ message: 'Permission removed from role', data: mapping });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Server error: ' + err.message });
+    const areValidPermissions = permissionIds.every(id => typeof id === 'number' && !isNaN(id));
+    if (!areValidPermissions) {
+      return res.status(400).json({ error: 'All permissionIds must be valid numbers' });
     }
+
+    // Update the permissions
+    const updated = await RolePermission.findOneAndUpdate(
+      { roleId: Number(roleId) },
+      { $set: { permissionId: permissionIds } },
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ error: 'RolePermission mapping not found for this roleId' });
+    }
+
+    return res.status(200).json({
+      message: 'Permissions updated successfully for the role',
+      data: updated,
+    });
+
+  } catch (err) {
+    console.error('Error updating permissions for role:', err);
+    return res.status(500).json({ error: 'Internal server error: ' + err.message });
   }
 }
+
+  // Get all role-permission mappings
+async getAllRolePermissions(req, res) {
+  try {
+    const rolePermissions = await RolePermission.find();
+
+    if (rolePermissions.length === 0) {
+      return res.status(404).json({ error: 'No role-permission mappings found' });
+    }
+
+    res.status(200).json({
+      message: 'Role-permission mappings retrieved successfully',
+      data: rolePermissions
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error: ' + err.message });
+  }
+}
+
+
+async removePermissionFromRole(req, res) {
+  try {
+    const { roleId, permissionId } = req.params;
+
+    const mapping = await RolePermission.findOne({ roleId: Number(roleId) });
+
+    if (!mapping) {
+      return res.status(404).json({ error: 'RolePermission mapping not found for this roleId' });
+    }
+
+    const permissionIdNum = Number(permissionId);
+    const index = mapping.permissionId.indexOf(permissionIdNum);
+
+    if (index === -1) {
+      return res.status(404).json({ error: 'Permission not found in role' });
+    }
+
+    // Remove the permission
+    mapping.permissionId.splice(index, 1);
+
+    await mapping.save();
+
+    return res.status(200).json({
+      message: 'Permission successfully removed from role',
+      data: mapping,
+    });
+
+  } catch (err) {
+    console.error('Error removing permission from role:', err);
+    return res.status(500).json({ error: 'Internal server error: ' + err.message });
+  }
+}
+async deleteRoleById(req, res) {
+  try {
+    const { roleId } = req.params;
+
+    const deleted = await RolePermission.findOneAndDelete({ roleId: Number(roleId) });
+
+    if (!deleted) {
+      return res.status(404).json({ error: 'Role not found with given roleId' });
+    }
+
+    res.status(200).json({ message: 'Role deleted successfully', data: deleted });
+  } catch (err) {
+    console.error('Error deleting role:', err);
+    res.status(500).json({ error: 'Server error: ' + err.message });
+  }
+}
+
+
+
+}
+  
+
 
 export default new RolePermissionController();

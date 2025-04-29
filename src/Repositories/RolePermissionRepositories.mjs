@@ -190,11 +190,11 @@ class RolePermissionRepository {
 
       if (!rolePermission) throw new Error(`Role ${roleId} not found`);
 
-      const updatedPermissions = rolePermission.permissionIds.filter(
+      const updatedPermissions = rolePermission.permissionId.filter(
         id => id !== permissionIdToRemove
       );
 
-      rolePermission.permissionIds = updatedPermissions;
+      rolePermission.permissionId = updatedPermissions;
 
       return await rolePermission.save();
     } catch (error) {

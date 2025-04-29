@@ -10,15 +10,18 @@ router.post('/createPermissionForRole', RolePermissionController.createPermissio
 router.get('/getPermissionsByRoleId/:roleId', RolePermissionController.getPermissionsByRoleId);
 
 // Get a specific permission for a role by roleId and permissionId
-router.get('/roles/:roleId/permissions/:permissionId', RolePermissionController.getPermissionForRole);
+router.get('/rolespermissions/:roleId/:permissionId', RolePermissionController.getPermissionForRole);
 
 // Update a permission for a role by roleId and permissionId
-router.put('/roles/:roleId/permissions/:permissionId', RolePermissionController.updatePermissionForRole);
+router.put('/updatePermissionForRole/:roleId', RolePermissionController.updatePermissionForRole);
 
 // Remove a permission from a role by roleId and permissionId
-router.delete('/removePermissionFromRole/:permissionId', RolePermissionController.removePermissionFromRole);
+router.delete('/removePermissionFromRole/:roleId/:permissionId', RolePermissionController.removePermissionFromRole);
 
+//GetAll RolePermissions
+router.get('/getAllRolePermissions', RolePermissionController.getAllRolePermissions);
 
-
+// // Delete Role By RoleId
+ router.delete('/deleteRoleById/:roleId', RolePermissionController.deleteRoleById);
 
 export default router;
