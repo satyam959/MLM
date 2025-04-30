@@ -217,10 +217,8 @@ import Reward from "../Models/RewardModels.mjs";
 class RewardRepositories {
   
   // Create a new reward
-static async createReward({ rank, equivalentRank, benefits, rankId, dailyRoyalty }) {
+static async createReward({  benefits, rankId, dailyRoyalty }) {
   const reward = new Reward({
-    rank,
-    equivalentRank,
     benefits,
     rankId,
     dailyRoyalty

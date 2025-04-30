@@ -231,7 +231,7 @@ import Reward from '../Models/RewardModels.mjs';
 class RewardController {
   static async createReward(req, res) {
     try {
-      const { rank, equivalentRank, benefits, rankId, dailyRoyalty } = req.body;
+      const {  benefits, rankId, dailyRoyalty } = req.body;
   
       if (!rank || !equivalentRank || !benefits || !rankId) {
         return res.status(400).json({ message: 'rank, equivalentRank, benefits, and rankId are required.' });

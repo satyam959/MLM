@@ -140,8 +140,31 @@ class UserRepository {
       throw new Error(`Error fetching downline : ${error.message}`);
     }
   }
+  static async findWalletByUserId(userId) {
+    console.log("Finding wallet for userId:", userId);
+    try {
+      const wallet = await WalletModel.findOne({ userId });
+      return wallet;
+    } catch (error) {
+      console.error("Error finding wallet:", error);
+      throw new Error('Error finding wallet');
+    }
+  }
   
+
+  // Other methods for wallet operations
+  static async createWallet(walletData) {
+    try {
+      const wallet = new WalletModel(walletData);
+      await wallet.save();
+      return wallet;
+    } catch (error) {
+      throw new Error('Error creating wallet');
+    }
+  }
 }
+  
+
 
 function generateReferralCode() {
   // Generate a random 8-character long referral code

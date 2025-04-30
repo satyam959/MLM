@@ -202,6 +202,24 @@ class UserController {
   //     res.status(500).json({ message: 'Error registering user', error: error.message });
   //   }
   // }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
   
   async registerUser(req, res) {
     const {
@@ -272,9 +290,11 @@ class UserController {
         userId: user.userId,
         balance: initialBalance
       };
+
+      
   
       const wallet = await WalletRepository.createWallet(walletData);
-  
+      
       if (!wallet) {
         return res.status(500).json({ message: 'User created, but wallet creation failed' });
       }

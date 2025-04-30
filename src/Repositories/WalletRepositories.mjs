@@ -64,8 +64,17 @@ const WalletRepository = {
       { balance: newBalance },
       { new: true }
     );
-  }
+  },
+  async findWalletByUserId(userId) {
+    try {
+      return await Wallet.findOne({ userId });
+    } catch (error) {
+      console.error('Error fetching wallet by userId:', error);
+      throw error;
+    }
+  },
 };
+
 
 export default WalletRepository;
 
