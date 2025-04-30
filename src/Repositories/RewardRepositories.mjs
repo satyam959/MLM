@@ -217,16 +217,17 @@ import Reward from "../Models/RewardModels.mjs";
 class RewardRepositories {
   
   // Create a new reward
-  static async createReward({ rank, equivalentRank, benefits, rankId, dailyRoyalty }) {
-    const reward = new Reward({
-      rank,
-      equivalentRank,
-      benefits,
-      rankId,
-      dailyRoyalty
-    });
-    return await reward.save();
-  }
+static async createReward({ rank, equivalentRank, benefits, rankId, dailyRoyalty }) {
+  const reward = new Reward({
+    rank,
+    equivalentRank,
+    benefits,
+    rankId,
+    dailyRoyalty
+  });
+  return await reward.save();
+}
+
 
   // Get all rewards
   static async getAllRewards() {

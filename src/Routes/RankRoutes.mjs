@@ -5,8 +5,8 @@ const router = express.Router();
 
 router.post('/createRank', RankController.create);
 router.get('/getAllRank', RankController.findAll);
-router.get('/getRankById:id', RankController.findById);
-router.put('/updateRank:id', RankController.update);
-router.delete('/deleteRank:id', RankController.delete);
+router.get('/getRankById/:rankId', RankController.findById);
+router.put('/updateRank/:rankId', RankController.update);
+router.delete('/deleteRank/:rankId', RankController.delete);
 
 export default router;

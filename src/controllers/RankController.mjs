@@ -1,5 +1,5 @@
 import RankRepository from '../Repositories/RankRepository.mjs';
-
+import mongoose from 'mongoose';
 class RankController {
   // Create a new rank
   static async create(req, res) {
@@ -24,7 +24,7 @@ class RankController {
   // Get a rank by ID
   static async findById(req, res) {
     try {
-      const rank = await RankRepository.findById(req.params.id);
+      const rank = await RankRepository.findById(req.params.rankId);
       res.status(200).json(rank);
     } catch (error) {
       res.status(404).json({ error: error.message });
@@ -41,16 +41,11 @@ class RankController {
 //     }
 //   }
 
-  /// Update a rank
-static async update(req, res) {
+ // Update by custom rankId
+ static async update(req, res) {
   try {
-    const updatedRank = await RankRepository.update(req.params.rankId, req.body);
-
-    if (!updatedRank) {
-      return res.status(404).json({
-        message: 'Rank not found. Update failed.',
-      });
-    }
+    const { rankId } = req.params;
+    const updatedRank = await RankRepository.update(rankId, req.body);
 
     res.status(200).json({
       message: 'Rank updated successfully.',
@@ -64,16 +59,11 @@ static async update(req, res) {
   }
 }
 
-// Delete a rank
+// Delete by custom rankId
 static async delete(req, res) {
   try {
-    const deletedRank = await RankRepository.delete(req.params.rankId);
-
-    if (!deletedRank) {
-      return res.status(404).json({
-        message: 'Rank not found. Deletion failed.',
-      });
-    }
+    const { rankId } = req.params;
+    await RankRepository.delete(rankId);
 
     res.status(200).json({
       message: 'Rank deleted successfully.',

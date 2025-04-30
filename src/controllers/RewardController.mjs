@@ -226,45 +226,76 @@
 
 
 import RewardRepositories from '../Repositories/RewardRepositories.mjs';
+import Reward from '../Models/RewardModels.mjs';
 
 class RewardController {
- // Create a reward
-static async createReward(req, res) {
-  try {
-    const { rank, equivalentRank, benefits , rankId,dailyRoyalty} = req.body;
-    
-
-    if (!rank || !equivalentRank || !benefits || !rankId) {
-      return res.status(400).json({ message: 'rank, equivalentRank, benefits, and rankId are required.' });
+  static async createReward(req, res) {
+    try {
+      const { rank, equivalentRank, benefits, rankId, dailyRoyalty } = req.body;
+  
+      if (!rank || !equivalentRank || !benefits || !rankId) {
+        return res.status(400).json({ message: 'rank, equivalentRank, benefits, and rankId are required.' });
+      }
+  
+      const reward = await RewardRepositories.createReward({
+        dailyRoyalty,
+        rank,
+        equivalentRank,
+        benefits,
+        rankId,
+      });
+  
+      res.status(201).json({
+        message: 'Reward created successfully!',
+        data: reward,
+      });
+    } catch (error) {
+      console.error('Error creating reward:', error);
+      res.status(500).json({ message: 'Failed to create reward', error: error.message });
     }
-    
-console.log(req.body)
-    const reward = await RewardRepositories.createReward({ dailyRoyalty,rank, equivalentRank, benefits ,rankId});
-
-    res.status(201).json({
-      message: 'Reward created successfully!',
-      data: reward,
-    });
-  } catch (error) {
-    console.error('Error creating reward:', error);
-    res.status(500).json({ message: 'Failed to create reward', error: error.message });
   }
-}
+  
 
 
-  // Get all rewards
-static async getAllRewards(req, res) {
-  try {
-    const rewards = await RewardRepositories.getAllRewards();
-    res.status(200).json({
-      message: 'Rewards fetched successfully!',
-      data: rewards,
-    });
-  } catch (error) {
-    console.error('Error fetching rewards:', error);
-    res.status(500).json({ message: 'Failed to fetch rewards', error: error.message });
+  static async getAllRewards(req, res) {
+    try {
+      const rewards = await Reward.aggregate([
+        {
+          $lookup: {
+            from: 'ranks', // Collection name in MongoDB
+            localField: 'rankId',
+            foreignField: 'rankId',
+            as: 'rankDetails'
+          }
+        },
+        {
+          $unwind: {
+            path: '$rankDetails',
+            preserveNullAndEmptyArrays: true 
+          }
+        },
+        {
+          $addFields: {
+            rankName: '$rankDetails.name'
+          }
+        },
+        {
+          $project: {
+            rankDetails: 0 
+          }
+        }
+      ]);
+  
+      res.status(200).json({
+        message: 'Rewards fetched successfully!',
+        data: rewards,
+      });
+  
+    } catch (error) {
+      console.error('Error fetching rewards:', error);
+      res.status(500).json({ message: 'Failed to fetch rewards', error: error.message });
+    }
   }
-}
 
 
   // Get reward by ID

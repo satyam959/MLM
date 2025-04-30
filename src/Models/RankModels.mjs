@@ -10,7 +10,7 @@ const rankSchema = new mongoose.Schema(
     },
     status: {
       type: Boolean,
-      default: true  // Default status is true (active) 
+      default: true  
     },
     rankId: {
       type: Number,
@@ -19,7 +19,7 @@ const rankSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, // ✅ Correctly placed
+    timestamps: true, 
   }
 );
 

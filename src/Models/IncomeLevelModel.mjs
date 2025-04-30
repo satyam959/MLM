@@ -3,28 +3,28 @@ import mongoose from 'mongoose';
 const IncomeLevelSchema = new mongoose.Schema({
   income: {
     type: Number,
-    required: true, // Ensure that the income field is always provided
+    required: true, 
   },
   team: {
     type: Number,
-    required: true, // Ensure that the team field is always provided
+    required: true, 
   },
   total: {
     type: Number,
-    required: true, // Ensure that the total field is always provided
+    required: true, 
   },
   status: {
-    type: Boolean,  // Corrected type to Boolean (not 'boolean' or 'boolean' from 'webidl-conversions')
-    default: true,   // Default to true
+    type: Boolean,  
+    default: true,   
   },
   level: {
     type: Number,
-    required: true, // Ensure that the level field is always provided
+    required: true, 
   },
    incomeId: { type: Number, default: () => Math.floor(100000 + Math.random() * 900000), unique: true },
 
 }, {
-  timestamps: true, // Automatically adds createdAt and updatedAt fields
+  timestamps: true, 
 });
 
 const IncomeLevel = mongoose.model('IncomeLevel', IncomeLevelSchema);
