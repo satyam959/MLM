@@ -233,14 +233,12 @@ class RewardController {
     try {
       const {  benefits, rankId, dailyRoyalty } = req.body;
   
-      if (!rank || !equivalentRank || !benefits || !rankId) {
+      if ( !dailyRoyalty || !benefits || !rankId) {
         return res.status(400).json({ message: 'rank, equivalentRank, benefits, and rankId are required.' });
       }
   
       const reward = await RewardRepositories.createReward({
         dailyRoyalty,
-        rank,
-        equivalentRank,
         benefits,
         rankId,
       });
@@ -317,7 +315,7 @@ class RewardController {
  // Update reward by ID
 static async updateReward(req, res) {
   try {
-    const { rank, equivalentRank, benefits } = req.body;
+    const { rankId, dailyRoyalty, benefits } = req.body;
     const { rewardId } = req.params;
 
     const reward = await RewardRepositories.findByRewardId(rewardId);
@@ -326,8 +324,8 @@ static async updateReward(req, res) {
       return res.status(404).json({ message: 'Reward not found' });
     }
 
-    reward.rank = rank || reward.rank;
-    reward.equivalentRank = equivalentRank || reward.equivalentRank;
+    reward.rankId = rankId || reward.rankId;
+    reward.dailyRoyalty = dailyRoyalty || reward.dailyRoyalty;
     reward.benefits = benefits || reward.benefits;
 
     await reward.save();
