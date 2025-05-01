@@ -354,10 +354,51 @@ async updatePermissionForRole(req, res) {
   }
 }
 
-  // Get all role-permission mappings
+
 async getAllRolePermissions(req, res) {
   try {
-    const rolePermissions = await RolePermission.find();
+    const rolePermissions = await RolePermission.aggregate([
+      {
+        $lookup: {
+          from: 'roles', // Collection name
+          localField: 'roleId',
+          foreignField: 'roleId',
+          as: 'roleDetails'
+        }
+      },
+      {
+        $unwind: {
+          path: '$roleDetails',
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $lookup: {
+          from: 'permissions',
+          localField: 'permissionId',
+          foreignField: 'permissionId',
+          as: 'permissionDetails'
+        }
+      },
+      {
+        $unwind: {
+          path: '$permissionDetails',
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $addFields: {
+          roleName: '$roleDetails.name',
+          permissionName: '$permissionDetails.name'
+        }
+      },
+      {
+        $project: {
+          roleDetails: 0,
+          permissionDetails: 0
+        }
+      }
+    ]);
 
     if (rolePermissions.length === 0) {
       return res.status(404).json({ error: 'No role-permission mappings found' });
@@ -367,6 +408,7 @@ async getAllRolePermissions(req, res) {
       message: 'Role-permission mappings retrieved successfully',
       data: rolePermissions
     });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error: ' + err.message });

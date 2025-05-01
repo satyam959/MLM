@@ -461,17 +461,6 @@ userSchema.post("save", async function (doc, next) {
       console.log(
         ` Level updated for userId ${doc.referredBy} to ${levelValue}`
       );
-      // const referredUserList = await User.find({referredBy :  doc.referredBy}).select("userId");
-      
-      const referredUserList = await User.find({ referredBy: doc.referredBy }).select('userId');
-
-      // Step 2: Extract only userId values (as an array)
-      const userIds = referredUserList.map(user => user.userId);
-    
-        const result = await Wallet.updateMany(
-          { userId: { $in: userIds } },
-          { $inc: { balance: 300 } }
-        );
   
     }
 

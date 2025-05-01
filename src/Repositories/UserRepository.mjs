@@ -162,6 +162,11 @@ class UserRepository {
       throw new Error('Error creating wallet');
     }
   }
+
+  static async findAllUserByReferredId(referredBy) {
+    const referredUser = await UserModel.find({ referredBy: referredBy }).select('userId');
+    return referredUser;
+  }
 }
   
 

@@ -1,226 +1,12 @@
 // Controllers/UserController.mjs
-import UserRepository from '../Repositories/UserRepository.mjs';
-import jwt from 'jsonwebtoken';
-import UserModel from '../Models/UserModels.mjs';
-import WalletRepository from '../Repositories/WalletRepositories.mjs';
+import UserRepository from "../Repositories/UserRepository.mjs";
+import jwt from "jsonwebtoken";
+import UserModel from "../Models/UserModels.mjs";
+import WalletRepository from "../Repositories/WalletRepositories.mjs";
+import IncomeLevelModel from "../Models/IncomeLevelModel.mjs";
+
 class UserController {
-  // async registerUser(req, res) {
-  //   const {
-  //     name,
-  //     fullName,
-  //     email,
-  //     phone,
-  //     address,
-  //     city,
-  //     pincode,
-  //     state,
-  //     password,
-  //     role,
-  //     companyName,
-  //     referralCode
-  //   } = req.body;
-  
-  //   try {
-    
-  //     const existingUser = await UserRepository.findUserByEmail(referralCode);
-  //     if (existingUser) {
-  //       return res.status(400).json({ message: 'Email already exists' });
-  //     }
-  
-     
-  //     let referredBy = null;
-  //     if (referralCode) {
-  //       const referrer = await UserModel.findOne({ referralCode });  
-  //       if (!referrer) {
-  //         return res.status(400).json({ message: 'Invalid referral code' });
-  //       }
-  //       referredBy = referrer.userId;
-  //     }
-  
-     
-  //     const newUserData = {
-  //       name,
-  //       fullName,
-  //       email,
-  //       phone,
-  //       address,
-  //       city,
-  //       pincode,
-  //       state,
-  //       password,
-  //       role,
-  //       companyName,
-  //       referredBy,
-  //       referraName
-  //     };
-  
-  //     const user = await UserRepository.createUser(newUserData);
-  //     res.status(201).json({ message: 'User registered successfully', user });
-      
-  //   } catch (error) {
-  //     res.status(500).json({ message: 'Error registering user', error: error.message });
-  //   }
-  // }
 
-  // async registerUser(req, res) {
-  //   const {
-  //     name,
-  //     fullName,
-  //     email,
-  //     phone,
-  //     address,
-  //     city,
-  //     pincode,
-  //     state,
-  //     password,
-  //     role,
-  //     companyName,
-  //     referralCode
-  //   } = req.body;
-  
-  //   try {
-  //     const existingUser = await UserRepository.findUserByEmail(referralCode);
-  //     if (existingUser) {
-  //       return res.status(400).json({ message: 'Email already exists' });
-  //     }
-  
-  //     let referredBy = null;
-  //     let referrerName = null;
-  //     let hierarchy = [];
-  //     if (referralCode) {
-  //       const referrer = await UserModel.findOne({ referralCode });  
-  //       if (!referrer) {
-  //         return res.status(400).json({ message: 'Invalid referral code' });
-  //       }
-  //       referredBy = referrer.userId;
-  //       referrerName = referrer.fullName || referrer.name || null; // adjust based on your schema
-  //       hierarchy = [referredBy, ...(referrer.hierarchy || [])]
-  //     }
-  
-  //     const newUserData = {
-  //       name,
-  //       fullName,
-  //       email,
-  //       phone,
-  //       address,
-  //       city,
-  //       pincode,
-  //       state,
-  //       password,
-  //       role,
-  //       companyName,
-  //       referredBy,
-  //       referrerName,
-  //       hierarchy
-  //     };
-  
-  //     const user = await UserRepository.createUser(newUserData);
-  //     res.status(201).json({ message: 'User registered successfully', user });
-  
-  //   } catch (error) {
-  //     res.status(500).json({ message: 'Error registering user', error: error.message });
-  //   }
-  // }
-
-
-
-  // async registerUser(req, res) {
-  //   const {
-  //     name,
-  //     fullName,
-  //     email,
-  //     phone,
-  //     address,
-  //     city,
-  //     pincode,
-  //     state,
-  //     password,
-  //     role,
-  //     companyName,
-  //     referralCode
-  //   } = req.body;
-  
-  //   try {
-  //     // Check if email already exists
-  //     const existingUser = await UserRepository.findUserByEmail(email); // Check email, not referral code
-  //     if (existingUser) {
-  //       return res.status(400).json({ message: 'Email already exists' });
-  //     }
-  
-  //     let referredBy = null;
-  //     let referrerName = null;
-  //     let hierarchy = [];
-  
-  //     if (referralCode) {
-  //       // Handle referral logic
-  //       const referrer = await UserModel.findOne({ referralCode });
-  //       if (!referrer) {
-  //         return res.status(400).json({ message: 'Invalid referral code' });
-  //       }
-  //       referredBy = referrer.userId;
-  //       referrerName = referrer.fullName || referrer.name || null;
-  //       hierarchy = [referredBy, ...(referrer.hierarchy || [])];
-  //     }
-  
-  //     // Prepare new user data
-  //     const newUserData = {
-  //       name,
-  //       fullName,
-  //       email,
-  //       phone,
-  //       address,
-  //       city,
-  //       pincode,
-  //       state,
-  //       password,
-  //       role,
-  //       companyName,
-  //       referredBy,
-  //       referrerName,
-  //       hierarchy
-  //     };
-  
-  //     // Create user
-  //     const user = await UserRepository.createUser(newUserData);
-
-  //     const initialBalance = 200; 
-  //     const walletData = {
-  //       userId: user.userId,  
-  //       balance: initialBalance
-  //     };
-  
-  //     // Create wallet for user
-  //     await WalletRepository.createWallet(walletData);
-  
-
-  //     res.status(201).json({
-  //       message: 'User registered successfully, wallet created',
-  //       user
-  //     });
-  
-  //   } catch (error) {
-  //     res.status(500).json({ message: 'Error registering user', error: error.message });
-  //   }
-  // }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-  
   async registerUser(req, res) {
     const {
       fullName,
@@ -233,33 +19,33 @@ class UserController {
       password,
       role,
       companyName,
-      referralCode
+      referralCode,
     } = req.body;
-  
+
     try {
       // Check if email already exists
       const existingUser = await UserRepository.findUserByEmail(email);
       if (existingUser) {
-        return res.status(400).json({ message: 'Email already exists' });
+        return res.status(400).json({ message: "Email already exists" });
       }
-  
+
       let referredBy = null;
       let referrerName = null;
       let hierarchy = [];
-  
+
       // Handle referral code
       if (referralCode) {
         const referrer = await UserModel.findOne({ referralCode });
-  
+
         if (!referrer) {
-          return res.status(400).json({ message: 'Invalid referral code' });
+          return res.status(400).json({ message: "Invalid referral code" });
         }
-  
+
         referredBy = referrer.userId;
         referrerName = referrer.fullName || referrer.name || null;
         hierarchy = [referredBy, ...(referrer.hierarchy || [])];
       }
-  
+
       // Prepare new user data
       const newUserData = {
         fullName,
@@ -274,44 +60,64 @@ class UserController {
         companyName,
         referredBy,
         referrerName,
-        hierarchy
+        hierarchy,
       };
-  
+
       // Create user
       const user = await UserRepository.createUser(newUserData);
-  
+
       if (!user || !user.userId) {
-        return res.status(500).json({ message: 'User creation failed' });
+        return res.status(500).json({ message: "User creation failed" });
       }
-  
+
       // Create wallet
       const initialBalance = 200;
       const walletData = {
         userId: user.userId,
-        balance: initialBalance
+        balance: initialBalance,
       };
 
-      
-  
       const wallet = await WalletRepository.createWallet(walletData);
-      
-      if (!wallet) {
-        return res.status(500).json({ message: 'User created, but wallet creation failed' });
+      if (user.referredBy) {
+        let amount = 0;
+        const referredUserList = await UserRepository.findAllUserByReferredId(
+          user.referredBy
+        );
+        let referredUserCount = referredUserList.length;
+        console.log("referredUserCount == ", referredUserCount);
+
+        if (referredUserCount === 3) {
+          amount = 200;
+        }
+        if (referredUserCount === 8) {
+          amount = 40;
+        }
+        console.log("amount --", amount);
+
+        const userIds = referredUserList.map((user) => user.userId);
+        await WalletRepository.updateReferredUserWallet(userIds, amount);
+
+       
+        await WalletRepository.rewardBasedOnTeamSize(user.referredBy);
       }
-  
+
+      if (!wallet) {
+        return res
+          .status(500)
+          .json({ message: "User created, but wallet creation failed" });
+      }
+
       return res.status(201).json({
-        message: 'User registered successfully, wallet created',
-        user
+        message: "User registered successfully, wallet created",
+        user,
       });
-  
     } catch (error) {
       return res.status(500).json({
-        message: 'Error registering user',
-        error: error.message
+        message: "Error registering user",
+        error: error.message,
       });
     }
   }
-  
 
   // User Login
   async loginUser(req, res) {
@@ -320,12 +126,12 @@ class UserController {
     try {
       const user = await UserRepository.findUserByEmail(email);
       if (!user) {
-        return res.status(404).json({ message: 'User not found' });
+        return res.status(404).json({ message: "User not found" });
       }
 
       const isMatch = await user.comparePassword(password);
       if (!isMatch) {
-        return res.status(400).json({ message: 'Invalid credentials' });
+        return res.status(400).json({ message: "Invalid credentials" });
       }
 
       const payload = {
@@ -334,15 +140,19 @@ class UserController {
         role: user.role,
       };
 
-      const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '9h' });
+      const token = jwt.sign(payload, process.env.JWT_SECRET, {
+        expiresIn: "9h",
+      });
 
       res.status(200).json({
-        message: 'Login successful',
+        message: "Login successful",
         token,
         user: { email: user.email, name: user.name, role: user.role },
       });
     } catch (error) {
-      res.status(500).json({ message: 'Error logging in user', error: error.message });
+      res
+        .status(500)
+        .json({ message: "Error logging in user", error: error.message });
     }
   }
 
@@ -352,7 +162,9 @@ class UserController {
       const users = await UserRepository.getAllUsers();
       res.status(200).json({ users });
     } catch (error) {
-      res.status(500).json({ message: 'Error fetching users', error: error.message });
+      res
+        .status(500)
+        .json({ message: "Error fetching users", error: error.message });
     }
   }
 
@@ -362,13 +174,20 @@ class UserController {
     const updateData = req.body;
 
     try {
-      const updatedUser = await UserRepository.updateUserByUserId(userId, updateData);
+      const updatedUser = await UserRepository.updateUserByUserId(
+        userId,
+        updateData
+      );
       if (!updatedUser) {
-        return res.status(404).json({ message: 'User not found' });
+        return res.status(404).json({ message: "User not found" });
       }
-      res.status(200).json({ message: 'User updated successfully', updatedUser });
+      res
+        .status(200)
+        .json({ message: "User updated successfully", updatedUser });
     } catch (error) {
-      res.status(500).json({ message: 'Error updating user', error: error.message });
+      res
+        .status(500)
+        .json({ message: "Error updating user", error: error.message });
     }
   }
 
@@ -379,11 +198,13 @@ class UserController {
     try {
       const deletedUser = await UserRepository.deleteUserByUserId(userId);
       if (!deletedUser) {
-        return res.status(404).json({ message: 'User not found' });
+        return res.status(404).json({ message: "User not found" });
       }
-      res.status(200).json({ message: 'User deleted successfully' });
+      res.status(200).json({ message: "User deleted successfully" });
     } catch (error) {
-      res.status(500).json({ message: 'Error deleting user', error: error.message });
+      res
+        .status(500)
+        .json({ message: "Error deleting user", error: error.message });
     }
   }
 
@@ -394,16 +215,18 @@ class UserController {
     try {
       const user = await UserRepository.findUserByUserId(userId);
       if (!user) {
-        return res.status(404).json({ message: 'User not found' });
+        return res.status(404).json({ message: "User not found" });
       }
 
       const { password, ...safeUserData } = user.toObject();
       res.status(200).json({
-        message: 'User profile fetched successfully',
-        user: safeUserData
+        message: "User profile fetched successfully",
+        user: safeUserData,
       });
     } catch (error) {
-      res.status(500).json({ message: 'Error fetching user profile', error: error.message });
+      res
+        .status(500)
+        .json({ message: "Error fetching user profile", error: error.message });
     }
   }
 
@@ -413,15 +236,22 @@ class UserController {
     const updateData = req.body;
 
     try {
-      const updatedUser = await UserRepository.updateUserByUserId(userId, updateData);
+      const updatedUser = await UserRepository.updateUserByUserId(
+        userId,
+        updateData
+      );
       if (!updatedUser) {
-        return res.status(404).json({ message: 'User not found' });
+        return res.status(404).json({ message: "User not found" });
       }
 
       const { password, ...safeUserData } = updatedUser.toObject();
-      res.status(200).json({ message: 'Profile updated successfully', user: safeUserData });
+      res
+        .status(200)
+        .json({ message: "Profile updated successfully", user: safeUserData });
     } catch (error) {
-      res.status(500).json({ message: 'Error updating profile', error: error.message });
+      res
+        .status(500)
+        .json({ message: "Error updating profile", error: error.message });
     }
   }
 
@@ -432,12 +262,14 @@ class UserController {
     try {
       const deletedUser = await UserRepository.deleteUserByUserId(userId);
       if (!deletedUser) {
-        return res.status(404).json({ message: 'User not found' });
+        return res.status(404).json({ message: "User not found" });
       }
 
-      res.status(200).json({ message: 'Profile deleted successfully' });
+      res.status(200).json({ message: "Profile deleted successfully" });
     } catch (error) {
-      res.status(500).json({ message: 'Error deleting profile', error: error.message });
+      res
+        .status(500)
+        .json({ message: "Error deleting profile", error: error.message });
     }
   }
 
@@ -448,16 +280,23 @@ class UserController {
     try {
       const user = await UserRepository.findUserByReferralCode(referralCode);
       if (!user) {
-        return res.status(404).json({ message: 'User not found with this referral code' });
+        return res
+          .status(404)
+          .json({ message: "User not found with this referral code" });
       }
 
       const { password, ...safeUserData } = user.toObject();
       res.status(200).json({
-        message: 'User fetched successfully by referral code',
-        user: safeUserData
+        message: "User fetched successfully by referral code",
+        user: safeUserData,
       });
     } catch (error) {
-      res.status(500).json({ message: 'Error fetching user by referral code', error: error.message });
+      res
+        .status(500)
+        .json({
+          message: "Error fetching user by referral code",
+          error: error.message,
+        });
     }
   }
 
@@ -466,17 +305,20 @@ class UserController {
     try {
       const { userId } = req.params;
       const userData = await UserRepository.findUserByUserId(userId);
-      const uplines = await UserRepository.getUserUplines(userId, userData.hierarchy);
-      
+      const uplines = await UserRepository.getUserUplines(
+        userId,
+        userData.hierarchy
+      );
+
       res.status(200).json({
-        message: 'Upline retrieved successfully',
-        data: uplines
+        message: "Upline retrieved successfully",
+        data: uplines,
       });
     } catch (error) {
-      console.error('Error fetching user upline:', error.message);
+      console.error("Error fetching user upline:", error.message);
       res.status(500).json({
-        message: 'Error fetching user upline',
-        error: error.message
+        message: "Error fetching user upline",
+        error: error.message,
       });
     }
   }
@@ -486,25 +328,26 @@ class UserController {
     try {
       const { userId } = req.params;
       const userData = await UserRepository.findUserByUserId(userId);
-      const downline = await UserRepository.getUserDownlines(userId, userData.hierarchy);
-      if(downline.length > 0) {
+      const downline = await UserRepository.getUserDownlines(
+        userId,
+        userData.hierarchy
+      );
+      if (downline.length > 0) {
         res.status(200).json({
-          message: 'Downline retrieved successfully',
-          data: downline
+          message: "Downline retrieved successfully",
+          data: downline,
         });
       } else {
         res.status(200).json({
-          message: 'No Downline found',
-          data: []
+          message: "No Downline found",
+          data: [],
         });
-
       }
-    
     } catch (error) {
-      console.error('Error fetching user upline:', error.message);
+      console.error("Error fetching user upline:", error.message);
       res.status(500).json({
-        message: 'Error fetching user upline',
-        error: error.message
+        message: "Error fetching user upline",
+        error: error.message,
       });
     }
   }

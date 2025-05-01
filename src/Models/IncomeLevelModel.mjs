@@ -15,7 +15,7 @@ const IncomeLevelSchema = new mongoose.Schema({
   },
   status: {
     type: Boolean,  
-    default: true,   
+    default: false,   
   },
   level: {
     type: Number,
