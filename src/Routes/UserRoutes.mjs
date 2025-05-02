@@ -1,42 +1,38 @@
-// Routes/userRoutes.mjs
 import express from 'express';
 import UserController from '../controllers/UserController.mjs';
 
 const router = express.Router();
 
-// Route for user registration
+// ----------------- USER ROUTES ------------------
+
+// Register new user
 router.post('/register', UserController.registerUser);
 
-// Route for user login
-router.post('/login', UserController.loginUser);
+// Login via password (if you still use it)
+// router.post('/login', UserController.loginUser);
 
-// Admin route to get all users
+// OTP-based login
+router.post('/request-otp', UserController.requestOTP);
+router.post('/verify-otp', UserController.verifyOTPLogin);
+router.post('/resend-otp', UserController.requestOTP);
+
+// Admin: Get all users
 router.get('/getAllusers', UserController.getAllUsers);
 
-// Route to update user by ID
+// Update and delete by userId
 router.put('/updateByUserId/:userId', UserController.updateUser);
-
-// Route to delete user by ID
 router.delete('/deleteByUserId/:userId', UserController.deleteUser);
 
-// Route for Get Profile
+// Profile
 router.get('/getProfile/:userId', UserController.getUserProfile);
-
-// Update Profile
 router.put('/updateProfile/:userId', UserController.updateProfile);
-
-//Delete Profile
 router.delete('/deleteProfile/:userId', UserController.deleteProfile);
 
-//Get user by referralCode
+// Referral-based user lookup
 router.get('/getReferral/:referralCode', UserController.getUserByReferralCode);
 
-//  get user upline
+// Upline and Downline
 router.get('/getUserUpline/:userId', UserController.getUserUpline);
-
-// get user downline
 router.get('/getUserDownline/:userId', UserController.getUserDownline);
-
-
 
 export default router;

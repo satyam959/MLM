@@ -353,7 +353,7 @@
 
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-import Wallet from "./WalletModels.mjs"; 
+import Wallet from "./WalletModels.mjs";
 
 // Generate unique referral code
 function generateReferralCode() {
@@ -376,15 +376,15 @@ const userSchema = new mongoose.Schema({
   },
   address: {
     type: String,
-    required: true,
+    default: "",
   },
   city: { type: String, default: "" },
   pincode: { type: String, default: "" },
   state: { type: String, default: "" },
-  password: {
-    type: String,
-    required: true,
-  },
+  // password: {
+  //   type: String,
+  //   required: true,
+  // },
   role: { type: String, default: "" },
   status: { type: Boolean, default: true },
 
@@ -395,8 +395,8 @@ const userSchema = new mongoose.Schema({
   },
 
   referredBy: {
-    type: Number, 
-    ref: 'User',
+    type: Number,
+    ref: "User",
     default: null,
   },
 
@@ -405,11 +405,29 @@ const userSchema = new mongoose.Schema({
     default: () => Math.floor(100000 + Math.random() * 900000),
     unique: true,
   },
-
-  companyName: {
+  dob: {
     type: String,
-    required: true,
+    require: true,
   },
+  otp: {
+    type: String,
+    default: null,
+  },
+
+  otpExpiry: {
+    type: Date,
+    default: null,
+  },
+  whatsapp: {
+    type: Number,
+    default: "",
+  },
+  
+
+  // companyName: {
+  //   type: String,
+  //   default: "",
+  // },
 
   referrerName: { type: String },
   hierarchy: { type: [Number], default: [] },
@@ -417,20 +435,20 @@ const userSchema = new mongoose.Schema({
   membership: { type: Number, default: 0 },
 });
 
-userSchema.pre("save", async function (next) {
-  if (this.isModified("password") || this.isNew) {
-    this.password = await bcrypt.hash(this.password, 10);
-  }
-  next();
-});
+// userSchema.pre("save", async function (next) {
+//   if (this.isModified("password") || this.isNew) {
+//     this.password = await bcrypt.hash(this.password, 10);
+//   }
+//   next();
+// });
 
 userSchema.statics.findByEmail = async function (email) {
   return this.findOne({ email });
 };
 
-userSchema.methods.comparePassword = async function (inputPassword) {
-  return bcrypt.compare(inputPassword, this.password);
-};
+// userSchema.methods.comparePassword = async function (inputPassword) {
+//   return bcrypt.compare(inputPassword, this.password);
+// };
 
 userSchema.post("save", async function (doc, next) {
   try {
@@ -461,7 +479,6 @@ userSchema.post("save", async function (doc, next) {
       console.log(
         ` Level updated for userId ${doc.referredBy} to ${levelValue}`
       );
-  
     }
 
     next();
@@ -470,6 +487,9 @@ userSchema.post("save", async function (doc, next) {
     next(err);
   }
 });
+{
+  timestamps: true;
+}
 
 const UserModel = mongoose.model("User", userSchema);
 export default UserModel;

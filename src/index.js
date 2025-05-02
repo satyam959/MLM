@@ -20,6 +20,7 @@ import BankRoutes from './Routes/BankAccountRoutes.mjs'
 import PlanRoutes from './Routes/PlanRoutes.mjs'
 import UserPlanRoutes from './Routes/UserPlanRoutes.mjs'
 import WithdrawalRoutes from './Routes/WithdrawalRoutes.mjs'
+import UserBenefits from './services/UserBenefits.mjs';
 dotenv.config();
 
 const app = express();

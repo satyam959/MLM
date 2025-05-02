@@ -4,9 +4,9 @@ import jwt from "jsonwebtoken";
 import UserModel from "../Models/UserModels.mjs";
 import WalletRepository from "../Repositories/WalletRepositories.mjs";
 import IncomeLevelModel from "../Models/IncomeLevelModel.mjs";
+import UserBenefits from "../services/UserBenefits.mjs";
 
 class UserController {
-
   async registerUser(req, res) {
     const {
       fullName,
@@ -16,17 +16,17 @@ class UserController {
       city,
       pincode,
       state,
-      password,
+      dob,
+      whatsapp,
       role,
-      companyName,
       referralCode,
     } = req.body;
 
     try {
       // Check if email already exists
-      const existingUser = await UserRepository.findUserByEmail(email);
+      const existingUser = await UserRepository.findUserByPhone(phone);
       if (existingUser) {
-        return res.status(400).json({ message: "Email already exists" });
+        return res.status(400).json({ message: "phone already exists" });
       }
 
       let referredBy = null;
@@ -55,9 +55,9 @@ class UserController {
         city,
         pincode,
         state,
-        password,
+        dob,
+        whatsapp,
         role,
-        companyName,
         referredBy,
         referrerName,
         hierarchy,
@@ -97,7 +97,8 @@ class UserController {
         const userIds = referredUserList.map((user) => user.userId);
         await WalletRepository.updateReferredUserWallet(userIds, amount);
 
-       
+        await UserBenefits.checkReferralRewardEligibility(user.referredBy);
+
         await WalletRepository.rewardBasedOnTeamSize(user.referredBy);
       }
 
@@ -119,42 +120,94 @@ class UserController {
     }
   }
 
-  // User Login
-  async loginUser(req, res) {
-    const { email, password } = req.body;
+  // Step 1: Send OTP
+async requestOTP(req, res) {
+  const { phone } = req.body;
 
-    try {
-      const user = await UserRepository.findUserByEmail(email);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      const isMatch = await user.comparePassword(password);
-      if (!isMatch) {
-        return res.status(400).json({ message: "Invalid credentials" });
-      }
-
-      const payload = {
-        userId: user._id,
-        name: user.name,
-        role: user.role,
-      };
-
-      const token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: "9h",
-      });
-
-      res.status(200).json({
-        message: "Login successful",
-        token,
-        user: { email: user.email, name: user.name, role: user.role },
-      });
-    } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Error logging in user", error: error.message });
-    }
+  // Validate phone number (must be 10 digits)
+  if (!phone || !/^\d{10}$/.test(phone)) {
+    return res.status(400).json({ message: "Phone number must be 10 digits" });
   }
+
+  try {
+    const user = await UserRepository.findUserByPhone(phone);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    await UserRepository.saveOTP(user._id, otp, otpExpiry);
+
+    // Simulate sending OTP
+    console.log(`OTP for ${phone}: ${otp}`);
+
+    return res.status(200).json({
+      statusCode: 200,
+      success: true,
+      message: "OTP sent successfully",
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      message: "Error sending OTP",
+      error: error.message,
+    });
+  }
+}
+
+// Step 2: Verify OTP and Login
+async verifyOTPLogin(req, res) {
+  const { phone, otp } = req.body;
+
+  // Validate phone number (must be 10 digits)
+  if (!phone || !/^\d{10}$/.test(phone)) {
+    return res.status(400).json({ message: "Phone number must be 10 digits" });
+  }
+
+  try {
+    const user = await UserRepository.findUserByPhone(phone);
+    if (!user || !user.otp || !user.otpExpiry) {
+      return res.status(400).json({ message: "OTP not requested or expired" });
+    }
+
+    if (user.otp !== otp || new Date(user.otpExpiry) < new Date()) {
+      return res.status(401).json({ message: "Invalid or expired OTP" });
+    }
+
+    await UserRepository.clearOTP(user._id);
+
+    const payload = {
+      userId: user._id,
+      name: user.fullName || user.name,
+      role: user.role,
+    };
+
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: "9h",
+    });
+
+    return res.status(200).json({
+      statusCode: 200,
+      success: true,
+      message: "Login successful via OTP",
+      token,
+      user: {
+        phone: user.phone,
+        name: user.fullName || user.name,
+        role: user.role,
+      },
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      message: "Error verifying OTP",
+      error: error.message,
+    });
+  }
+}
+
 
   // Admin: Get all users
   async getAllUsers(req, res) {
@@ -291,12 +344,10 @@ class UserController {
         user: safeUserData,
       });
     } catch (error) {
-      res
-        .status(500)
-        .json({
-          message: "Error fetching user by referral code",
-          error: error.message,
-        });
+      res.status(500).json({
+        message: "Error fetching user by referral code",
+        error: error.message,
+      });
     }
   }
 

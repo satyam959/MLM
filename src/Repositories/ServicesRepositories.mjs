@@ -61,18 +61,18 @@
 import Service from '../Models/ServicesModel.mjs';
 
 const ServiceRepository = {
-  // ✅ Create a new service
+  //  Create a new service
   async create(data) {
     const newService = new Service(data);
     return await newService.save();
   },
 
-  // ✅ Get all services
+  // Get all services
   async find() {
     return await Service.find();
   },
 
-  // ✅ Get a service by MongoDB ObjectId (if still used)
+  //  Get a service by MongoDB ObjectId (if still used)
   async findById(serviceId) {
     return await Service.findById(serviceId);
   },

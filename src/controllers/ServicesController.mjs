@@ -190,37 +190,91 @@
 
 import ServiceRepository from '../Repositories/ServicesRepositories.mjs';
 import mongoose from 'mongoose';
+import multer from 'multer';
 
 class ServiceController {
-  //  Create a new Service with duplicate check
-  async createService(req, res) {
-    try {
-      const { serviceType, description } = req.body;
+//   // Create a new Service with duplicate check
+// async createService(req, res) {
+//   try {
+//     const { serviceName, image, colour } = req.body;
 
-      if (!serviceType || typeof serviceType !== 'string' || serviceType.trim() === '') {
-        return res.status(400).json({ message: 'Valid serviceType is required' });
-      }
+//     // Validate serviceType
+//     if (!serviceName || typeof serviceName !== 'string' || serviceName.trim() === '') {
+//       return res.status(400).json({ message: 'Valid serviceType is required' });
+//     }
 
-      // Check if serviceType already exists
-      const existingService = await ServiceRepository.findOneByType(serviceType);
+//     // Validate image (optional, only if you require it)
+//     if (image && (typeof image !== 'string' || image.trim() === '')) {
+//       return res.status(400).json({ message: 'Valid image name or URL is required' });
+//     }
 
-      //  Create the new service regardless of duplication
-      const newService = await ServiceRepository.create({ serviceType, description });
+//     // Validate colour (optional)
+//     if (colour && (typeof colour !== 'string' || colour.trim() === '')) {
+//       return res.status(400).json({ message: 'Valid colour value is required' });
+//     }
 
-      return res.status(201).json({
-        message: existingService
-          ? 'service created successfully'
-          : 'Service created successfully',
-        isDuplicate: !!existingService,
-        newService
-      });
-    } catch (error) {
-      return res.status(500).json({
-        message: 'Error creating service',
-        error: error.message
-      });
+//     // Check if serviceType already exists
+//     const existingService = await ServiceRepository.findOneByType(serviceName);
+
+//     // Create the new service
+//     const newService = await ServiceRepository.create({ serviceName, image, colour });
+
+//     return res.status(201).json({
+//       message: existingService
+//         ? 'Service created successfully '
+//         : 'Service created successfully',
+//       isDuplicate: !!existingService,
+//       newService
+//     });
+//   } catch (error) {
+//     return res.status(500).json({
+//       message: 'Error creating service',
+//       error: error.message
+//     });
+//   }
+// }
+async createService(req, res) {
+  try {
+    const { serviceName, image, colour } = req.body;
+
+    // Validate serviceName
+    if (!serviceName || typeof serviceName !== 'string' || serviceName.trim() === '') {
+      return res.status(400).json({ message: 'Valid service name is required' });
     }
+
+    // Validate image (optional)
+    if (image && (typeof image !== 'string' || image.trim() === '')) {
+      return res.status(400).json({ message: 'Valid image name or URL is required' });
+    }
+
+    // Validate colour (optional)
+    if (colour && (typeof colour !== 'string' || colour.trim() === '')) {
+      return res.status(400).json({ message: 'Valid colour value is required' });
+    }
+
+    // Check if service already exists
+    const existingService = await ServiceRepository.findOneByType(serviceName);
+
+    // Optionally prevent duplicate creation (uncomment below if needed)
+    // if (existingService) {
+    //   return res.status(409).json({ message: 'Service with this name already exists' });
+    // }
+
+    // Create the new service
+    const newService = await ServiceRepository.create({ serviceName, image, colour });
+
+    return res.status(201).json({
+      message: 'Service created successfully',
+      newService,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Error creating service',
+      error: error.message,
+    });
   }
+}
+
 
   // Get all services
   async getAllServices(req, res) {
