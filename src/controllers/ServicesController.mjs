@@ -191,6 +191,7 @@
 import ServiceRepository from '../Repositories/ServicesRepositories.mjs';
 import mongoose from 'mongoose';
 import multer from 'multer';
+import upload from '../middelware/UploadImage.mjs';
 
 class ServiceController {
 //   // Create a new Service with duplicate check

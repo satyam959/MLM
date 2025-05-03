@@ -1,6 +1,7 @@
 import express from 'express';
 import ServiceController from '../controllers/ServicesController.mjs';
 import multer from 'multer';
+import upload from '../middelware/UploadImage.mjs';
 
 // Set up multer for file uploads
 const storage = multer.diskStorage({
@@ -12,12 +13,12 @@ const storage = multer.diskStorage({
   }
 });
 
-const upload = multer({ storage: storage });
+// const upload = multer({ storage: storage });
 
 const router = express.Router();
 
 // POST route for creating a new service with image upload (multer middleware used)
-router.post('/services', upload.single('image'), ServiceController.createService);
+router.post('/services', ServiceController.createService);
 
 // GET all services
 router.get('/services', ServiceController.getAllServices);

@@ -405,6 +405,7 @@ const userSchema = new mongoose.Schema({
     default: () => Math.floor(100000 + Math.random() * 900000),
     unique: true,
   },
+  
   dob: {
     type: String,
     require: true,
@@ -422,7 +423,7 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: "",
   },
-  
+  image: { type: String, default: false },
 
   // companyName: {
   //   type: String,

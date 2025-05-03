@@ -5,10 +5,180 @@ import UserModel from "../Models/UserModels.mjs";
 import WalletRepository from "../Repositories/WalletRepositories.mjs";
 import IncomeLevelModel from "../Models/IncomeLevelModel.mjs";
 import UserBenefits from "../services/UserBenefits.mjs";
+import upload from "../middelware/UploadImage.mjs";
 
 class UserController {
-  async registerUser(req, res) {
-    const {
+//   async registerUser(req, res) {
+//     const {
+//       fullName,
+//       email,
+//       phone,
+//       address,
+//       city,
+//       pincode,
+//       state,
+//       dob,
+//       whatsapp,
+//       role,
+//       referralCode,
+//     } = req.body;
+
+//     try {
+//       // Check if email already exists
+//       const existingUser = await UserRepository.findUserByPhone(phone);
+//       if (existingUser) {
+//         return res.status(400).json({ message: "phone already exists" });
+//       }
+
+//       let referredBy = null;
+//       let referrerName = null;
+//       let hierarchy = [];
+
+//       // Handle referral code
+//       if (referralCode) {
+//         const referrer = await UserModel.findOne({ referralCode });
+
+//         if (!referrer) {
+//           return res.status(400).json({ message: "Invalid referral code" });
+//         }
+
+//         referredBy = referrer.userId;
+//         referrerName = referrer.fullName || referrer.name || null;
+//         hierarchy = [referredBy, ...(referrer.hierarchy || [])];
+//       }
+
+//       // Prepare new user data
+//       const newUserData = {
+//         fullName,
+//         email,
+//         phone,
+//         address,
+//         city,
+//         pincode,
+//         state,
+//         dob,
+//         whatsapp,
+//         role,
+//         referredBy,
+//         referrerName,
+//         hierarchy,
+//       };
+
+//       // Create user
+//       const user = await UserRepository.createUser(newUserData);
+
+//       if (!user || !user.userId) {
+//         return res.status(500).json({ message: "User creation failed" });
+//       }
+
+//       // Create wallet
+//       const initialBalance = 200;
+//       const walletData = {
+//         userId: user.userId,
+//         balance: initialBalance,
+//       };
+
+//       const wallet = await WalletRepository.createWallet(walletData);
+//       if (user.referredBy) {
+//         let amount = 0;
+//         const referredUserList = await UserRepository.findAllUserByReferredId(
+//           user.referredBy
+//         );
+//         let referredUserCount = referredUserList.length;
+//         console.log("referredUserCount == ", referredUserCount);
+
+//         if (referredUserCount === 3) {
+//           amount = 200;
+//         }
+//         if (referredUserCount === 8) {
+//           amount = 40;
+//         }
+//         console.log("amount --", amount);
+
+//         const userIds = referredUserList.map((user) => user.userId);
+//         await WalletRepository.updateReferredUserWallet(userIds, amount);
+
+//         await UserBenefits.checkReferralRewardEligibility(user.referredBy);
+
+//         await WalletRepository.rewardBasedOnTeamSize(user.referredBy);
+//       }
+
+//       if (!wallet) {
+//         return res
+//           .status(500)
+//           .json({ message: "User created, but wallet creation failed" });
+//       }
+//     return res.status(201).json({
+//       statusCode: 201,
+//       success: true,
+//       message: "User registered successfully, wallet created",
+//       user, 
+//     });
+//   } catch (error) {
+//     return res.status(500).json({
+//       message: "Error registering user",
+//       error: error.message,
+//     });
+//   }
+// }
+
+
+
+
+
+
+
+
+async registerUser(req, res) {
+  const {
+    fullName,
+    email,
+    phone,
+    address,
+    city,
+    pincode,
+    state,
+    dob,
+    whatsapp,
+    role,
+    referralCode,
+  } = req.body;
+
+  const image = req.file ? req.file.filename : null; // Multer handles this
+
+  try {
+    // Check if phone already exists
+    const existingUser = await UserRepository.findUserByPhone(phone);
+    if (existingUser) {
+      return res.status(400).json({
+        statusCode: 400,
+        success: false,
+        message: "Phone number already exists",
+      });
+    }
+
+    let referredBy = null;
+    let referrerName = null;
+    let hierarchy = [];
+
+    // Handle referral code
+    if (referralCode) {
+      const referrer = await UserModel.findOne({ referralCode });
+      if (!referrer) {
+        return res.status(400).json({
+          statusCode: 400,
+          success: false,
+          message: "Invalid referral code",
+        });
+      }
+
+      referredBy = referrer.userId;
+      referrerName = referrer.fullName || referrer.name || null;
+      hierarchy = [referredBy, ...(referrer.hierarchy || [])];
+    }
+
+    // Prepare new user data
+    const newUserData = {
       fullName,
       email,
       phone,
@@ -19,106 +189,67 @@ class UserController {
       dob,
       whatsapp,
       role,
-      referralCode,
-    } = req.body;
+      image,
+      referredBy,
+      referrerName,
+      hierarchy,
+    };
 
-    try {
-      // Check if email already exists
-      const existingUser = await UserRepository.findUserByPhone(phone);
-      if (existingUser) {
-        return res.status(400).json({ message: "phone already exists" });
-      }
-
-      let referredBy = null;
-      let referrerName = null;
-      let hierarchy = [];
-
-      // Handle referral code
-      if (referralCode) {
-        const referrer = await UserModel.findOne({ referralCode });
-
-        if (!referrer) {
-          return res.status(400).json({ message: "Invalid referral code" });
-        }
-
-        referredBy = referrer.userId;
-        referrerName = referrer.fullName || referrer.name || null;
-        hierarchy = [referredBy, ...(referrer.hierarchy || [])];
-      }
-
-      // Prepare new user data
-      const newUserData = {
-        fullName,
-        email,
-        phone,
-        address,
-        city,
-        pincode,
-        state,
-        dob,
-        whatsapp,
-        role,
-        referredBy,
-        referrerName,
-        hierarchy,
-      };
-
-      // Create user
-      const user = await UserRepository.createUser(newUserData);
-
-      if (!user || !user.userId) {
-        return res.status(500).json({ message: "User creation failed" });
-      }
-
-      // Create wallet
-      const initialBalance = 200;
-      const walletData = {
-        userId: user.userId,
-        balance: initialBalance,
-      };
-
-      const wallet = await WalletRepository.createWallet(walletData);
-      if (user.referredBy) {
-        let amount = 0;
-        const referredUserList = await UserRepository.findAllUserByReferredId(
-          user.referredBy
-        );
-        let referredUserCount = referredUserList.length;
-        console.log("referredUserCount == ", referredUserCount);
-
-        if (referredUserCount === 3) {
-          amount = 200;
-        }
-        if (referredUserCount === 8) {
-          amount = 40;
-        }
-        console.log("amount --", amount);
-
-        const userIds = referredUserList.map((user) => user.userId);
-        await WalletRepository.updateReferredUserWallet(userIds, amount);
-
-        await UserBenefits.checkReferralRewardEligibility(user.referredBy);
-
-        await WalletRepository.rewardBasedOnTeamSize(user.referredBy);
-      }
-
-      if (!wallet) {
-        return res
-          .status(500)
-          .json({ message: "User created, but wallet creation failed" });
-      }
-
-      return res.status(201).json({
-        message: "User registered successfully, wallet created",
-        user,
-      });
-    } catch (error) {
+    // Create user
+    const user = await UserRepository.createUser(newUserData);
+    if (!user || !user.userId) {
       return res.status(500).json({
-        message: "Error registering user",
-        error: error.message,
+        statusCode: 500,
+        success: false,
+        message: "User creation failed",
       });
     }
+
+    // Create wallet
+    const wallet = await WalletRepository.createWallet({
+      userId: user.userId,
+      balance: 200,
+    });
+
+    if (!wallet) {
+      return res.status(500).json({
+        statusCode: 500,
+        success: false,
+        message: "User created, but wallet creation failed",
+      });
+    }
+
+    // Handle referral rewards
+    if (user.referredBy) {
+      const referredUserList = await UserRepository.findAllUserByReferredId(user.referredBy);
+      const referredUserCount = referredUserList.length;
+
+      let amount = 0;
+      if (referredUserCount === 3) amount = 200;
+      if (referredUserCount === 8) amount = 40;
+
+      const userIds = referredUserList.map(u => u.userId);
+      await WalletRepository.updateReferredUserWallet(userIds, amount);
+      await UserBenefits.checkReferralRewardEligibility(user.referredBy);
+      await WalletRepository.rewardBasedOnTeamSize(user.referredBy);
+    }
+
+    return res.status(201).json({
+      statusCode: 201,
+      success: true,
+      message: "User registered successfully, wallet created",
+      user,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      statusCode: 500,
+      success: false,
+      message: "Error registering user",
+      error: error.message,
+    });
   }
+}
+
 
   // Step 1: Send OTP
 async requestOTP(req, res) {
@@ -264,49 +395,113 @@ async verifyOTPLogin(req, res) {
   // Get user profile
   async getUserProfile(req, res) {
     const { userId } = req.params;
-
+  
     try {
       const user = await UserRepository.findUserByUserId(userId);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-
-      const { password, ...safeUserData } = user.toObject();
-      res.status(200).json({
+  
+      const {
+        userId: uId, 
+        fullName,
+        phone,
+        email,
+        companyName,
+        address,
+        city,
+        state,
+        country,
+        pinCode,
+        image,
+      } = user;
+  
+      return res.status(200).json({
+        statusCode: 200,
+        success: true,
         message: "User profile fetched successfully",
-        user: safeUserData,
+        user: {
+          userId: uId,
+          fullName,
+          phone,
+          email,
+          companyName,
+          address,
+          city,
+          state,
+          country,
+          pinCode,
+          image,
+        },
       });
     } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Error fetching user profile", error: error.message });
+      return res.status(500).json({
+        message: "Error fetching user profile",
+        error: error.message,
+      });
     }
   }
+  
+  
 
   // Update profile
   async updateProfile(req, res) {
     const { userId } = req.params;
     const updateData = req.body;
-
+  
     try {
-      const updatedUser = await UserRepository.updateUserByUserId(
-        userId,
-        updateData
-      );
+      // If image is uploaded via multer, include its path
+      if (req.file) {
+        updateData.image = req.file.path; // Or construct a URL if serving statically
+      }
+  
+      const updatedUser = await UserRepository.updateUserByUserId(userId, updateData);
+  
       if (!updatedUser) {
         return res.status(404).json({ message: "User not found" });
       }
-
-      const { password, ...safeUserData } = updatedUser.toObject();
-      res
-        .status(200)
-        .json({ message: "Profile updated successfully", user: safeUserData });
+  
+      // Extract only required fields
+      const {
+        fullName,
+        phone,
+        email,
+        companyName,
+        address,
+        city,
+        state,
+        country,
+        pinCode,
+        image,
+      } = updatedUser;
+  
+      return res.status(200).json({
+        statusCode: 200,
+        success: true,
+        message: "Profile updated successfully",
+        user: {
+          fullName,
+          phone,
+          email,
+          companyName,
+          address,
+          city,
+          state,
+          country,
+          pinCode,
+          image,
+        },
+      });
     } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Error updating profile", error: error.message });
+      return res.status(500).json({
+        statusCode: 500,
+        success: false,
+        message: "Error updating profile",
+        error: error.message,
+      });
     }
   }
+  
 
   // Delete profile
   async deleteProfile(req, res) {
