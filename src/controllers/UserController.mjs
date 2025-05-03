@@ -144,7 +144,7 @@ async registerUser(req, res) {
     referralCode,
   } = req.body;
 
-  const image = req.file ? req.file.filename : null; // Multer handles this
+  const image = req.file ? req.file.filename : null;
 
   try {
     // Check if phone already exists
@@ -161,7 +161,6 @@ async registerUser(req, res) {
     let referrerName = null;
     let hierarchy = [];
 
-    // Handle referral code
     if (referralCode) {
       const referrer = await UserModel.findOne({ referralCode });
       if (!referrer) {
@@ -177,7 +176,6 @@ async registerUser(req, res) {
       hierarchy = [referredBy, ...(referrer.hierarchy || [])];
     }
 
-    // Prepare new user data
     const newUserData = {
       fullName,
       email,
@@ -195,7 +193,6 @@ async registerUser(req, res) {
       hierarchy,
     };
 
-    // Create user
     const user = await UserRepository.createUser(newUserData);
     if (!user || !user.userId) {
       return res.status(500).json({
@@ -205,7 +202,6 @@ async registerUser(req, res) {
       });
     }
 
-    // Create wallet
     const wallet = await WalletRepository.createWallet({
       userId: user.userId,
       balance: 200,
@@ -219,7 +215,6 @@ async registerUser(req, res) {
       });
     }
 
-    // Handle referral rewards
     if (user.referredBy) {
       const referredUserList = await UserRepository.findAllUserByReferredId(user.referredBy);
       const referredUserCount = referredUserList.length;
@@ -234,11 +229,19 @@ async registerUser(req, res) {
       await WalletRepository.rewardBasedOnTeamSize(user.referredBy);
     }
 
+    // Return only selected fields
     return res.status(201).json({
       statusCode: 201,
       success: true,
       message: "User registered successfully, wallet created",
-      user,
+      user: {
+        fullName: user.fullName,
+        email: user.email,
+        dob: user.dob,
+        phone: user.phone,
+        whatsapp: user.whatsapp,
+        referralCode: user.referralCode,
+      },
     });
   } catch (error) {
     return res.status(500).json({
@@ -249,6 +252,7 @@ async registerUser(req, res) {
     });
   }
 }
+
 
 
   // Step 1: Send OTP
