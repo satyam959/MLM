@@ -312,23 +312,12 @@ async resendOTP(req, res) {
 
   // Get user profile
   async getUserProfile(req, res) {
-    const { userId } = req.user; // Get userId from the decoded JWT token
-  
-    // Debugging: log the userId
-    console.log("Extracted UserId from Token:", userId);
-  
+    const { userId } = req.user;   
     try {
-      // Fetch the user data from the database using the userId
-      const user = await UserRepository.findUserByUserId(userId);
-  
-      // Debugging: log the user object returned from the database
-      console.log("Fetched User:", user);
-  
+      const user = await UserRepository.findUserByUserId(userId);  
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-  
-      // Destructure the data you want to send back in the response
       const {
         userId: uId,
         fullName,
@@ -338,13 +327,11 @@ async resendOTP(req, res) {
         address,
         city,
         state,
-        country,
-        pinCode,
+        country, 
+        pinCode,  
         image,
       } = user;
-  
-      // Send back the user profile details
-      return res.status(200).json({
+        return res.status(200).json({
         statusCode: 200,
         success: true,
         message: "User profile fetched successfully",
@@ -357,20 +344,19 @@ async resendOTP(req, res) {
           address,
           city,
           state,
-          country,
-          pinCode,
+          country,  
+          pinCode,  
           image,
         },
       });
     } catch (error) {
-      // Debugging: log the error during the database query
-      console.error("Error fetching user profile:", error.message);
       return res.status(500).json({
         message: "Error fetching user profile",
         error: error.message,
       });
     }
   }
+  
   
   
 

@@ -379,7 +379,7 @@ const userSchema = new mongoose.Schema({
     default: "",
   },
   city: { type: String, default: "" },
-  pincode: { type: String, default: "" },
+  pinCode: { type: String, default: "" },
   state: { type: String, default: "" },
   // password: {
   //   type: String,
@@ -421,6 +421,10 @@ const userSchema = new mongoose.Schema({
   },
   whatsapp: {
     type: Number,
+    default: "",
+  },
+  country: {
+    type: String,
     default: "",
   },
   image: { type: String, default: false },
