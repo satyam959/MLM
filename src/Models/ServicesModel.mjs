@@ -6,14 +6,15 @@ const serviceSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    image: {
+    serviceIcon: {
       type: String,
       required: false,
     },
-    colour: {
+    category: {
       type: String,
       required: false,
     },
+
     serviceId: {
       type: Number,
       default: () => Math.floor(100000 + Math.random() * 900000),

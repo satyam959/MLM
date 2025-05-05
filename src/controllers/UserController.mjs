@@ -5,130 +5,11 @@ import UserModel from "../Models/UserModels.mjs";
 import WalletRepository from "../Repositories/WalletRepositories.mjs";
 import IncomeLevelModel from "../Models/IncomeLevelModel.mjs";
 import UserBenefits from "../services/UserBenefits.mjs";
-import upload from "../middelware/UploadImage.mjs";
+// import upload from "../middelware/UploadImage.mjs";
+import { getUploadMiddleware } from "../middelware/UploadImage.mjs"; // ✅ correct
+
 
 class UserController {
-//   async registerUser(req, res) {
-//     const {
-//       fullName,
-//       email,
-//       phone,
-//       address,
-//       city,
-//       pincode,
-//       state,
-//       dob,
-//       whatsapp,
-//       role,
-//       referralCode,
-//     } = req.body;
-
-//     try {
-//       // Check if email already exists
-//       const existingUser = await UserRepository.findUserByPhone(phone);
-//       if (existingUser) {
-//         return res.status(400).json({ message: "phone already exists" });
-//       }
-
-//       let referredBy = null;
-//       let referrerName = null;
-//       let hierarchy = [];
-
-//       // Handle referral code
-//       if (referralCode) {
-//         const referrer = await UserModel.findOne({ referralCode });
-
-//         if (!referrer) {
-//           return res.status(400).json({ message: "Invalid referral code" });
-//         }
-
-//         referredBy = referrer.userId;
-//         referrerName = referrer.fullName || referrer.name || null;
-//         hierarchy = [referredBy, ...(referrer.hierarchy || [])];
-//       }
-
-//       // Prepare new user data
-//       const newUserData = {
-//         fullName,
-//         email,
-//         phone,
-//         address,
-//         city,
-//         pincode,
-//         state,
-//         dob,
-//         whatsapp,
-//         role,
-//         referredBy,
-//         referrerName,
-//         hierarchy,
-//       };
-
-//       // Create user
-//       const user = await UserRepository.createUser(newUserData);
-
-//       if (!user || !user.userId) {
-//         return res.status(500).json({ message: "User creation failed" });
-//       }
-
-//       // Create wallet
-//       const initialBalance = 200;
-//       const walletData = {
-//         userId: user.userId,
-//         balance: initialBalance,
-//       };
-
-//       const wallet = await WalletRepository.createWallet(walletData);
-//       if (user.referredBy) {
-//         let amount = 0;
-//         const referredUserList = await UserRepository.findAllUserByReferredId(
-//           user.referredBy
-//         );
-//         let referredUserCount = referredUserList.length;
-//         console.log("referredUserCount == ", referredUserCount);
-
-//         if (referredUserCount === 3) {
-//           amount = 200;
-//         }
-//         if (referredUserCount === 8) {
-//           amount = 40;
-//         }
-//         console.log("amount --", amount);
-
-//         const userIds = referredUserList.map((user) => user.userId);
-//         await WalletRepository.updateReferredUserWallet(userIds, amount);
-
-//         await UserBenefits.checkReferralRewardEligibility(user.referredBy);
-
-//         await WalletRepository.rewardBasedOnTeamSize(user.referredBy);
-//       }
-
-//       if (!wallet) {
-//         return res
-//           .status(500)
-//           .json({ message: "User created, but wallet creation failed" });
-//       }
-//     return res.status(201).json({
-//       statusCode: 201,
-//       success: true,
-//       message: "User registered successfully, wallet created",
-//       user, 
-//     });
-//   } catch (error) {
-//     return res.status(500).json({
-//       message: "Error registering user",
-//       error: error.message,
-//     });
-//   }
-// }
-
-
-
-
-
-
-
-
 async registerUser(req, res) {
   const {
     fullName,
@@ -144,7 +25,7 @@ async registerUser(req, res) {
     referralCode,
   } = req.body;
 
-  const image = req.file ? req.file.filename : null;
+  const image = req.file ? req.file.fullUrl : null;
 
   try {
     // Check if phone already exists
@@ -252,14 +133,10 @@ async registerUser(req, res) {
     });
   }
 }
-
-
-
   // Step 1: Send OTP
 async requestOTP(req, res) {
   const { phone } = req.body;
 
-  // Validate phone number (must be 10 digits)
   if (!phone || !/^\d{10}$/.test(phone)) {
     return res.status(400).json({ message: "Phone number must be 10 digits" });
   }

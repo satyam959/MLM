@@ -1,26 +1,14 @@
 import express from 'express';
 import UserController from '../controllers/UserController.mjs';
-import upload from "../middelware/UploadImage.mjs";
-
-// For updating user profile with image
-//  router.patch("/profile/:userId", upload.single("image"), UserController.updateProfile);
-
+import { getUploadMiddleware } from "../middelware/UploadImage.mjs"; 
 
 const router = express.Router();
 
 // ----------------- USER ROUTES ------------------
 
 
+router.post('/register', getUploadMiddleware('image', 'default'), UserController.registerUser); 
 
-
- router.post("/register", upload.single("image"), UserController.registerUser.bind(UserController));
-// router.put("/profile/:userId", upload.single("image"), UserController.updateProfile.bind(UserController));
-
-
-// Register new user
- //router.post('/register',upload, UserController.registerUser);
-
-// Login via password (if you still use it)
 // router.post('/login', UserController.loginUser);
 
 // OTP-based login
