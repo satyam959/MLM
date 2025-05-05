@@ -102,13 +102,21 @@ class UserRepository {
 
   static async findUserByUserId(userId) {
     try {
-      return await UserModel.findOne({ userId });
+      // Debugging: log the query being executed
+      console.log("Querying User with userId:", userId);
+  
+      const user = await UserModel.findOne({ userId: userId });
+  
+      // Debugging: log the user object returned from the database
+      console.log("User Found:", user);
+  
+      return user;
     } catch (error) {
-      console.error("Error finding user by userId:", error.message);
-      throw new Error(`Failed to find user by userId: ${error.message}`);
+      // Debugging: log the error during the database query
+      console.error("Error fetching user from the database:", error.message);
+      throw new Error("Error fetching user from the database");
     }
   }
-
   static async findUserByReferralCode(referralCode) {
     try {
       return await UserModel.findOne({ referralCode });
@@ -148,9 +156,12 @@ class UserRepository {
 
   static async clearOTP(userId) {
     try {
-      return await UserModel.findByIdAndUpdate(userId, {
-        $unset: { otp: "", otpExpiry: "" },
-      });
+
+      return await UserModel.findOneAndUpdate(
+        { userId: userId }, 
+        { $unset: { otp: "", otpExpiry: "" } },
+        { new: true } 
+      );
     } catch (error) {
       console.error("Error clearing OTP:", error.message);
       throw new Error(`Failed to clear OTP: ${error.message}`);

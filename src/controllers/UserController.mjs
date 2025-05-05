@@ -188,10 +188,10 @@ async verifyOTPLogin(req, res) {
       return res.status(401).json({ message: "Invalid or expired OTP" });
     }
 
-    await UserRepository.clearOTP(user._id);
+    await UserRepository.clearOTP(user.userId);
 
     const payload = {
-      userId: user._id,
+      userId: user.userId,
       name: user.fullName || user.name,
       role: user.role,
     };
@@ -312,16 +312,25 @@ async resendOTP(req, res) {
 
   // Get user profile
   async getUserProfile(req, res) {
-    const { userId } = req.params;
+    const { userId } = req.user; // Get userId from the decoded JWT token
+  
+    // Debugging: log the userId
+    console.log("Extracted UserId from Token:", userId);
   
     try {
+      // Fetch the user data from the database using the userId
       const user = await UserRepository.findUserByUserId(userId);
+  
+      // Debugging: log the user object returned from the database
+      console.log("Fetched User:", user);
+  
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
   
+      // Destructure the data you want to send back in the response
       const {
-        userId: uId, 
+        userId: uId,
         fullName,
         phone,
         email,
@@ -334,6 +343,7 @@ async resendOTP(req, res) {
         image,
       } = user;
   
+      // Send back the user profile details
       return res.status(200).json({
         statusCode: 200,
         success: true,
@@ -353,6 +363,8 @@ async resendOTP(req, res) {
         },
       });
     } catch (error) {
+      // Debugging: log the error during the database query
+      console.error("Error fetching user profile:", error.message);
       return res.status(500).json({
         message: "Error fetching user profile",
         error: error.message,
@@ -364,13 +376,12 @@ async resendOTP(req, res) {
 
   // Update profile
   async updateProfile(req, res) {
-    const { userId } = req.params;
-    const updateData = req.body;
+    const { userId } = req.user; 
+    const updateData = req.body; 
   
     try {
-      // If image is uploaded via multer, include its path
       if (req.file) {
-        updateData.image = req.file.path; // Or construct a URL if serving statically
+        updateData.image = req.file.path; 
       }
   
       const updatedUser = await UserRepository.updateUserByUserId(userId, updateData);
@@ -379,7 +390,6 @@ async resendOTP(req, res) {
         return res.status(404).json({ message: "User not found" });
       }
   
-      // Extract only required fields
       const {
         fullName,
         phone,
@@ -421,23 +431,39 @@ async resendOTP(req, res) {
   }
   
 
-  // Delete profile
-  async deleteProfile(req, res) {
-    const { userId } = req.params;
-
-    try {
-      const deletedUser = await UserRepository.deleteUserByUserId(userId);
-      if (!deletedUser) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      res.status(200).json({ message: "Profile deleted successfully" });
-    } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Error deleting profile", error: error.message });
+  /// Delete profile
+async deleteProfile(req, res) {
+  const { userId } = req.user; // ✅ token se userId
+  
+  try {
+    const deletedUser = await UserRepository.deleteUserByUserId(userId);
+    
+    // If the user is not found in the database
+    if (!deletedUser) {
+      return res.status(404).json({
+        statusCode: 404,
+        success: false,
+        message: "User not found"
+      });
     }
+    
+    // Successful deletion, return 200 status code with success details
+    return res.status(200).json({
+      statusCode: 200,
+      success: true,
+      message: "Profile deleted successfully"
+    });
+  } catch (error) {
+    // If there's an error, return 500 status code
+    return res.status(500).json({
+      statusCode: 500,
+      success: false,
+      message: "Error deleting profile",
+      error: error.message
+    });
   }
+}
+
 
   // Get user by referral code
   async getUserByReferralCode(req, res) {

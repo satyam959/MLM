@@ -1,26 +1,33 @@
-// middlewares/authMiddleware.mjs
 import jwt from 'jsonwebtoken';
 
-const verifyToken = (req, res, next) => {
-  const token = req.headers['authorization']?.split(' ')[1];  // Extract token from Bearer scheme
-  if (!token) {
-    return res.status(403).json({ message: 'Access denied. No token provided.' });
+const verify = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  // Debugging: log the entire Authorization header
+  console.log("Authorization Header:", authHeader);
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Unauthorized: No token provided" });
   }
 
-  jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key', (err, decoded) => {
-    if (err) {
-      return res.status(403).json({ message: 'Invalid or expired token' });
-    }
-    req.user = decoded;  // Attach decoded user information to request
+  const token = authHeader.split(" ")[1];
+
+  // Debugging: log the extracted token
+  console.log("Extracted Token:", token);
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Debugging: log the decoded token
+    console.log("Decoded Token:", decoded);
+
+    req.user = decoded;  // Save the decoded token to the request object
     next();
-  });
-};
-
-const isAdmin = (req, res, next) => {
-  if (req.user.role !== 'admin') {
-    return res.status(403).json({ message: 'Forbidden. Admins only.' });
+  } catch (error) {
+    // Debugging: log the error if token verification fails
+    console.error("Error verifying token:", error);
+    return res.status(401).json({ message: "Unauthorized: Invalid token" });
   }
-  next();
 };
 
-export { verifyToken, isAdmin };
+export default verify;
