@@ -26,7 +26,7 @@ const router = express.Router();
 // OTP-based login
 router.post('/request-otp', UserController.requestOTP);
 router.post('/verify-otp', UserController.verifyOTPLogin);
-router.post('/resend-otp', UserController.requestOTP);
+router.post('/resend-otp', UserController.resendOTP);
 
 // Admin: Get all users
 router.get('/getAllusers', UserController.getAllUsers);

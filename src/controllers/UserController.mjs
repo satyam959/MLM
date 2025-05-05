@@ -343,6 +343,43 @@ async verifyOTPLogin(req, res) {
   }
 }
 
+async resendOTP(req, res) {
+  const { phone } = req.body;
+
+  // Validate phone number
+  if (!phone || !/^\d{10}$/.test(phone)) {
+    return res.status(400).json({ message: "Phone number must be 10 digits" });
+  }
+
+  try {
+    const user = await UserRepository.findUserByPhone(phone);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Generate a new OTP and expiry time
+    const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    await UserRepository.saveOTP(user._id, newOtp, otpExpiry);
+
+    // Simulate sending OTP
+    console.log(`Resent OTP for ${phone}: ${newOtp}`);
+
+    return res.status(200).json({
+      statusCode: 200,
+      success: true,
+      message: "OTP resent successfully",
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      message: "Error resending OTP",
+      error: error.message,
+    });
+  }
+}
+
 
   // Admin: Get all users
   async getAllUsers(req, res) {
