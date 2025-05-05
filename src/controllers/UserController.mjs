@@ -330,6 +330,7 @@ async resendOTP(req, res) {
         country, 
         pinCode,  
         image,
+        referralCode,
       } = user;
         return res.status(200).json({
         statusCode: 200,
@@ -347,6 +348,7 @@ async resendOTP(req, res) {
           country,  
           pinCode,  
           image,
+          referralCode,
         },
       });
     } catch (error) {

@@ -102,18 +102,11 @@ class UserRepository {
 
   static async findUserByUserId(userId) {
     try {
-      // Debugging: log the query being executed
-      console.log("Querying User with userId:", userId);
   
       const user = await UserModel.findOne({ userId: userId });
-  
-      // Debugging: log the user object returned from the database
-      console.log("User Found:", user);
-  
+
       return user;
     } catch (error) {
-      // Debugging: log the error during the database query
-      console.error("Error fetching user from the database:", error.message);
       throw new Error("Error fetching user from the database");
     }
   }
