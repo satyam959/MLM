@@ -171,7 +171,7 @@ app.use('/api/permissions', permissionRoutes);
 app.use('/api/ranks', rankRoutes);
 app.use('/api/royalties', royaltyRoutes);
 app.use('/api/Withdrawal', WithdrawalRoutes);
-app.use('/api/home-dashboard',HomeDashboard)
+app.use('/api/homeDashboard',HomeDashboard)
 
 // Start server
 app.listen(port, () => {
