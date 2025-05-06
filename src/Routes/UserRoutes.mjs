@@ -9,7 +9,7 @@ const router = express.Router();
 // ----------------- USER ROUTES ------------------
 
 // Register with image
-router.post('/register', getUploadMiddleware('image', 'default'), UserController.registerUser); 
+router.post('/register', getUploadMiddleware('image'), UserController.registerUser); 
 
 // OTP-based login
 router.post('/request-otp', UserController.requestOTP);
@@ -21,11 +21,11 @@ router.get('/getAllusers', UserController.getAllUsers);
 
 // 🔒 Protected Routes (token required)
 router.get('/getUserProfile', verifyToken, UserController.getUserProfile); // No userId in URL anymore
-router.put('/updateProfile', verifyToken, getUploadMiddleware('image', 'default'), UserController.updateProfile);
+router.put('/updateProfile', verifyToken, getUploadMiddleware('image'), UserController.updateProfile);
 router.delete('/deleteProfile', verifyToken, UserController.deleteProfile);
 
 // Admin routes by userId (if needed)
-router.put('/updateByUserId/:userId', UserController.updateUser);
+// router.put('/updateByUserId/:userId', UserController.updateUser);
 router.delete('/deleteByUserId/:userId', UserController.deleteUser);
 
 // Referral-based

@@ -44,12 +44,12 @@ const upload = multer({
 });
 
 // Middleware to upload and attach full URL
-export const getUploadMiddleware = () => {
+export const getUploadMiddleware = (fieldName = 'image') => {
   return (req, res, next) => {
-    upload.single('image')(req, res, (err) => {
+    upload.single(fieldName)(req, res, (err) => {
       if (err) return next(err);
       if (req.file) {
-        req.file.fullUrl = `${UPLOADS_FOLDER}/${req.file.filename}`;
+        req.file.fullUrl = `/${UPLOADS_FOLDER}/${req.file.filename}`; 
       }
       next();
     });
