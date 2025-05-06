@@ -128,6 +128,7 @@ import PlanRoutes from './Routes/PlanRoutes.mjs';
 import UserPlanRoutes from './Routes/UserPlanRoutes.mjs';
 import WithdrawalRoutes from './Routes/WithdrawalRoutes.mjs';
 import UserBenefits from './services/UserBenefits.mjs';
+import HomeDashboard from './Routes/HomeDashboardRoutes.mjs';
 
 dotenv.config();
 
@@ -170,6 +171,7 @@ app.use('/api/permissions', permissionRoutes);
 app.use('/api/ranks', rankRoutes);
 app.use('/api/royalties', royaltyRoutes);
 app.use('/api/Withdrawal', WithdrawalRoutes);
+app.use('/api/home-dashboard',HomeDashboard)
 
 // Start server
 app.listen(port, () => {
