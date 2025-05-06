@@ -421,7 +421,7 @@ async resendOTP(req, res) {
 
   async updateProfile(req, res) {
     const { userId } = req.user; 
-    const updateData = { ...req.query };  
+    const updateData = { ...req.body, ...req.query };
   
     try {
       if (req.file) {
