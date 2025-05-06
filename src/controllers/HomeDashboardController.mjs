@@ -1,20 +1,18 @@
-
 import ServiceRepository from '../Repositories/ServicesRepositories.mjs';
 import UserRepository from "../Repositories/UserRepository.mjs";
 
-class HomeDashboardController{
+class HomeDashboardController {
 
-
- async getAll(req, res) {
-    const { userId } = req.user;   
+  async getAll(req, res) {
+    const { userId } = req.user;
     try {
-      const user = await UserRepository.findUserByUserId(userId);  
+      const user = await UserRepository.findUserByUserId(userId);
       const services = await ServiceRepository.find();
-      const banner = [];
-      const companyProfile = [];
+
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
+
       const {
         userId: uId,
         fullName,
@@ -24,12 +22,22 @@ class HomeDashboardController{
         address,
         city,
         state,
-        country, 
-        pinCode,  
+        country,
+        pinCode,
         image,
         referralCode,
       } = user;
-        return res.status(200).json({
+
+      const banner = [];
+
+      const companyProfile = {
+        companyName: companyName || "Scriza",
+        companyContact: phone || "N/A",
+        companyEmail: email || "support@scriza.in",
+        companyWebsite: "https://yourcompanywebsite.com"
+      };
+
+      return res.status(200).json({
         statusCode: 200,
         success: true,
         message: "User profile fetched successfully",
@@ -42,15 +50,16 @@ class HomeDashboardController{
           address,
           city,
           state,
-          country,  
-          pinCode,  
+          country,
+          pinCode,
           image,
           referralCode,
         },
         services,
         banner,
-        companyProfile,
+        companyProfile
       });
+
     } catch (error) {
       return res.status(500).json({
         message: "Error fetching user profile",
@@ -58,7 +67,7 @@ class HomeDashboardController{
       });
     }
   }
-  
 
 }
+
 export default new HomeDashboardController();
