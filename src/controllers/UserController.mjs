@@ -197,7 +197,7 @@ async verifyOTPLogin(req, res) {
     };
 
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: "9h",
+      expiresIn: "365d",
     });
 
     return res.status(200).json({
