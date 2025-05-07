@@ -9,7 +9,7 @@ const router = express.Router();
 router.post('/createBankAccount',verify ,BankController.createBank);
 
 // Get all bank accounts
-router.get('/getBankAccountsankController.getAllBanks);
+router.get('/getAllBanks',verify, BankController.getAllBanks);
 
 // Get a bank account by userId
 router.get('/getBankById/:bankId',verify, BankController.getBankById);
