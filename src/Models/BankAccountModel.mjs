@@ -7,6 +7,8 @@ const bankSchema = new mongoose.Schema({
   bank: { type: String, required: true },
   branch: { type: String, required: true },
   userId: { type: String, required: true, unique: true }, // Add this
+  bankId: { type: Number, default: () => Math.floor(100000 + Math.random() * 900000), unique: true },
+
 }, { timestamps: true });
 
 export const Bank = mongoose.model('Bank', bankSchema);

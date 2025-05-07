@@ -1,21 +1,23 @@
 import express from 'express';
 import BankController from '../controllers/BankAccountController.mjs';
+import verify from '../middelware/authMiddleware.mjs';
+
 
 const router = express.Router();
 
 // Create bank account
-router.post('/createBankAccount', BankController.createBank);
+router.post('/createBankAccount',verify ,BankController.createBank);
 
 // Get all bank accounts
-router.get('/getAllBanks', BankController.getAllBanks);
+router.get('/getAllBanks',verify, BankController.getAllBanks);
 
 // Get a bank account by userId
-router.get('/getBankById/:userId', BankController.getBankById);
+router.get('/getBankById/:bankId',verify, BankController.getBankById);
 
 // Update a bank account by userId
-router.put('/updateBank/:userId', BankController.updateBank);
+router.put('/updateBank/:bankId', verify,BankController.updateBank);
 
 // Delete a bank account by userId
-router.delete('/deleteBank/:userId', BankController.deleteBank);
+router.delete('/deleteBank/:bankId',verify, BankController.deleteBank);
 
 export default router;
