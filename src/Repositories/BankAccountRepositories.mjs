@@ -16,6 +16,10 @@ class BankRepository {
   static async getAllBanks() {
     return await Bank.find();
   }
+  static async getBanksByUserId(userId) {
+    return await Bank.find({ userId });
+  }
+  
 
   // Get a bank account by userId
   static async getBankById(userId) {

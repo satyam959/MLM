@@ -23,27 +23,28 @@ class BankController {
   
 
   // In BankController.mjs
-static async getAllBanks(req, res) {
-  try {
-    const { userId } = req.user; // Extract userId from token
-    const bank = await BankRepository.getBankById(userId);
-
-    if (!bank) {
-      return res.status(404).json({ message: "No bank account found for this user" });
+  static async getAllBanks(req, res) {
+    try {
+      const { userId } = req.user; 
+      const banks = await BankRepository.getBanksByUserId(userId); 
+  
+      if (!banks || banks.length === 0) {
+        return res.status(404).json({ message: "No bank accounts found for this user" });
+      }
+  
+      res.status(200).json({
+        message: "Bank accounts fetched successfully",
+        statusCode: 200,
+        banks
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: "Error fetching bank accounts",
+        error: error.message
+      });
     }
-
-    res.status(200).json({
-      message: "Bank account fetched successfully",
-      statusCode: 200,
-      bank
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: "Error fetching bank account",
-      error: error.message
-    });
   }
-}
+  
 
 
   // Get a single bank account (assuming one per user)
