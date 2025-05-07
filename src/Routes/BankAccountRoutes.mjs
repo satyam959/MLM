@@ -20,4 +20,9 @@ router.put('/updateBank/:bankId', verify,BankController.updateBank);
 // Delete a bank account by userId
 router.delete('/deleteBank/:bankId',verify, BankController.deleteBank);
 
+// In routes/BankRoutes.js or similar
+
+router.put('/setPrimary/:bankId', verify, BankController.setPrimaryBank);
+
+
 export default router;

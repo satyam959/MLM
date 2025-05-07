@@ -107,6 +107,35 @@ class BankController {
       });
     }
   }
+  // In BankController.mjs
+static async setPrimaryBank(req, res) {
+  try {
+    const { bankId } = req.params;
+    const { userId } = req.user; // From token
+
+    // First, unset isPrimary for all user's accounts
+    await BankRepository.unsetAllPrimary(userId);
+
+    // Then, set isPrimary: true for selected bankId
+    const updated = await BankRepository.setPrimaryBank(bankId, userId);
+
+    if (!updated) {
+      return res.status(404).json({ message: 'Bank account not found or not authorized' });
+    }
+
+    return res.status(200).json({
+      message: 'Primary bank account set successfully',
+      statusCode: 200,
+      data: updated
+    });
+  } catch (err) {
+    return res.status(500).json({
+      message: 'Error setting primary bank account',
+      error: err.message
+    });
+  }
+}
+
 }
 
 export default BankController;
