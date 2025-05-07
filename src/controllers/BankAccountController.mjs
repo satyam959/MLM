@@ -4,7 +4,7 @@ class BankController {
   // Create a new bank entry
   static async createBank(req, res) {
     try {
-      const userId = req.user.userId; // Token se userId
+      const userId = req.user.userId;
       const bank = await BankRepository.createBank({ ...req.body, userId });
       res.status(201).json({
         message: 'Bank account created successfully',
@@ -12,30 +12,38 @@ class BankController {
         data: bank,
       });
     } catch (error) {
-      res.status(500).json({
-        message: 'Error creating bank account',
+      const isDuplicate = error.message.includes('already exists');
+      res.status(isDuplicate ? 409 : 500).json({
+        message: isDuplicate ? 'Bank account already exists with this account number.' : 'Error creating bank account',
         error: error.message,
       });
     }
   }
+  
 
-  // Get all bank accounts for the user
-  static async getAllBanks(req, res) {
-    try {
-      const userId = req.user.userId;
-      const banks = await BankRepository.getAllBanks(userId);
-      res.status(200).json({
-        message: 'Bank accounts fetched successfully',
-        statusCode: 200,
-        data: banks,
-      });
-    } catch (error) {
-      res.status(500).json({
-        message: 'Error fetching bank accounts',
-        error: error.message,
-      });
+  // In BankController.mjs
+static async getAllBanks(req, res) {
+  try {
+    const { userId } = req.user; // Extract userId from token
+    const bank = await BankRepository.getBankById(userId);
+
+    if (!bank) {
+      return res.status(404).json({ message: "No bank account found for this user" });
     }
+
+    res.status(200).json({
+      message: "Bank account fetched successfully",
+      statusCode: 200,
+      bank
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error fetching bank account",
+      error: error.message
+    });
   }
+}
+
 
   // Get a single bank account (assuming one per user)
   static async getBankById(req, res) {
