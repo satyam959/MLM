@@ -7,36 +7,29 @@ class BankRepository {
     if (existing) {
       throw new Error('This account number already exists.');
     }
-
+  
     const bank = new Bank(data);
     return await bank.save();
   }
-
-  // Get all bank accounts
-  static async getAllBanks() {
+    static async getAllBanks() {
     return await Bank.find().sort({ isPrimary: -1 }); // Sort by isPrimary, with true accounts first
   }
-
-  // Get all bank accounts for a specific user
   static async getBanksByUserId(userId) {
-    return await Bank.find({ userId }).sort({ isPrimary: -1 }); // Sort by isPrimary, with true accounts first
+    return await Bank.find({ userId }).sort({ isPrimary: -1 }); 
   }
-
-  // Get a bank account by userId
   static async getBankById(userId) {
     return await Bank.findOne({ userId });
   }
-
-  // Update bank account by userId
-  static async updateBank(userId, updateData) {
-    return await Bank.findOneAndUpdate({ userId }, updateData, { new: true });
-  }
-// Delete a bank account by bankId and userId
-static async findbybankId(bankId) {
+static async findbybankIdAndUpdate(bankId, updateData) {
+  return await Bank.findOneAndUpdate(
+    { bankId: Number(bankId) },
+    updateData,
+    { new: true }
+  );
+}
+static async findbybankIdAndDelete(bankId) {
   return await Bank.findOneAndDelete({ bankId });
 }
-  
-
   static async unsetAllPrimary(userId) {
     return await Bank.updateMany({ userId }, { isPrimary: false });
   }

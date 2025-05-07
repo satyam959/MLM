@@ -1,7 +1,6 @@
 import BankRepository from '../Repositories/BankAccountRepositories.mjs';
 
 class BankController {
-  // Create a new bank entry
   static async createBank(req, res) {
     
     try {
@@ -20,10 +19,7 @@ class BankController {
       });
     }
   }
-  
-
-  // In BankController.mjs
-  static async getAllBanks(req, res) {
+    static async getAllBanks(req, res) {
     try {
       const { userId } = req.user; 
       const banks = await BankRepository.getBanksByUserId(userId); 
@@ -44,10 +40,7 @@ class BankController {
       });
     }
   }
-  
-
-  // Get a single bank account (assuming one per user)
-  static async getBankById(req, res) {
+    static async getBankById(req, res) {
     try {
       const userId = req.user.userId;
       const bank = await BankRepository.getBankById(userId);
@@ -66,34 +59,36 @@ class BankController {
       });
     }
   }
+static async updateBank(req, res) {
+  try {
+    const userId = req.user.userId; 
+    const bankId = req.params.bankId;
+    const updateData = req.body;
 
-  // Update bank account
-  static async updateBank(req, res) {
-    try {
-      const userId = req.user.userId;
-      const updatedBank = await BankRepository.updateBank(userId, req.body);
-      if (!updatedBank) {
-        return res.status(404).json({ message: 'Bank account not found' });
-      }
-      res.status(200).json({
-        message: 'Bank account updated successfully',
-        statusCode: 200,
-        data: updatedBank,
-      });
-    } catch (error) {
-      res.status(500).json({
-        message: 'Error updating bank account',
-        error: error.message,
-      });
+    const updatedBank = await BankRepository.findbybankIdAndUpdate(bankId, updateData);
+
+    if (!updatedBank) {
+      return res.status(404).json({ message: 'Bank account not found' });
     }
-  }
 
+    res.status(200).json({
+      message: 'Bank account updated successfully',
+      statusCode: 200,
+      data: updatedBank,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Error updating bank account',
+      error: error.message,
+    });
+  }
+}
   static async deleteBank(req, res) {
     try {
       const userId = req.user.userId;
       const bankId = req.params.bankId;
   
-      const deletedBank = await BankRepository.findbybankId(bankId);
+      const deletedBank = await BankRepository.findbybankIdAndDelete(bankId);
   
       if (!deletedBank) {
         return res.status(404).json({ message: 'Bank account not found' });
@@ -111,18 +106,12 @@ class BankController {
     }
   }
   
-
-  
   static async setPrimaryBank(req, res) {
     try {
-      const bankId = Number(req.params.bankId); // Ensure it's a Number
-      const { userId } = req.user; // From token
-  
-      // First, unset isPrimary for all user's accounts
-      await BankRepository.unsetAllPrimary(userId);
-  
-      // Then, set isPrimary: true for selected bankId
-      const updated = await BankRepository.setPrimaryBank(bankId, userId);
+      const bankId = Number(req.params.bankId); 
+      const { userId } = req.user; 
+        await BankRepository.unsetAllPrimary(userId);
+        const updated = await BankRepository.setPrimaryBank(bankId, userId);
   
       if (!updated) {
         return res.status(404).json({ message: 'Bank account not found or not authorized' });
