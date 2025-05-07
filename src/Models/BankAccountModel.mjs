@@ -8,10 +8,7 @@ const bankSchema = new mongoose.Schema({
   branch: { type: String, required: true },
   userId: { type: String, required: true, unique: true }, // Add this
   bankId: { type: Number, default: () => Math.floor(100000 + Math.random() * 900000), unique: true },
-  isPrimary: { type: String,
-    enum: ['true', 'false'],
-    default: 'true',
-  }, 
+  isPrimary: { type: Boolean, default: false }
 
 }, { timestamps: true });
 
