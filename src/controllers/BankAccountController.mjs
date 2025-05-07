@@ -46,7 +46,6 @@ class BankController {
   }
   
 
-
   // Get a single bank account (assuming one per user)
   static async getBankById(req, res) {
     try {
