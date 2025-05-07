@@ -3,6 +3,7 @@ import BankRepository from '../Repositories/BankAccountRepositories.mjs';
 class BankController {
   // Create a new bank entry
   static async createBank(req, res) {
+    
     try {
       const bank = await BankRepository.createBank(req.body);
       res.status(201).json({ message: 'Bank account created', bank });

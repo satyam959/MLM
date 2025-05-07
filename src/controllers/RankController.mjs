@@ -1,6 +1,7 @@
 import RankRepository from '../Repositories/RankRepository.mjs';
 import mongoose from 'mongoose';
 class RankController {
+  
   // Create a new rank
   static async create(req, res) {
     try {
