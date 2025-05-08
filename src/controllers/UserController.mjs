@@ -634,7 +634,7 @@ class UserController {
         downline = downline.filter((user) => {
           const fullNameMatch = user.fullName?.toLowerCase().includes(lowerSearch);
           const statusLabel = user.status ? "active" : "inactive";
-          const statusMatch = statusLabel.includes(lowerSearch);
+          const statusMatch = statusLabel === lowerSearch; // ✅ Exact match only
           return fullNameMatch || statusMatch;
         });
       }
@@ -679,6 +679,7 @@ class UserController {
       });
     }
   }
+  
   
 }
 
