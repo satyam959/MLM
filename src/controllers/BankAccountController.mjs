@@ -129,6 +129,31 @@ static async updateBank(req, res) {
       });
     }
   }
+  static async getBanksByUserId(req, res) {
+    try {
+      const userId = req.params.userId;
+  
+      const banks = await BankRepository.getBanksByUserId(userId);
+  
+      if (!banks || banks.length === 0) {
+        return res.status(404).json({ message: "No bank accounts found for this user" });
+      }
+  
+      const sortedBanks = banks.sort((a, b) => b.isPrimary - a.isPrimary);
+  
+      res.status(200).json({
+        message: "Bank accounts fetched successfully",
+        statusCode: 200,
+        banks: sortedBanks
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: "Error fetching bank accounts",
+        error: error.message
+      });
+    }
+  }
+  
   
 }
 

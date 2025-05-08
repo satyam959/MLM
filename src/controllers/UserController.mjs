@@ -6,7 +6,7 @@ import WalletRepository from "../Repositories/WalletRepositories.mjs";
 import IncomeLevelModel from "../Models/IncomeLevelModel.mjs";
 import UserBenefits from "../services/UserBenefits.mjs";
 // import upload from "../middelware/UploadImage.mjs";
-import { getUploadMiddleware } from "../middelware/UploadImage.mjs"; // ✅ correct
+import { getUploadMiddleware } from "../middelware/UploadImage.mjs"; 
 
 
 class UserController {
@@ -395,124 +395,6 @@ async resendOTP(req, res) {
       });
     }
   }
-  
-  
-  
-
-  // Update profile
-  // async updateProfile(req, res) {
-  //   const { userId } = req.user; 
-  //   const updateData = req.body; 
-  
-  //   try {
-  //     if (req.file) {
-  //       updateData.image = req.file.path; 
-  //     }
-  
-  //     const updatedUser = await UserRepository.updateUserByUserId(userId, updateData);
-  
-  //     if (!updatedUser) {
-  //       return res.status(404).json({ message: "User not found" });
-  //     }
-  
-  //     const {
-  //       fullName,
-  //       phone,
-  //       email,
-  //       companyName,
-  //       address,
-  //       city,
-  //       state,
-  //       country,
-  //       pinCode,
-  //       image,
-  //     } = updatedUser;
-  
-  //     return res.status(200).json({
-  //       statusCode: 200,
-  //       success: true,
-  //       message: "Profile updated successfully",
-  //       user: {
-  //         fullName,
-  //         phone,
-  //         email,
-  //         companyName,
-  //         address,
-  //         city,
-  //         state,
-  //         country,
-  //         pinCode,
-  //         image,
-  //       },
-  //     });
-  //   } catch (error) {
-  //     return res.status(500).json({
-  //       statusCode: 500,
-  //       success: false,
-  //       message: "Error updating profile",
-  //       error: error.message,
-  //     });
-  //   }
-  // }
-  
-
-  // async updateProfile(req, res) {
-  //   const { userId } = req.user; 
-  //   const updateData = { ...req.body, ...req.query };
-  
-  //   try {
-  //     if (req.file) {
-  //       updateData.image = req.file.path; 
-  //     }
-  
-  //     const updatedUser = await UserRepository.updateUserByUserId(userId, updateData);
-  
-  //     if (!updatedUser) {
-  //       return res.status(404).json({
-  //         statusCode: 404,
-  //         success: false,
-  //         message: "User not found"
-  //       });
-  //     }
-  
-  //     const {
-  //       fullName,
-  //       phone,
-  //       email,
-  //       address,
-  //       city,
-  //       state,
-  //       country,
-  //       pinCode,
-  //       image,
-  //     } = updatedUser;
-  
-  //     return res.status(200).json({
-  //       statusCode: 200,
-  //       success: true,
-  //       message: "Profile updated successfully",
-  //       user: {
-  //         fullName,
-  //         phone,
-  //         email,
-  //         address,
-  //         city,
-  //         state,
-  //         country,
-  //         pinCode,
-  //         image,
-  //       },
-  //     });
-  //   } catch (error) {
-  //     return res.status(500).json({
-  //       statusCode: 500,
-  //       success: false,
-  //       message: "Error updating profile",
-  //       error: error.message,
-  //     });
-  //   }
-  // }
-  
 
   /// Delete profile
 async deleteProfile(req, res) {

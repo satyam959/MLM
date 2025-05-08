@@ -30,6 +30,10 @@ static async findbybankIdAndUpdate(bankId, updateData) {
 static async findbybankIdAndDelete(bankId) {
   return await Bank.findOneAndDelete({ bankId });
 }
+static async getBanksByUserId(userId) {
+  return await Bank.find({ userId });
+}
+
   static async unsetAllPrimary(userId) {
     return await Bank.updateMany({ userId }, { isPrimary: false });
   }

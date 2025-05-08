@@ -22,4 +22,7 @@ router.delete('/deleteBank/:bankId', verify, BankController.deleteBank);
 // Set a specific account as primary
 router.put('/setPrimary/:bankId', verify, BankController.setPrimaryBank);
 
+router.get('/getBanksByUserId/:userId', verify, BankController.getBanksByUserId);
+
+
 export default router;
