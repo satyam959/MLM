@@ -615,6 +615,7 @@ class UserController {
       const hierarchy = Array.isArray(userData.hierarchy) ? userData.hierarchy : [];
   
       let downline = await UserRepository.getUserDownlines(userId, hierarchy);
+  
       if (startDate && endDate) {
         const start = new Date(startDate);
         const end = new Date(endDate);
@@ -627,6 +628,7 @@ class UserController {
           });
         }
       }
+  
       if (search && search.trim() !== "") {
         const lowerSearch = search.toLowerCase();
         downline = downline.filter((user) => {
@@ -636,13 +638,14 @@ class UserController {
           return fullNameMatch || statusMatch;
         });
       }
+  
       if (downline.length > 0) {
         const formatted = downline.map((user) => ({
           fullName: user.fullName,
           userId: user.userId,
           level: user.level,
           state: user.state,
-          status: user.status ? "Active" : "Inactive",  // ✅ Converted here
+          status: user.status ? "Active" : "Inactive",
           createDate: new Date(user.createdAt).toLocaleString("en-GB", {
             timeZone: "Asia/Kolkata",
             year: "numeric",
@@ -655,12 +658,14 @@ class UserController {
         }));
   
         return res.status(200).json({
+          statusCode: 200,
           message: "Downline retrieved successfully",
           totalMember: formatted.length,
           data: formatted,
         });
       } else {
         return res.status(200).json({
+          statusCode: 200,
           message: "No Downline found",
           data: [],
         });
@@ -668,6 +673,7 @@ class UserController {
     } catch (error) {
       console.error("Error fetching user downline:", error);
       return res.status(500).json({
+        statusCode: 500,
         message: "Error fetching user downline",
         error: error.message,
       });
