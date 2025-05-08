@@ -2,7 +2,7 @@
 import express from 'express';
 import UserController from '../controllers/UserController.mjs';
 import { getUploadMiddleware } from "../middelware/UploadImage.mjs"; 
-import verifyToken from '../middelware/authMiddleware.mjs';  // ✅ Correct import
+import verifyToken from '../middelware/authMiddleware.mjs';  
 
 const router = express.Router();
 
@@ -32,7 +32,8 @@ router.delete('/deleteByUserId/:userId', UserController.deleteUser);
 router.get('/getReferral/:referralCode', UserController.getUserByReferralCode);
 
 // Upline & Downline
-router.get('/getUserUpline/:userId', UserController.getUserUpline);
-router.get('/getUserDownline/:userId', UserController.getUserDownline);
+router.get('/getUserUpline/:userId',verifyToken, UserController.getUserUpline);
+router.get('/getUserDownline/:userId', verifyToken, UserController.getUserDownline);
+// router.get('/getUserDownline/:userId', verifyToken, UserController.getUserDownline);
 
 export default router;

@@ -128,14 +128,26 @@ class UserRepository {
     }
   }
 
-  static async getUserDownlines(userId, hierarchy) {
+  // static async getUserDownlines(userId, hierarchy) {
+  //   try {
+  //     return await UserModel.find({ hierarchy: userId }).select("name");
+  //   } catch (error) {
+  //     console.error("Error fetching downline:", error.message);
+  //     throw new Error(`Error fetching downline: ${error.message}`);
+  //   }
+  // }
+  
+  static async getUserDownlines(userId) {
     try {
-      return await UserModel.find({ hierarchy: userId }).select("name");
+      return await UserModel.find({
+        hierarchy: userId  // Finds users who have this userId in their hierarchy
+      }).select("fullName userId state level createdAt status");
     } catch (error) {
       console.error("Error fetching downline:", error.message);
       throw new Error(`Error fetching downline: ${error.message}`);
     }
   }
+  
 
   // OTP Operations
   static async saveOTP(userId, otp, expiry) {
@@ -203,7 +215,7 @@ class UserRepository {
   }
 }
 
-// ✅ Generate Referral Code
+//  Generate Referral Code
 function generateReferralCode() {
   return Math.random().toString(36).substr(2, 8).toUpperCase();
 }

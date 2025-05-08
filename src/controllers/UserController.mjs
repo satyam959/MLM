@@ -125,6 +125,7 @@ async registerUser(req, res) {
       },
     });
   } catch (error) {
+    console.log("error  -- ",error);
     return res.status(500).json({
       statusCode: 500,
       success: false,
@@ -479,29 +480,40 @@ async deleteProfile(req, res) {
     try {
       const { userId } = req.params;
       const userData = await UserRepository.findUserByUserId(userId);
-      const downline = await UserRepository.getUserDownlines(
-        userId,
-        userData.hierarchy
-      );
+      const hierarchy = Array.isArray(userData.hierarchy) ? userData.hierarchy : [];
+  
+      const downline = await UserRepository.getUserDownlines(userId, hierarchy);
+  
       if (downline.length > 0) {
-        res.status(200).json({
+        const formatted = downline.map((user) => ({
+          fullName: user.fullName,
+          userId: user.userId,
+          level: user.level,
+          state: user.state,
+          status: user.status,
+          createDate: user.createdAt,
+        }));
+  
+        return res.status(200).json({
           message: "Downline retrieved successfully",
-          data: downline,
+          totalMember:formatted.length,
+          data: formatted,
         });
       } else {
-        res.status(200).json({
+        return res.status(200).json({
           message: "No Downline found",
           data: [],
         });
       }
     } catch (error) {
-      console.error("Error fetching user upline:", error.message);
-      res.status(500).json({
-        message: "Error fetching user upline",
+      console.error("Error fetching user downline:", error.message);
+      return res.status(500).json({
+        message: "Error fetching user downline",
         error: error.message,
       });
     }
   }
+  
 }
 
 export default new UserController();
