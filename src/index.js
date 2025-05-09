@@ -130,6 +130,7 @@ import PlanRoutes from './Routes/PlanRoutes.mjs';
 import UserPlanRoutes from './Routes/UserPlanRoutes.mjs';
 import WithdrawalRoutes from './Routes/WithdrawalRoutes.mjs';
 import UserBenefits from './services/UserBenefits.mjs';
+import HomeDashboard from './Routes/HomeDashboardRoutes.mjs';
 import userModuleRoutes from './Routes/User/userModuleRoutes.mjs'
 
 dotenv.config();

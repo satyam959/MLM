@@ -245,13 +245,9 @@ class UserController {
 
         const userIds = referredUserList.map((u) => u.userId);
         await WalletRepository.updateReferredUserWallet(userIds, amount);
-<<<<<<< HEAD
-        await UserBenefits.checkReferralRewardEligibility(user.referredBy);
-=======
 
         await UserBenefits.checkReferralRewardEligibility(user.referredBy);
 
->>>>>>> 75cb7ad (portfolio code added)
         await WalletRepository.rewardBasedOnTeamSize(user.referredBy);
       }
 
@@ -284,12 +280,6 @@ class UserController {
   async requestOTP(req, res) {
     const { phone } = req.body;
 
-<<<<<<< HEAD
-    if (!phone || !/^\d{10}$/.test(phone)) {
-      return res
-        .status(400)
-        .json({ message: "Phone number must be 10 digits" });
-=======
     // Validate phone number (must be 10 digits)
     if (!phone || !/^\d{10}$/.test(phone)) {
       return res.status(400).json({ message: "Phone number must be 10 digits" });
@@ -330,65 +320,10 @@ class UserController {
     // Validate phone number (must be 10 digits)
     if (!phone || !/^\d{10}$/.test(phone)) {
       return res.status(400).json({ message: "Phone number must be 10 digits" });
->>>>>>> 75cb7ad (portfolio code added)
     }
 
     try {
       const user = await UserRepository.findUserByPhone(phone);
-<<<<<<< HEAD
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      const otp = Math.floor(100000 + Math.random() * 900000).toString();
-      const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
-
-      await UserRepository.saveOTP(user._id, otp, otpExpiry);
-
-      // Simulate sending OTP
-      console.log(`OTP for ${phone}: ${otp}`);
-
-      return res.status(200).json({
-        statusCode: 200,
-        success: true,
-        message: "OTP sent successfully",
-      });
-    } catch (error) {
-      return res.status(500).json({
-        message: "Error sending OTP",
-        error: error.message,
-      });
-    }
-  }
-
-  // Step 2: Verify OTP and Login
-  async verifyOTPLogin(req, res) {
-    const { phone, otp } = req.body;
-
-    // Validate phone number (must be 10 digits)
-    if (!phone || !/^\d{10}$/.test(phone)) {
-      return res
-        .status(400)
-        .json({ message: "Phone number must be 10 digits" });
-    }
-
-    try {
-      const user = await UserRepository.findUserByPhone(phone);
-      if (!user || !user.otp || !user.otpExpiry) {
-        return res
-          .status(400)
-          .json({ message: "OTP not requested or expired" });
-      }
-
-      if (user.otp !== otp || new Date(user.otpExpiry) < new Date()) {
-        return res.status(401).json({ message: "Invalid or expired OTP" });
-      }
-
-      await UserRepository.clearOTP(user.userId);
-
-      const payload = {
-        userId: user.userId,
-=======
       if (!user || !user.otp || !user.otpExpiry) {
         return res.status(400).json({ message: "OTP not requested or expired" });
       }
@@ -401,7 +336,6 @@ class UserController {
 
       const payload = {
         userId: user._id,
->>>>>>> 75cb7ad (portfolio code added)
         name: user.fullName || user.name,
         role: user.role,
       };
@@ -430,46 +364,6 @@ class UserController {
     }
   }
 
-<<<<<<< HEAD
-  async resendOTP(req, res) {
-    const { phone } = req.body;
-
-    // Validate phone number
-    if (!phone || !/^\d{10}$/.test(phone)) {
-      return res
-        .status(400)
-        .json({ message: "Phone number must be 10 digits" });
-    }
-
-    try {
-      const user = await UserRepository.findUserByPhone(phone);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      // Generate a new OTP and expiry time
-      const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
-      const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
-
-      await UserRepository.saveOTP(user._id, newOtp, otpExpiry);
-
-      // Simulate sending OTP
-      console.log(`Resent OTP for ${phone}: ${newOtp}`);
-
-      return res.status(200).json({
-        statusCode: 200,
-        success: true,
-        message: "OTP resent successfully",
-      });
-    } catch (error) {
-      return res.status(500).json({
-        message: "Error resending OTP",
-        error: error.message,
-      });
-    }
-  }
-=======
->>>>>>> 75cb7ad (portfolio code added)
 
   // Admin: Get all users
   async getAllUsers(req, res) {
@@ -930,7 +824,43 @@ class UserController {
     }
   }
 
+  async resendOTP(req, res) {
+    const { phone } = req.body;
 
+    // Validate phone number
+    if (!phone || !/^\d{10}$/.test(phone)) {
+      return res
+        .status(400)
+        .json({ message: "Phone number must be 10 digits" });
+    }
+
+    try {
+      const user = await UserRepository.findUserByPhone(phone);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Generate a new OTP and expiry time
+      const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+      const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+      await UserRepository.saveOTP(user._id, newOtp, otpExpiry);
+
+      // Simulate sending OTP
+      console.log(`Resent OTP for ${phone}: ${newOtp}`);
+
+      return res.status(200).json({
+        statusCode: 200,
+        success: true,
+        message: "OTP resent successfully",
+      });
+    } catch (error) {
+      return res.status(500).json({
+        message: "Error resending OTP",
+        error: error.message,
+      });
+    }
+  }
 
 }
 
