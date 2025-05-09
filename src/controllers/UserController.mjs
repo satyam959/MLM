@@ -153,9 +153,9 @@ class UserController {
       role,
       referralCode,
     } = req.body;
-  
+
     const image = req.file ? req.file.fullUrl : null;
-  
+
     try {
       // Check if phone already exists
       const existingUser = await UserRepository.findUserByPhone(phone);
@@ -166,14 +166,14 @@ class UserController {
           message: "Phone number already exists",
         });
       }
-  
+
       let referredBy = null;
       let referrerName = null;
       let hierarchy = [];
       let walletBalance = 0;
-  
+
       let referrer = null;
-  
+
       if (referralCode) {
         referrer = await UserModel.findOne({ referralCode });
         if (!referrer) {
@@ -183,17 +183,17 @@ class UserController {
             message: "Invalid referral code",
           });
         }
-  
+
         referredBy = referrer.userId;
         referrerName = referrer.fullName || referrer.name || null;
         hierarchy = [referredBy, ...(referrer.hierarchy || [])];
-          if (
+        if (
           referrer.membership &&
           referrer.membership.toLowerCase() === "active"
-        ) 
+        )
           walletBalance = 200;
       }
-  
+
       const newUserData = {
         fullName,
         email,
@@ -210,7 +210,7 @@ class UserController {
         referrerName,
         hierarchy,
       };
-  
+
       const user = await UserRepository.createUser(newUserData);
       if (!user || !user.userId) {
         return res.status(500).json({
@@ -219,12 +219,12 @@ class UserController {
           message: "User creation failed",
         });
       }
-  
+
       const wallet = await WalletRepository.createWallet({
         userId: user.userId,
         balance: walletBalance,
       });
-  
+
       if (!wallet) {
         return res.status(500).json({
           statusCode: 500,
@@ -232,23 +232,23 @@ class UserController {
           message: "User created, but wallet creation failed",
         });
       }
-  
+
       if (user.referredBy) {
         const referredUserList = await UserRepository.findAllUserByReferredId(
           user.referredBy
         );
         const referredUserCount = referredUserList.length;
-  
+
         let amount = 0;
         if (referredUserCount === 3) amount = 200;
         if (referredUserCount === 8) amount = 40;
-  
+
         const userIds = referredUserList.map((u) => u.userId);
         await WalletRepository.updateReferredUserWallet(userIds, amount);
         await UserBenefits.checkReferralRewardEligibility(user.referredBy);
         await WalletRepository.rewardBasedOnTeamSize(user.referredBy);
       }
-  
+
       return res.status(201).json({
         statusCode: 201,
         success: true,
@@ -273,7 +273,7 @@ class UserController {
       });
     }
   }
-  
+
   // Step 1: Send OTP
   async requestOTP(req, res) {
     const { phone } = req.body;
@@ -618,22 +618,22 @@ class UserController {
       });
     }
   }
-  
+
   // async getUserDownline(req, res) {
   //   try {
   //     const userId = req.user.userId;
   //     const { startDate, endDate, search } = req.query;
-  
+
   //     const userData = await UserRepository.findUserByUserId(userId);
   //     const hierarchy = Array.isArray(userData.hierarchy) ? userData.hierarchy : [];
-  
+
   //     let downline = await UserRepository.getUserDownlines(userId, hierarchy);
-  
+
   //     if (startDate && endDate) {
   //       const start = new Date(startDate);
   //       const end = new Date(endDate);
   //       end.setHours(23, 59, 59, 999);
-  
+
   //       if (!isNaN(start) && !isNaN(end)) {
   //         downline = downline.filter((user) => {
   //           const createdAt = new Date(user.createdAt);
@@ -641,7 +641,7 @@ class UserController {
   //         });
   //       }
   //     }
-  
+
   //     if (search && search.trim() !== "") {
   //       const lowerSearch = search.toLowerCase();
   //       downline = downline.filter((user) => {
@@ -651,7 +651,7 @@ class UserController {
   //         return fullNameMatch || statusMatch;
   //       });
   //     }
-  
+
   //     if (downline.length > 0) {
   //       const formatted = downline.map((user) => ({
   //         fullName: user.fullName,
@@ -669,7 +669,7 @@ class UserController {
   //           hour12: true,
   //         }).replace(",", ""),
   //       }));
-  
+
   //       return res.status(200).json({
   //         statusCode: 200,
   //         message: "Downline retrieved successfully",
@@ -692,23 +692,23 @@ class UserController {
   //     });
   //   }
   // }
-  
+
 
   async getUserDownline(req, res) {
     try {
       const userId = req.user.userId;
       const { startDate, endDate, search } = req.query;
-  
+
       const userData = await UserRepository.findUserByUserId(userId);
       const hierarchy = Array.isArray(userData.hierarchy) ? userData.hierarchy : [];
-  
+
       let downline = await UserRepository.getUserDownlines(userId, hierarchy);
-  
+
       if (startDate && endDate) {
         const start = new Date(startDate);
         const end = new Date(endDate);
         end.setHours(23, 59, 59, 999);
-  
+
         if (!isNaN(start) && !isNaN(end)) {
           downline = downline.filter((user) => {
             const createdAt = new Date(user.createdAt);
@@ -716,7 +716,7 @@ class UserController {
           });
         }
       }
-  
+
       if (search && search.trim() !== "") {
         const lowerSearch = search.toLowerCase();
         downline = downline.filter((user) => {
@@ -727,7 +727,7 @@ class UserController {
           return fullNameMatch || statusMatch || userIdMatch;
         });
       }
-  
+
       if (downline.length > 0) {
         const formatted = downline.map((user) => ({
           fullName: user.fullName,
@@ -745,7 +745,7 @@ class UserController {
             hour12: true,
           }).replace(",", ""),
         }));
-  
+
         return res.status(200).json({
           statusCode: 200,
           message: "Downline retrieved successfully",
@@ -777,14 +777,14 @@ class UserController {
   async getUserDownline(req, res) {
     try {
       const { userId, startDate, endDate, search } = req.query;
-  
+
       if (!userId) {
         return res.status(400).json({
           statusCode: 400,
           message: "User ID is required",
         });
       }
-  
+
       const userData = await UserRepository.findUserByUserId(userId);
       if (!userData) {
         return res.status(404).json({
@@ -792,16 +792,16 @@ class UserController {
           message: "User not found",
         });
       }
-  
+
       const hierarchy = Array.isArray(userData.hierarchy) ? userData.hierarchy : [];
-  
+
       let downline = await UserRepository.getUserDownlines(userId, hierarchy);
-  
+
       if (startDate && endDate) {
         const start = new Date(startDate);
         const end = new Date(endDate);
         end.setHours(23, 59, 59, 999);
-  
+
         if (!isNaN(start) && !isNaN(end)) {
           downline = downline.filter((user) => {
             const createdAt = new Date(user.createdAt);
@@ -809,7 +809,7 @@ class UserController {
           });
         }
       }
-  
+
       if (search && search.trim() !== "") {
         const lowerSearch = search.toLowerCase();
         downline = downline.filter((user) => {
@@ -820,7 +820,7 @@ class UserController {
           return fullNameMatch || statusMatch || userIdMatch;
         });
       }
-  
+
       if (downline.length > 0) {
         const formatted = downline.map((user) => ({
           fullName: user.fullName,
@@ -838,7 +838,7 @@ class UserController {
             hour12: true,
           }).replace(",", ""),
         }));
-  
+
         return res.status(200).json({
           statusCode: 200,
           message: "Downline retrieved successfully",
@@ -861,9 +861,9 @@ class UserController {
       });
     }
   }
-  
-  
-  
+
+
+
 }
 
 export default new UserController();

@@ -6,7 +6,7 @@
 //     balance: {
 //       type: String, 
 //       required: true,
-      
+
 //     },
 //     status: {
 //       type: Boolean, 
@@ -35,7 +35,7 @@ import mongoose from 'mongoose';
 const walletSchema = new mongoose.Schema(
   {
     balance: {
-      type: Number, 
+      type: Number,
       required: true,
     },
     status: {
@@ -49,7 +49,6 @@ const walletSchema = new mongoose.Schema(
     },
     userId: {
       type: Number,
-      default: () => Math.floor(100000 + Math.random() * 900000),
       unique: true,
     },
   },
