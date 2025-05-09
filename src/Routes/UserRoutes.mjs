@@ -34,6 +34,10 @@ router.get('/getReferral/:referralCode', UserController.getUserByReferralCode);
 // Upline & Downline
 router.get('/getUserUpline/:userId',verifyToken, UserController.getUserUpline);
 router.get('/getUserDownline', verifyToken, UserController.getUserDownline);
-// router.get('/getUserDownline/:userId', verifyToken, UserController.getUserDownline);
+
+
+
+///This Routes For Admin /////
+router.get("/downline", UserController.getUserDownline);
 
 export default router;

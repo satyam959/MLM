@@ -9,6 +9,136 @@ import UserBenefits from "../services/UserBenefits.mjs";
 import { getUploadMiddleware } from "../middelware/UploadImage.mjs";
 
 class UserController {
+  // async registerUser(req, res) {
+  //   const {
+  //     fullName,
+  //     email,
+  //     phone,
+  //     address,
+  //     city,
+  //     pincode,
+  //     state,
+  //     dob,
+  //     whatsapp,
+  //     role,
+  //     referralCode,
+  //   } = req.body;
+
+  //   const image = req.file ? req.file.fullUrl : null;
+
+  //   try {
+  //     // Check if phone already exists
+  //     const existingUser = await UserRepository.findUserByPhone(phone);
+  //     if (existingUser) {
+  //       return res.status(400).json({
+  //         statusCode: 400,
+  //         success: false,
+  //         message: "Phone number already exists",
+  //       });
+  //     }
+
+  //     let referredBy = null;
+  //     let referrerName = null;
+  //     let hierarchy = [];
+
+  //     if (referralCode) {
+  //       const referrer = await UserModel.findOne({ referralCode });
+  //       if (!referrer) {
+  //         return res.status(400).json({
+  //           statusCode: 400,
+  //           success: false,
+  //           message: "Invalid referral code",
+  //         });
+  //       }
+
+  //       referredBy = referrer.userId;
+  //       referrerName = referrer.fullName || referrer.name || null;
+  //       hierarchy = [referredBy, ...(referrer.hierarchy || [])];
+  //     }
+
+  //     const newUserData = {
+  //       fullName,
+  //       email,
+  //       phone,
+  //       address,
+  //       city,
+  //       pincode,
+  //       state,
+  //       dob,
+  //       whatsapp,
+  //       role,
+  //       image,
+  //       referredBy,
+  //       referrerName,
+  //       hierarchy,
+  //     };
+
+  //     const user = await UserRepository.createUser(newUserData);
+  //     if (!user || !user.userId) {
+  //       return res.status(500).json({
+  //         statusCode: 500,
+  //         success: false,
+  //         message: "User creation failed",
+  //       });
+  //     }
+
+  //     const wallet = await WalletRepository.createWallet({
+  //       userId: user.userId,
+  //       balance: 200,
+  //     });
+
+  //     if (!wallet) {
+  //       return res.status(500).json({
+  //         statusCode: 500,
+  //         success: false,
+  //         message: "User created, but wallet creation failed",
+  //       });
+  //     }
+
+  //     if (user.referredBy) {
+  //       const referredUserList = await UserRepository.findAllUserByReferredId(
+  //         user.referredBy
+  //       );
+  //       const referredUserCount = referredUserList.length;
+
+  //       let amount = 0;
+  //       if (referredUserCount === 3) amount = 200;
+  //       if (referredUserCount === 8) amount = 40;
+
+  //       const userIds = referredUserList.map((u) => u.userId);
+  //       await WalletRepository.updateReferredUserWallet(userIds, amount);
+  //       await UserBenefits.checkReferralRewardEligibility(user.referredBy);
+  //       await WalletRepository.rewardBasedOnTeamSize(user.referredBy);
+  //     }
+
+  //     // Return only selected fields
+  //     return res.status(201).json({
+  //       statusCode: 201,
+  //       success: true,
+  //       message: "User registered successfully, wallet created",
+  //       user: {
+  //         fullName: user.fullName,
+  //         email: user.email,
+  //         dob: user.dob,
+  //         phone: user.phone,
+  //         whatsapp: user.whatsapp,
+  //         referralCode: user.referralCode,
+  //       },
+  //     });
+  //   } catch (error) {
+  //     console.log("error  -- ", error);
+  //     return res.status(500).json({
+  //       statusCode: 500,
+  //       success: false,
+  //       message: "Error registering user",
+  //       error: error.message,
+  //     });
+  //   }
+  // }
+
+
+
+
   async registerUser(req, res) {
     const {
       fullName,
@@ -23,9 +153,9 @@ class UserController {
       role,
       referralCode,
     } = req.body;
-
+  
     const image = req.file ? req.file.fullUrl : null;
-
+  
     try {
       // Check if phone already exists
       const existingUser = await UserRepository.findUserByPhone(phone);
@@ -36,13 +166,16 @@ class UserController {
           message: "Phone number already exists",
         });
       }
-
+  
       let referredBy = null;
       let referrerName = null;
       let hierarchy = [];
-
+      let walletBalance = 0;
+  
+      let referrer = null;
+  
       if (referralCode) {
-        const referrer = await UserModel.findOne({ referralCode });
+        referrer = await UserModel.findOne({ referralCode });
         if (!referrer) {
           return res.status(400).json({
             statusCode: 400,
@@ -50,12 +183,17 @@ class UserController {
             message: "Invalid referral code",
           });
         }
-
+  
         referredBy = referrer.userId;
         referrerName = referrer.fullName || referrer.name || null;
         hierarchy = [referredBy, ...(referrer.hierarchy || [])];
+          if (
+          referrer.membership &&
+          referrer.membership.toLowerCase() === "active"
+        ) 
+          walletBalance = 200;
       }
-
+  
       const newUserData = {
         fullName,
         email,
@@ -72,7 +210,7 @@ class UserController {
         referrerName,
         hierarchy,
       };
-
+  
       const user = await UserRepository.createUser(newUserData);
       if (!user || !user.userId) {
         return res.status(500).json({
@@ -81,12 +219,12 @@ class UserController {
           message: "User creation failed",
         });
       }
-
+  
       const wallet = await WalletRepository.createWallet({
         userId: user.userId,
-        balance: 200,
+        balance: walletBalance,
       });
-
+  
       if (!wallet) {
         return res.status(500).json({
           statusCode: 500,
@@ -94,24 +232,23 @@ class UserController {
           message: "User created, but wallet creation failed",
         });
       }
-
+  
       if (user.referredBy) {
         const referredUserList = await UserRepository.findAllUserByReferredId(
           user.referredBy
         );
         const referredUserCount = referredUserList.length;
-
+  
         let amount = 0;
         if (referredUserCount === 3) amount = 200;
         if (referredUserCount === 8) amount = 40;
-
+  
         const userIds = referredUserList.map((u) => u.userId);
         await WalletRepository.updateReferredUserWallet(userIds, amount);
         await UserBenefits.checkReferralRewardEligibility(user.referredBy);
         await WalletRepository.rewardBasedOnTeamSize(user.referredBy);
       }
-
-      // Return only selected fields
+  
       return res.status(201).json({
         statusCode: 201,
         success: true,
@@ -123,6 +260,7 @@ class UserController {
           phone: user.phone,
           whatsapp: user.whatsapp,
           referralCode: user.referralCode,
+          // walletBalance,
         },
       });
     } catch (error) {
@@ -135,6 +273,7 @@ class UserController {
       });
     }
   }
+  
   // Step 1: Send OTP
   async requestOTP(req, res) {
     const { phone } = req.body;
@@ -629,6 +768,100 @@ class UserController {
       });
     }
   }
+
+
+
+  /////////////////// This use for Admin Only ////////////////////////
+
+
+  async getUserDownline(req, res) {
+    try {
+      const { userId, startDate, endDate, search } = req.query;
+  
+      if (!userId) {
+        return res.status(400).json({
+          statusCode: 400,
+          message: "User ID is required",
+        });
+      }
+  
+      const userData = await UserRepository.findUserByUserId(userId);
+      if (!userData) {
+        return res.status(404).json({
+          statusCode: 404,
+          message: "User not found",
+        });
+      }
+  
+      const hierarchy = Array.isArray(userData.hierarchy) ? userData.hierarchy : [];
+  
+      let downline = await UserRepository.getUserDownlines(userId, hierarchy);
+  
+      if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+  
+        if (!isNaN(start) && !isNaN(end)) {
+          downline = downline.filter((user) => {
+            const createdAt = new Date(user.createdAt);
+            return createdAt >= start && createdAt <= end;
+          });
+        }
+      }
+  
+      if (search && search.trim() !== "") {
+        const lowerSearch = search.toLowerCase();
+        downline = downline.filter((user) => {
+          const fullNameMatch = user.fullName?.toLowerCase().includes(lowerSearch);
+          const statusLabel = user.status ? "active" : "inactive";
+          const statusMatch = statusLabel === lowerSearch;
+          const userIdMatch = user.userId.toString() === search;
+          return fullNameMatch || statusMatch || userIdMatch;
+        });
+      }
+  
+      if (downline.length > 0) {
+        const formatted = downline.map((user) => ({
+          fullName: user.fullName,
+          userId: user.userId,
+          level: user.level,
+          state: user.state,
+          status: user.status ? "Active" : "Inactive",
+          createDate: new Date(user.createdAt).toLocaleString("en-GB", {
+            timeZone: "Asia/Kolkata",
+            year: "numeric",
+            month: "short",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          }).replace(",", ""),
+        }));
+  
+        return res.status(200).json({
+          statusCode: 200,
+          message: "Downline retrieved successfully",
+          totalMember: formatted.length,
+          data: formatted,
+        });
+      } else {
+        return res.status(200).json({
+          statusCode: 200,
+          message: "No Downline found",
+          data: [],
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching user downline:", error);
+      return res.status(500).json({
+        statusCode: 500,
+        message: "Error fetching user downline",
+        error: error.message,
+      });
+    }
+  }
+  
   
   
 }
