@@ -2,7 +2,7 @@ import UserModel from "../../Models/UserModels.mjs";
 
 class userRepository {
 
-    static async findUserByUserId(userId) {
+    static async getUserDetails(userId) {
         try {
             return await UserModel.findOne({ userId: userId }); // assuming userId is a custom field
         } catch (error) {
