@@ -106,26 +106,20 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import bodyParser from 'body-parser'; 
-import path from 'path'; 
-import { fileURLToPath } from 'url'; 
+import bodyParser from 'body-parser';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
 import royaltyRoutes from './Routes/royaltyRoutes.mjs';
 import permissionRoutes from './Routes/permissionRoutes.mjs';
 import rankRoutes from './Routes/RankRoutes.mjs';
 import userRoutes from './Routes/UserRoutes.mjs';
-<<<<<<< HEAD
-import incomeLeveleRoutes from './Routes/IncomeLevelRoutes.mjs';
-import servicesRoutes from './Routes/ServicesRoutes.mjs';
-import RolePermissionRoutes from './Routes/RolePermissionRoutes.mjs';
-=======
 // import roleRoutes from './Routes/RoleRoutes.mjs'; 
 
 import incomeLeveleRoutes from './Routes/IncomeLevelRoutes.mjs'
 import servicesRoutes from './Routes/ServicesRoutes.mjs';
 import RolePermissionRoutes from './Routes/RolePermissionRoutes.mjs'
->>>>>>> 816c343 (resolve conflicts)
 import RewardsRoutes from './Routes/RewardsRoutes.mjs';
 import TypeIncomeRoutes from './Routes/TypeIncomeRoutes.mjs';
 import TransactionRoutes from './Routes/TransactionRoutes.mjs';
@@ -136,11 +130,7 @@ import PlanRoutes from './Routes/PlanRoutes.mjs';
 import UserPlanRoutes from './Routes/UserPlanRoutes.mjs';
 import WithdrawalRoutes from './Routes/WithdrawalRoutes.mjs';
 import UserBenefits from './services/UserBenefits.mjs';
-<<<<<<< HEAD
-import HomeDashboard from './Routes/HomeDashboardRoutes.mjs';
-=======
 import userModuleRoutes from './Routes/User/userModuleRoutes.mjs'
->>>>>>> 816c343 (resolve conflicts)
 
 dotenv.config();
 
@@ -159,18 +149,15 @@ mongoose.connect(process.env.MONGO_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
-.then(() => {
-    console.log('Connected to MongoDB');
-})
-.catch((error) => {
-    console.error('Error connecting to MongoDB:', error);
-});
+    .then(() => {
+        console.log('Connected to MongoDB');
+    })
+    .catch((error) => {
+        console.error('Error connecting to MongoDB:', error);
+    });
 
-<<<<<<< HEAD
 // Routes
-=======
 // User Management Routes
->>>>>>> 816c343 (resolve conflicts)
 app.use('/api/users', userRoutes);
 app.use('/api/roles', RoleRoutes);
 app.use('/api/role-permissions', RolePermissionRoutes);
@@ -187,17 +174,14 @@ app.use('/api/permissions', permissionRoutes);
 app.use('/api/ranks', rankRoutes);
 app.use('/api/royalties', royaltyRoutes);
 app.use('/api/Withdrawal', WithdrawalRoutes);
-app.use('/api/homeDashboard',HomeDashboard)
+app.use('/api/homeDashboard', HomeDashboard)
 
-<<<<<<< HEAD
 // Start server
-=======
 
 //user routes
 app.use('/api', userModuleRoutes);
 
 // Start the server
->>>>>>> 816c343 (resolve conflicts)
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });

@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-const verifyToken = (req, res, next) => {
+const verify = (req, res, next) => {
   try {
     const token = req.headers.authorization?.split(" ")[1] || req.cookies.jwt;
     if (!token) throw new MiddlewareError('Token not found in header or cookies');
