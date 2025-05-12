@@ -24,13 +24,13 @@ async createService(req, res) {
       });
     }
 
-    const serviceIcon = req.file?.fullUrl;
-    if (!serviceIcon) {
-      return res.status(400).json({
-        statusCode: 400,
-        message: 'Service icon image is required',
-      });
-    }
+     const serviceIcon = req.file?.fullUrl;
+    // if (!serviceIcon) {
+    //   return res.status(400).json({
+    //     statusCode: 400,
+    //     message: 'Service icon image is required',
+    //   });
+    // }
 
 
     const existingService = await ServiceRepository.findOneByType(serviceName);

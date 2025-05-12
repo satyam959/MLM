@@ -1,4 +1,6 @@
-import walletRepo from "../repositories/wallet.repo.js";
+import walletRepo from "../../Repositories/WalletRepositories.mjs";
+import userRepository from "../../Repositories/user/userRepositories.mjs";
+import TeamRepositories from "../../Repositories/user/TeamRepositories.mjs";
 
 class LevelIncomeController {
   async getLevelIncomeReport(req, res) {
@@ -14,16 +16,30 @@ class LevelIncomeController {
   async getWalletSummary(req, res) {
     try {
       const userId = req.user.userId;
-      const totalAmount = await walletRepo.getTotalWalletAmount(userId);
-      const directIncome = totalAmount * 0.7;
-      const teamIncome = totalAmount * 0.3;
+
+      // Get user details
+      const userDetails = await userRepo.getUserById(userId);
+      const walletBalance = await walletRepo.getTotalWalletAmount(userId);
+      const teamCount = await teamRepo.getTeamCount(userId); 
 
       res.json({
         success: true,
         data: {
-          totalAmount,
-          directIncome,
-          teamIncome
+          userInfo: {
+            userImage: userDetails.image,
+            name: userDetails.fullName,
+            email: userDetails.email,
+            rank: userDetails.rank,
+            totalEarning: walletBalance ?? 0
+          },
+          royaltyIncome: {
+            balance: 0 
+          },
+          team: {
+            total: teamCount.total,
+            active: teamCount.active,
+            inActive: teamCount.nonActive
+          }
         }
       });
     } catch (error) {
@@ -31,5 +47,6 @@ class LevelIncomeController {
     }
   }
 }
+
 
 export default new LevelIncomeController();

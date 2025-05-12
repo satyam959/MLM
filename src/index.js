@@ -132,6 +132,7 @@ import WithdrawalRoutes from './Routes/WithdrawalRoutes.mjs';
 import UserBenefits from './services/UserBenefits.mjs';
 import HomeDashboard from './Routes/HomeDashboardRoutes.mjs';
 import userModuleRoutes from './Routes/User/userModuleRoutes.mjs'
+import LevelIncomeRoutes from './Routes/User/LevelIncomeRoutes.mjs'
 
 dotenv.config();
 
@@ -176,6 +177,7 @@ app.use('/api/ranks', rankRoutes);
 app.use('/api/royalties', royaltyRoutes);
 app.use('/api/Withdrawal', WithdrawalRoutes);
 app.use('/api/homeDashboard', HomeDashboard)
+app.use('/api/LevelIncome',LevelIncomeRoutes)
 
 // Start server
 

@@ -69,7 +69,7 @@ const ServiceRepository = {
 
   // Get all services
   async find() {
-    return await Service.find();
+    return await Service.find().sort({ serviceId: 1 });
   },
 
   //  Get a service by MongoDB ObjectId (if still used)
