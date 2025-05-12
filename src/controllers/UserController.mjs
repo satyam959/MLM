@@ -9,136 +9,6 @@ import UserBenefits from "../services/UserBenefits.mjs";
 import { getUploadMiddleware } from "../middelware/UploadImage.mjs";
 
 class UserController {
-  // async registerUser(req, res) {
-  //   const {
-  //     fullName,
-  //     email,
-  //     phone,
-  //     address,
-  //     city,
-  //     pincode,
-  //     state,
-  //     dob,
-  //     whatsapp,
-  //     role,
-  //     referralCode,
-  //   } = req.body;
-
-  //   const image = req.file ? req.file.fullUrl : null;
-
-  //   try {
-  //     // Check if phone already exists
-  //     const existingUser = await UserRepository.findUserByPhone(phone);
-  //     if (existingUser) {
-  //       return res.status(400).json({
-  //         statusCode: 400,
-  //         success: false,
-  //         message: "Phone number already exists",
-  //       });
-  //     }
-
-  //     let referredBy = null;
-  //     let referrerName = null;
-  //     let hierarchy = [];
-
-  //     if (referralCode) {
-  //       const referrer = await UserModel.findOne({ referralCode });
-  //       if (!referrer) {
-  //         return res.status(400).json({
-  //           statusCode: 400,
-  //           success: false,
-  //           message: "Invalid referral code",
-  //         });
-  //       }
-
-  //       referredBy = referrer.userId;
-  //       referrerName = referrer.fullName || referrer.name || null;
-  //       hierarchy = [referredBy, ...(referrer.hierarchy || [])];
-  //     }
-
-  //     const newUserData = {
-  //       fullName,
-  //       email,
-  //       phone,
-  //       address,
-  //       city,
-  //       pincode,
-  //       state,
-  //       dob,
-  //       whatsapp,
-  //       role,
-  //       image,
-  //       referredBy,
-  //       referrerName,
-  //       hierarchy,
-  //     };
-
-  //     const user = await UserRepository.createUser(newUserData);
-  //     if (!user || !user.userId) {
-  //       return res.status(500).json({
-  //         statusCode: 500,
-  //         success: false,
-  //         message: "User creation failed",
-  //       });
-  //     }
-
-  //     const wallet = await WalletRepository.createWallet({
-  //       userId: user.userId,
-  //       balance: 200,
-  //     });
-
-  //     if (!wallet) {
-  //       return res.status(500).json({
-  //         statusCode: 500,
-  //         success: false,
-  //         message: "User created, but wallet creation failed",
-  //       });
-  //     }
-
-  //     if (user.referredBy) {
-  //       const referredUserList = await UserRepository.findAllUserByReferredId(
-  //         user.referredBy
-  //       );
-  //       const referredUserCount = referredUserList.length;
-
-  //       let amount = 0;
-  //       if (referredUserCount === 3) amount = 200;
-  //       if (referredUserCount === 8) amount = 40;
-
-  //       const userIds = referredUserList.map((u) => u.userId);
-  //       await WalletRepository.updateReferredUserWallet(userIds, amount);
-  //       await UserBenefits.checkReferralRewardEligibility(user.referredBy);
-  //       await WalletRepository.rewardBasedOnTeamSize(user.referredBy);
-  //     }
-
-  //     // Return only selected fields
-  //     return res.status(201).json({
-  //       statusCode: 201,
-  //       success: true,
-  //       message: "User registered successfully, wallet created",
-  //       user: {
-  //         fullName: user.fullName,
-  //         email: user.email,
-  //         dob: user.dob,
-  //         phone: user.phone,
-  //         whatsapp: user.whatsapp,
-  //         referralCode: user.referralCode,
-  //       },
-  //     });
-  //   } catch (error) {
-  //     console.log("error  -- ", error);
-  //     return res.status(500).json({
-  //       statusCode: 500,
-  //       success: false,
-  //       message: "Error registering user",
-  //       error: error.message,
-  //     });
-  //   }
-  // }
-
-
-
-
   async registerUser(req, res) {
     const {
       fullName,
@@ -279,39 +149,40 @@ class UserController {
   // Step 1: Send OTP
   async requestOTP(req, res) {
     const { phone } = req.body;
-
+  
     // Validate phone number (must be 10 digits)
     if (!phone || !/^\d{10}$/.test(phone)) {
       return res.status(400).json({ message: "Phone number must be 10 digits" });
-
-      try {
-        const user = await UserRepository.findUserByPhone(phone);
-        if (!user) {
-          return res.status(404).json({ message: "User not found" });
-        }
-
-        const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
-
-        await UserRepository.saveOTP(user._id, otp, otpExpiry);
-
-        // Simulate sending OTP
-        console.log(`OTP for ${phone}: ${otp}`);
-
-        return res.status(200).json({
-          statusCode: 200,
-          success: true,
-          message: "OTP sent successfully",
-        });
-
-      } catch (error) {
-        return res.status(500).json({
-          message: "Error sending OTP",
-          error: error.message,
-        });
+    }
+  
+    try {
+      const user = await UserRepository.findUserByPhone(phone);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
       }
+  
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+  
+      await UserRepository.saveOTP(user._id, otp, otpExpiry);
+  
+      // Simulate sending OTP
+      console.log(`OTP for ${phone}: ${otp}`);
+  
+      return res.status(200).json({
+        statusCode: 200,
+        success: true,
+        message: "OTP sent successfully",
+      });
+  
+    } catch (error) {
+      return res.status(500).json({
+        message: "Error sending OTP",
+        error: error.message,
+      });
     }
   }
+  
 
   // Step 2: Verify OTP and Login
   async verifyOTPLogin(req, res) {
@@ -580,82 +451,6 @@ class UserController {
       });
     }
   }
-
-  // async getUserDownline(req, res) {
-  //   try {
-  //     const userId = req.user.userId;
-  //     const { startDate, endDate, search } = req.query;
-
-  //     const userData = await UserRepository.findUserByUserId(userId);
-  //     const hierarchy = Array.isArray(userData.hierarchy) ? userData.hierarchy : [];
-
-  //     let downline = await UserRepository.getUserDownlines(userId, hierarchy);
-
-  //     if (startDate && endDate) {
-  //       const start = new Date(startDate);
-  //       const end = new Date(endDate);
-  //       end.setHours(23, 59, 59, 999);
-
-  //       if (!isNaN(start) && !isNaN(end)) {
-  //         downline = downline.filter((user) => {
-  //           const createdAt = new Date(user.createdAt);
-  //           return createdAt >= start && createdAt <= end;
-  //         });
-  //       }
-  //     }
-
-  //     if (search && search.trim() !== "") {
-  //       const lowerSearch = search.toLowerCase();
-  //       downline = downline.filter((user) => {
-  //         const fullNameMatch = user.fullName?.toLowerCase().includes(lowerSearch);
-  //         const statusLabel = user.status ? "active" : "inactive";
-  //         const statusMatch = statusLabel === lowerSearch; 
-  //         return fullNameMatch || statusMatch;
-  //       });
-  //     }
-
-  //     if (downline.length > 0) {
-  //       const formatted = downline.map((user) => ({
-  //         fullName: user.fullName,
-  //         userId: user.userId,
-  //         level: user.level,
-  //         state: user.state,
-  //         status: user.status ? "Active" : "Inactive",
-  //         createDate: new Date(user.createdAt).toLocaleString("en-GB", {
-  //           timeZone: "Asia/Kolkata",
-  //           year: "numeric",
-  //           month: "short",
-  //           day: "2-digit",
-  //           hour: "2-digit",
-  //           minute: "2-digit",
-  //           hour12: true,
-  //         }).replace(",", ""),
-  //       }));
-
-  //       return res.status(200).json({
-  //         statusCode: 200,
-  //         message: "Downline retrieved successfully",
-  //         totalMember: formatted.length,
-  //         data: formatted,
-  //       });
-  //     } else {
-  //       return res.status(200).json({
-  //         statusCode: 200,
-  //         message: "No Downline found",
-  //         data: [],
-  //       });
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching user downline:", error);
-  //     return res.status(500).json({
-  //       statusCode: 500,
-  //       message: "Error fetching user downline",
-  //       error: error.message,
-  //     });
-  //   }
-  // }
-
-
   async getUserDownline(req, res) {
     try {
       const userId = req.user.userId;
@@ -861,7 +656,79 @@ class UserController {
       });
     }
   }
+  // Get users by rank
+async getUsersByRank(req, res) {
+  try {
+    const { rank } = req.query; 
 
+    if (!rank) {
+      return res.status(400).json({
+        statusCode: 400,
+        success: false,
+        message: "Rank parameter is required",
+      });
+    }
+
+    const users = await UserModel.find({ rank }); 
+
+    res.status(200).json({
+      statusCode: 200,
+      success: true,
+      message: "Users fetched by rank successfully",
+      data: users,
+    });
+  } catch (error) {
+    console.error("Error fetching users by rank:", error.message);
+    res.status(500).json({
+      statusCode: 500,
+      success: false,
+      message: "Error fetching users by rank",
+      error: error.message,
+    });
+  }
 }
+
+async getLevelIncomeReport(req, res) {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ success: false, message: "Unauthorized: Token missing" });
+    }
+
+    const token = authHeader.split(" ")[1];
+    const decoded = jwt.verify(token);
+    const userId = decoded.id;
+
+    const levelIncomes = await Wallet.aggregate([
+      { $match: { userId } },
+      {
+        $group: {
+          _id: "$level",
+          totalAmount: { $sum: "$amount" }
+        }
+      },
+      {
+        $project: {
+          level: "$_id",
+          totalAmount: 1,
+          directIncome: { $multiply: ["$totalAmount", 0.7] },
+          teamIncome: { $multiply: ["$totalAmount", 0.3] },
+          _id: 0
+        }
+      },
+      { $sort: { level: 1 } }
+    ]);
+
+    return res.json({ success: true, data: levelIncomes });
+
+  } catch (error) {
+    console.error("Level income report error:", error);
+    return res.status(500).json({ success: false, message: "Server Error", error: error.message });
+  }
+}
+}
+
+
 
 export default new UserController();

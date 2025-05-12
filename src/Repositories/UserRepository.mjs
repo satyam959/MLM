@@ -192,6 +192,17 @@ class UserRepository {
       throw new Error("Error finding wallet");
     }
   }
+  static async getUsersByRank({ level, referredBy }) {
+    const filter = { referredBy };
+
+    if (level !== null) {
+      filter.level = level;
+    }
+
+    return await UserModel.find(filter);
+  }
+
+  
 
   static async findAllUserByReferredId(referredBy) {
     try {
@@ -213,8 +224,8 @@ class UserRepository {
       throw new Error("Error updating referred user wallets");
     }
   }
-}
 
+}
 //  Generate Referral Code
 function generateReferralCode() {
   return Math.random().toString(36).substr(2, 8).toUpperCase();

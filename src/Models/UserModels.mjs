@@ -211,7 +211,6 @@ const userSchema = new mongoose.Schema(
     level: { type: Number, default: 0 },
     membership: { type: Number, default: 0 },
 
-    // ✅ Added rank field
     rank: {
       type: String,
       default: "Unranked",
@@ -227,6 +226,9 @@ userSchema.statics.findByEmail = async function (email) {
   return this.findOne({ email });
 };
 
+userSchema.statics.getUsersByRank = async function (rank) {
+  return this.find({ rank });
+};
 // Post-save hook
 userSchema.post("save", async function (doc, next) {
   try {

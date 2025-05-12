@@ -40,4 +40,13 @@ router.get('/getUserDownline', verifyToken, UserController.getUserDownline);
 ///This Routes For Admin /////
 router.get("/downline", UserController.getUserDownline);
 
+
+
+// Get users by rank (Protected)
+router.get('/getUsersByRank', verifyToken, UserController.getUsersByRank);
+
+router.get("/level-income",verifyToken, UserController.getLevelIncomeReport);
+
+
+
 export default router;
