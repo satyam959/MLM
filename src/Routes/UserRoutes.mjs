@@ -45,7 +45,7 @@ router.get("/downline", UserController.getUserDownline);
 // Get users by rank (Protected)
 router.get('/getUsersByRank', verifyToken, UserController.getUsersByRank);
 
-router.get("/level-income",verifyToken, UserController.getLevelIncomeReport);
+// router.get("/level-income",verifyToken, UserController.getLevelIncomeReport);
 
 
 

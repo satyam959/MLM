@@ -187,34 +187,51 @@ class UserController {
   // Step 2: Verify OTP and Login
   async verifyOTPLogin(req, res) {
     const { phone, otp } = req.body;
-
-    // Validate phone number (must be 10 digits)
+  
+    // Validate input
     if (!phone || !/^\d{10}$/.test(phone)) {
       return res.status(400).json({ message: "Phone number must be 10 digits" });
     }
-
+  
+    if (!otp || !/^\d{6}$/.test(otp)) {
+      return res.status(400).json({ message: "OTP must be a 6-digit code" });
+    }
+  
     try {
       const user = await UserRepository.findUserByPhone(phone);
+  
       if (!user || !user.otp || !user.otpExpiry) {
         return res.status(400).json({ message: "OTP not requested or expired" });
       }
-
-      if (user.otp !== otp || new Date(user.otpExpiry) < new Date()) {
-        return res.status(401).json({ message: "Invalid or expired OTP" });
+  
+      // Check OTP and expiry
+      const now = new Date();
+      const otpExpiry = new Date(user.otpExpiry);
+  
+      if (user.otp !== otp) {
+        return res.status(401).json({ message: "Invalid OTP" });
       }
-
+  
+      if (otpExpiry < now) {
+        return res.status(401).json({ message: "OTP has expired" });
+      }
+  
+      // Clear OTP after successful login
       await UserRepository.clearOTP(user._id);
-
+  
+      // Create JWT payload
       const payload = {
         userId: user._id,
         name: user.fullName || user.name,
         role: user.role,
       };
-
+  
+      // Sign JWT token
       const token = jwt.sign(payload, process.env.JWT_SECRET, {
         expiresIn: "365d",
       });
-
+  
+      // Success response
       return res.status(200).json({
         statusCode: 200,
         success: true,
@@ -226,8 +243,9 @@ class UserController {
           role: user.role,
         },
       });
-
+  
     } catch (error) {
+      console.error("Error verifying OTP:", error);
       return res.status(500).json({
         message: "Error verifying OTP",
         error: error.message,
@@ -685,46 +703,6 @@ async getUsersByRank(req, res) {
       message: "Error fetching users by rank",
       error: error.message,
     });
-  }
-}
-
-async getLevelIncomeReport(req, res) {
-  try {
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({ success: false, message: "Unauthorized: Token missing" });
-    }
-
-    const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token);
-    const userId = decoded.id;
-
-    const levelIncomes = await Wallet.aggregate([
-      { $match: { userId } },
-      {
-        $group: {
-          _id: "$level",
-          totalAmount: { $sum: "$amount" }
-        }
-      },
-      {
-        $project: {
-          level: "$_id",
-          totalAmount: 1,
-          directIncome: { $multiply: ["$totalAmount", 0.7] },
-          teamIncome: { $multiply: ["$totalAmount", 0.3] },
-          _id: 0
-        }
-      },
-      { $sort: { level: 1 } }
-    ]);
-
-    return res.json({ success: true, data: levelIncomes });
-
-  } catch (error) {
-    console.error("Level income report error:", error);
-    return res.status(500).json({ success: false, message: "Server Error", error: error.message });
   }
 }
 }

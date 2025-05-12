@@ -161,9 +161,8 @@ class UserRepository {
 
   static async clearOTP(userId) {
     try {
-
       return await UserModel.findOneAndUpdate(
-        { userId: userId }, 
+        { _id: userId }, 
         { $unset: { otp: "", otpExpiry: "" } },
         { new: true } 
       );
@@ -172,7 +171,7 @@ class UserRepository {
       throw new Error(`Failed to clear OTP: ${error.message}`);
     }
   }
-
+  
   // Wallet Operations
   static async createWallet(walletData) {
     try {
