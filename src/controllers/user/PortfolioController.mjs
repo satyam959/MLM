@@ -22,7 +22,7 @@ class PortfolioController {
                         email: userDetails.email,
                         rank: userDetails.rank,
                         totalEarning: walletBalance?.balance ?? 0,
-                        isPrime: userDetails.membership  
+                        isPrime: userDetails.membership.type == 1 ? true : false  
                     },
                     royaltyIncome: {
                         balance: 0
