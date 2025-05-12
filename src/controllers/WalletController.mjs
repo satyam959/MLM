@@ -106,10 +106,11 @@
 
 // export default WalletController;
 import WalletRepository from '../Repositories/WalletRepositories.mjs';
-
+import UserRepository from "../Repositories/UserRepository.mjs";
 class WalletController {
   // Create wallet
   static async create(req, res) {
+    const { userId } = req.user;
     try {
       const { balance } = req.body;
 
@@ -118,12 +119,21 @@ class WalletController {
       if (isNaN(parsedBalance)) {
         return res.status(400).json({ message: 'Valid balance is required' });
       }
+      const user = await UserRepository.findUserByUserId(userId);
+      if(!user){
+        return res.status(400).json({message:"User not found!"});
+      }
 
-      const wallet = await WalletRepository.create({ balance: parsedBalance });
-      return res.status(201).json({
-        message: 'Wallet created successfully',
-        data: wallet
-      });
+      const existingWallet = await WalletRepository.findByUserId(userId);
+    if (existingWallet) {
+      return res.status(400).json({ message: 'Wallet already exists for this user' });
+    }
+      
+    const wallet = await WalletRepository.create({ balance: parsedBalance, userId });
+    return res.status(201).json({
+      message: 'Wallet created successfully',
+      data: wallet,
+    });
     } catch (err) {
       return res.status(500).json({
         message: 'Server error while creating wallet',
@@ -148,7 +158,23 @@ class WalletController {
   // Get wallet by ID
   static async getById(req, res) {
     try {
-      const wallet = await WalletRepository.findById(req.params.walletId);
+      const wallet = await WalletRepository.findByWalletId(req.params.walletId);
+      if (!wallet) {
+        return res.status(404).json({ message: 'Wallet not found' });
+      }
+      return res.status(200).json({ data: wallet });
+    } catch (err) {
+      return res.status(500).json({
+        message: 'Server error while fetching wallet',
+        error: err.message
+      });
+    }
+  }
+
+  static async getByUserId(req, res) {
+    const { userId } = req.user;
+    try {
+      const wallet = await WalletRepository.findByUserId(userId);
       if (!wallet) {
         return res.status(404).json({ message: 'Wallet not found' });
       }

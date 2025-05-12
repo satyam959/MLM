@@ -1,70 +1,121 @@
 import IncomeLevelRepository from '../Repositories/IncomeLevelRepositories.mjs';
-
+import UserRepository from "../Repositories/UserRepository.mjs";
+import ServiceRepository from '../Repositories/ServicesRepositories.mjs';
 class IncomeLevelController {
     // Create new income level
     async create(req, res) {
         try {
-            const { income, team, status, level } = req.body;
+          if (!req.user || !req.user.userId) {
+            return res.status(401).json({ message: "Unauthorized: User not found" });
+          }
+      
+          const { userId } = req.user;
+      
 
-            // Ensure all required fields are provided
-            if (!income || !team || !status || level === undefined || level === null) {
-                return res.status(400).json({ message: 'Income, team, status, and level are required fields' });
-            }
+          let { income, team, level } = req.body;
+      
 
-            // Calculate total
-            const total = income * team;
+          income = Number(income);
+          team = Number(team);
+          level = Number(level);
+      
 
-            const newIncomeLevel = await IncomeLevelRepository.create({ income, team, status, total, level });
-
-            res.status(201).json({
-                message: 'Income Level created successfully',
-                data: newIncomeLevel
-            });
+          if (isNaN(income) || isNaN(team) || isNaN(level)) {
+            return res.status(400).json({ message: 'income, team, and level must be valid numbers' });
+          }
+      
+          const total = income * team;
+      
+          const newIncomeLevel = await IncomeLevelRepository.create({ userId, income, team, total, level });
+      
+          res.status(201).json({
+            message: 'Income Level created successfully',
+            data: newIncomeLevel
+          });
         } catch (error) {
-            console.error('Error creating income level:', error);
-            res.status(500).json({ message: 'Error creating income level', error: error.message });
+          console.error('Error creating income level:', error);
+          res.status(500).json({ message: 'Error creating income level', error: error.message });
         }
-    }
-
+      }
    // Get all income levels
   async getAllIncome(req, res) {
+    const { userId } = req.user;
     try {
-      // Fetch all income levels from the repository
-      const levels = await IncomeLevelRepository.findAllIncomeRecord();
+      const user = await UserRepository.findUserByUserId(userId);
+      const services = await ServiceRepository.find();
 
-      // If no levels are found
-      if (!levels || levels.length === 0) {
-        return res.status(404).json({
-          message: 'No income levels found'
-        });
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const {
+        userId: uId,
+        fullName,
+        phone,
+        email,
+        companyName,
+        address,
+        city,
+        state,
+        country,
+        pinCode,
+        image,
+        referralCode,
+      } = user;
+
+      const banner = [];
+
+      const companyProfile = {
+        companyName: companyName || "Scriza",
+        companyContact: phone || "N/A",
+        companyEmail: email || "support@scriza.in",
+        companyWebsite: "https://yourcompanywebsite.com"
+      };
+
+      return res.status(200).json({
+        statusCode: 200,
+        success: true,
+        message: "User profile fetched successfully",
+        user: {
+          userId: uId,
+          fullName,
+          phone,
+          email,
+          companyName,
+          address,
+          city,
+          state,
+          country,
+          pinCode,
+          image,
+          referralCode,
+        },
+        services,
+        banner,
+        companyProfile
+      });
+
+    } catch (error) {
+      return res.status(500).json({
+        message: "Error fetching user profile",
+        error: error.message,
+      });
     }
-
-    res.json({
-      message: 'Income Levels fetched successfully',
-      data: levels
-    });
-  } catch (error) {
-    console.error('Error fetching income levels:', error);
-    res.status(500).json({
-      message: 'Error fetching income levels',
-      error: error.message
-    });
   }
-}
 
 
 
-    // Get income level by ID
-    async getById(req, res) {
-        try {
-            const level = await IncomeLevelRepository.findById(req.params.id);
-            if (!level) return res.status(404).json({ message: 'Income Level not found' });
-            res.json({ message: 'Income Level fetched successfully', data: level });
-        } catch (error) {
-            console.error('Error fetching income level:', error);
-            res.status(500).json({ message: 'Error fetching income level', error: error.message });
-        }
-    }
+    // // Get income level by ID
+    // async getById(req, res) {
+    //     try {
+    //         const level = await IncomeLevelRepository.findById(req.params.id);
+    //         if (!level) return res.status(404).json({ message: 'Income Level not found' });
+    //         res.json({ message: 'Income Level fetched successfully', data: level });
+    //     } catch (error) {
+    //         console.error('Error fetching income level:', error);
+    //         res.status(500).json({ message: 'Error fetching income level', error: error.message });
+    //     }
+    // }
 
     // Update income level by ID
     async update(req, res) {

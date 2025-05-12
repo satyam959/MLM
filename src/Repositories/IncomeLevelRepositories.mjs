@@ -35,23 +35,23 @@ class IncomeLevelRepository {
 
 
   // Find an income level by ID
-  static async findById(id) {
-    try {
-      // Validate if the ID is valid
-      if (!mongoose.Types.ObjectId.isValid(incomeId)) {
-        throw new Error('Invalid ID format');
-      }
+  // static async findById(id) {
+  //   try {
+  //     // Validate if the ID is valid
+  //     if (!mongoose.Types.ObjectId.isValid(incomeId)) {
+  //       throw new Error('Invalid ID format');
+  //     }
 
-      const level = await IncomeLevel.findById(incomeId);
-      if (!level) {
-        throw new Error(`Income level with ID ${id} not found`);
-      }
-      return level;
-    } catch (error) {
-      console.error('Error finding income level:', error);
-      throw new Error('Error finding income level: ' + error.message);
-    }
-  }
+  //     const level = await IncomeLevel.findById(incomeId);
+  //     if (!level) {
+  //       throw new Error(`Income level with ID ${id} not found`);
+  //     }
+  //     return level;
+  //   } catch (error) {
+  //     console.error('Error finding income level:', error);
+  //     throw new Error('Error finding income level: ' + error.message);
+  //   }
+  // }
 
   // Update an income level by ID
   static async update(incomeId, data) {

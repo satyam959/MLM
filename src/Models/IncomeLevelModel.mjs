@@ -1,6 +1,10 @@
 import mongoose from 'mongoose';
 
 const IncomeLevelSchema = new mongoose.Schema({
+  userId: {
+    type: Number,
+    unique: true,
+  },
   income: {
     type: Number,
     required: true, 

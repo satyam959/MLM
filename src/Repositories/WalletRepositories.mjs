@@ -6,10 +6,16 @@ const WalletRepository = {
   async findAll() {
     return await Wallet.find();
   },
-
-  async findById(walletId) {
-    return await Wallet.findById(walletId);
+   async findByUserId(userId) {
+    return await Wallet.findOne({ userId });
   },
+  async findById(walletId) {
+    return await Wallet.findByWalletId(walletId);
+  },
+   async findByWalletId(walletId) {
+    return await Wallet.findOne({ walletId });
+  }
+,
 
   async create(data) {
     const wallet = new Wallet(data);

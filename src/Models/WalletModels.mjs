@@ -32,6 +32,7 @@
 // export default Wallet;
 import mongoose from 'mongoose';
 
+
 const walletSchema = new mongoose.Schema(
   {
     balance: {
@@ -49,7 +50,6 @@ const walletSchema = new mongoose.Schema(
     },
     userId: {
       type: Number,
-      default: () => Math.floor(100000 + Math.random() * 900000),
       unique: true,
     },
   },

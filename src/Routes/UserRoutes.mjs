@@ -19,6 +19,10 @@ router.post('/verify-otp', UserController.verifyOTPLogin);
 // Admin: Get all users
 router.get('/getAllusers', UserController.getAllUsers);
 
+
+
+
+
 // 🔒 Protected Routes (token required)
 router.get('/getUserProfile', verifyToken, UserController.getUserProfile); // No userId in URL anymore
 router.put('/updateProfile', verifyToken, getUploadMiddleware('image'), UserController.updateProfile);
