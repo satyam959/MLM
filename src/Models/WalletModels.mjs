@@ -35,7 +35,7 @@ import mongoose from 'mongoose';
 const walletSchema = new mongoose.Schema(
   {
     balance: {
-      type: Number,
+      type: String,
       required: true,
     },
     status: {
