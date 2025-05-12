@@ -9,6 +9,7 @@ class PortfolioController {
             const userTokenData = req.user;
             const userDetails = await UserRepository.getUserDetails(userTokenData.userId);
             const walletBalance = await UserWalletRepository.findWalletByUserId(userTokenData.userId);
+
             const teamCount = await UserRepository.getTotalCountUserDownlines(userTokenData.userId);
             return res.status(200).json({
                 status: true,
@@ -20,7 +21,7 @@ class PortfolioController {
                         name: userDetails.fullName,
                         email: userDetails.email,
                         rank: userDetails.rank,
-                        totalEarning: walletBalance.balance
+                        totalEarning: walletBalance?.balance ?? 0
                     },
                     royaltyIncome: {
                         balance: 0
