@@ -209,8 +209,23 @@ const userSchema = new mongoose.Schema(
     referrerName: { type: String },
     hierarchy: { type: [Number], default: [] },
     level: { type: Number, default: 0 },
-    membership: { type: Number, default: 0 },
-
+    // membership: { type: Number, default: 0 },
+    membership: {
+      type: new mongoose.Schema(
+        {
+          type: {
+            type: Number,
+            enum: [0, 1], // 0 = Basic, 1 = Premium
+            default: 0,
+          },
+          startDate: { type: Date, default: null },
+          endDate: { type: Date, default: null },
+          lastPayoutDate: { type: Date, default: null },
+        },
+        { _id: false }
+      ),
+      default: () => ({}),
+    },
     // ✅ Added rank field
     rank: {
       type: String,

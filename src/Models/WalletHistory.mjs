@@ -21,7 +21,7 @@ const walletSchema = new mongoose.Schema(
         },
         amount: { type: Number, required: true }, // transaction amount
         type: { type: String, enum: ['credit', 'debit'], required: true },
-        method: { type: String }, // like 'bank', 'paypal', 'betting', 'referral', etc.
+        source: { type: String }, // like 'bank', 'paypal', 'betting', 'referral', etc.
         balanceAfter: { type: Number }, // wallet balance after transaction (for history)
         status: {
             type: String, enum: ['pending', 'completed', 'failed'], default: 'completed'
