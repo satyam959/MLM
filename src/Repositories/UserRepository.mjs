@@ -11,7 +11,14 @@ class UserRepository {
       throw new Error(`Failed to find user by phone: ${error.message}`);
     }
   }
-
+  static async findById(userId) {
+    try {
+      return await UserModel.findById(userId);
+    } catch (error) {
+      console.error("Error fetching user by ID:", error.message);
+      throw new Error(`Failed to fetch user by ID: ${error.message}`);
+    }
+  }
   // Create a new user
   static async createUser(userData) {
     try {
@@ -127,15 +134,6 @@ class UserRepository {
       throw new Error(`Error fetching upline names: ${error.message}`);
     }
   }
-
-  // static async getUserDownlines(userId, hierarchy) {
-  //   try {
-  //     return await UserModel.find({ hierarchy: userId }).select("name");
-  //   } catch (error) {
-  //     console.error("Error fetching downline:", error.message);
-  //     throw new Error(`Error fetching downline: ${error.message}`);
-  //   }
-  // }
   
   static async getUserDownlines(userId) {
     try {
@@ -223,6 +221,7 @@ class UserRepository {
       throw new Error("Error updating referred user wallets");
     }
   }
+  
 
 }
 //  Generate Referral Code

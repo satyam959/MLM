@@ -21,7 +21,8 @@ class PortfolioController {
                         name: userDetails.fullName,
                         email: userDetails.email,
                         rank: userDetails.rank,
-                        totalEarning: walletBalance?.balance ?? 0
+                        totalEarning: walletBalance?.balance ?? 0,
+                        isPrime: userDetails.membership  
                     },
                     royaltyIncome: {
                         balance: 0

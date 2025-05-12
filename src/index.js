@@ -177,7 +177,7 @@ app.use('/api/ranks', rankRoutes);
 app.use('/api/royalties', royaltyRoutes);
 app.use('/api/Withdrawal', WithdrawalRoutes);
 app.use('/api/homeDashboard', HomeDashboard)
-app.use('/api/LevelIncome',LevelIncomeRoutes)
+app.use('/api',LevelIncomeRoutes)
 
 // Start server
 

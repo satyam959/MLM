@@ -7,7 +7,7 @@ import verify from "../../middelware/authMiddleware.mjs";
 const router = express.Router();
 
 
-router.get("/wallet-summary", verify, LevelIncomeReportController.getWalletSummary);
+router.get("/LevelIncome", verify, LevelIncomeReportController.getWalletSummary);
 
 
 
