@@ -2,16 +2,31 @@ import WalletRepository from '../Repositories/WalletRepositories.mjs';
 
 class WalletController {
   // ✅ Create wallet
+  // ✅ Create wallet only if it doesn't exist already
   static async create(req, res) {
     try {
-      const { balance } = req.body;
+      const { userId } = req.body;  // Assuming userId is passed in the body
+      
+      // ✅ Check if wallet already exists for the user
+      const existingWallet = await WalletRepository.findByUserId(userId);
+      
+      if (existingWallet) {
+        return res.status(400).json({
+          message: "Wallet already exists for this user",
+          data: existingWallet,  // Returning the existing wallet
+        });
+      }
 
+      // If no wallet found, create a new one
+      const { balance } = req.body;
       const parsedBalance = Number(balance);
       if (isNaN(parsedBalance)) {
         return res.status(400).json({ message: 'Balance must be a valid number' });
       }
 
-      const wallet = await WalletRepository.create({ balance: parsedBalance });
+      // Create new wallet
+      const wallet = await WalletRepository.create({ userId, balance: parsedBalance });
+      
       return res.status(201).json({
         message: 'Wallet created successfully',
         data: wallet
@@ -24,6 +39,7 @@ class WalletController {
     }
   }
 
+  
   // ✅ Get all wallets
   static async getAll(req, res) {
     try {
@@ -37,13 +53,18 @@ class WalletController {
     }
   }
 
-  // ✅ Get wallet by ID
+  // ✅ Get wallet by ID (Updated with debugging)
   static async getById(req, res) {
     try {
-      const wallet = await WalletRepository.findById(req.params.walletId);
+      const userId = req.user.userId; // Assuming userId comes from the authentication middleware
+      console.log("Fetching wallet for userId:", userId); // Debugging log
+
+      const wallet = await WalletRepository.findByUserId(userId);
+
       if (!wallet) {
         return res.status(404).json({ message: 'Wallet not found' });
       }
+
       return res.status(200).json({ data: wallet });
     } catch (err) {
       return res.status(500).json({
@@ -57,8 +78,8 @@ class WalletController {
   static async update(req, res) {
     try {
       const { balance } = req.body;
-
       const parsedBalance = Number(balance);
+
       if (isNaN(parsedBalance)) {
         return res.status(400).json({ message: 'Balance must be a valid number' });
       }
