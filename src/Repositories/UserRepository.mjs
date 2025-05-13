@@ -13,12 +13,13 @@ class UserRepository {
   }
   static async findById(userId) {
     try {
-      return await UserModel.findById(userId);
+      return await UserModel.findOne({ userId });
     } catch (error) {
       console.error("Error fetching user by ID:", error.message);
       throw new Error(`Failed to fetch user by ID: ${error.message}`);
     }
   }
+  
   // Create a new user
   static async createUser(userData) {
     try {

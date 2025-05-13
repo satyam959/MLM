@@ -27,7 +27,6 @@ class UserController {
     const image = req.file ? req.file.fullUrl : null;
 
     try {
-      // Check if phone already exists
       const existingUser = await UserRepository.findUserByPhone(phone);
       if (existingUser) {
         return res.status(400).json({
@@ -41,11 +40,12 @@ class UserController {
       let referrerName = null;
       let hierarchy = [];
       let walletBalance = 0;
-
-      let referrer = null;
+      let level = 1; // Default level is always 1
 
       if (referralCode) {
-        referrer = await UserModel.findOne({ referralCode });
+        console.log("1111");
+        const referrer = await UserModel.findOne({ referralCode });
+
         if (!referrer) {
           return res.status(400).json({
             statusCode: 400,
@@ -57,12 +57,26 @@ class UserController {
         referredBy = referrer.userId;
         referrerName = referrer.fullName || referrer.name || null;
         hierarchy = [referredBy, ...(referrer.hierarchy || [])];
-        if (
-          referrer.membership &&
-          referrer.membership.toLowerCase() === "active"
-        )
-          walletBalance = 200;
+
+        // ✅ If referrer has level >= 1, assign new level = referrer.level + 1
+        // if (typeof referrer.level === "number" && referrer.level >= 1) {
+        level = referrer.level + 1;
+        // }
+        console.log("level 64--", level);
+
+        // // ✅ If referrer has active membership, give wallet bonus
+        // if (
+        //   referrer.membership &&
+        //   typeof referrer.membership === "object" &&
+        //   referrer.membership.status &&
+        //   referrer.membership.status.toLowerCase() === "active"
+        // ) {
+        //   walletBalance = 200;
+        // }
+
+        // ✅ Ensure referrer level is at least 1
       }
+      console.log("22222");
 
       const newUserData = {
         fullName,
@@ -88,38 +102,17 @@ class UserController {
           success: false,
           message: "User creation failed",
         });
-      }
+      } else {
+        console.log("userId --", user.userId);
+        console.log("level 107 --", level);
 
-      const wallet = await WalletRepository.createWallet({
-        userId: user.userId,
-        balance: walletBalance,
-      });
-
-      if (!wallet) {
-        return res.status(500).json({
-          statusCode: 500,
-          success: false,
-          message: "User created, but wallet creation failed",
-        });
-      }
-
-      if (user.referredBy) {
-        const referredUserList = await UserRepository.findAllUserByReferredId(
-          user.referredBy
+        await UserModel.updateOne(
+          { userId: user.userId },
+          { $set: { level: level } }
         );
-        const referredUserCount = referredUserList.length;
-
-        let amount = 0;
-        if (referredUserCount === 3) amount = 200;
-        if (referredUserCount === 8) amount = 40;
-
-        const userIds = referredUserList.map((u) => u.userId);
-        await WalletRepository.updateReferredUserWallet(userIds, amount);
-
-        await UserBenefits.checkReferralRewardEligibility(user.referredBy);
-
-        await WalletRepository.rewardBasedOnTeamSize(user.referredBy);
       }
+      // ✅ Fetch full latest user from DB
+      const savedUser = await UserModel.findOne({ userId: user.userId });
 
       return res.status(201).json({
         statusCode: 201,
@@ -132,7 +125,7 @@ class UserController {
           phone: user.phone,
           whatsapp: user.whatsapp,
           referralCode: user.referralCode,
-          // walletBalance,
+          level: savedUser.level,
         },
       });
     } catch (error) {
@@ -149,32 +142,33 @@ class UserController {
   // Step 1: Send OTP
   async requestOTP(req, res) {
     const { phone } = req.body;
-  
+
     // Validate phone number (must be 10 digits)
     if (!phone || !/^\d{10}$/.test(phone)) {
-      return res.status(400).json({ message: "Phone number must be 10 digits" });
+      return res
+        .status(400)
+        .json({ message: "Phone number must be 10 digits" });
     }
-  
+
     try {
       const user = await UserRepository.findUserByPhone(phone);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-  
+
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
       const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
-  
+
       await UserRepository.saveOTP(user._id, otp, otpExpiry);
-  
+
       // Simulate sending OTP
       console.log(`OTP for ${phone}: ${otp}`);
-  
+
       return res.status(200).json({
         statusCode: 200,
         success: true,
         message: "OTP sent successfully",
       });
-  
     } catch (error) {
       return res.status(500).json({
         message: "Error sending OTP",
@@ -182,55 +176,58 @@ class UserController {
       });
     }
   }
-  
 
   // Step 2: Verify OTP and Login
   async verifyOTPLogin(req, res) {
     const { phone, otp } = req.body;
-  
+
     // Validate input
     if (!phone || !/^\d{10}$/.test(phone)) {
-      return res.status(400).json({ message: "Phone number must be 10 digits" });
+      return res
+        .status(400)
+        .json({ message: "Phone number must be 10 digits" });
     }
-  
+
     if (!otp || !/^\d{6}$/.test(otp)) {
       return res.status(400).json({ message: "OTP must be a 6-digit code" });
     }
-  
+
     try {
       const user = await UserRepository.findUserByPhone(phone);
-  
+
       if (!user || !user.otp || !user.otpExpiry) {
-        return res.status(400).json({ message: "OTP not requested or expired" });
+        return res
+          .status(400)
+          .json({ message: "OTP not requested or expired" });
       }
-  
+
       // Check OTP and expiry
       const now = new Date();
       const otpExpiry = new Date(user.otpExpiry);
-  
+
       if (user.otp !== otp) {
         return res.status(401).json({ message: "Invalid OTP" });
       }
-  
+
       if (otpExpiry < now) {
         return res.status(401).json({ message: "OTP has expired" });
       }
-  
+
       // Clear OTP after successful login
       await UserRepository.clearOTP(user._id);
-  
+
       // Create JWT payload
       const payload = {
         userId: user.userId,
         name: user.fullName || user.name,
         role: user.role,
       };
-  
+
       // Sign JWT token
       const token = jwt.sign(payload, process.env.JWT_SECRET, {
         expiresIn: "365d",
       });
-  
+
       // Success response
       return res.status(200).json({
         statusCode: 200,
@@ -243,7 +240,6 @@ class UserController {
           role: user.role,
         },
       });
-  
     } catch (error) {
       console.error("Error verifying OTP:", error);
       return res.status(500).json({
@@ -252,7 +248,6 @@ class UserController {
       });
     }
   }
-
 
   // Admin: Get all users
   async getAllUsers(req, res) {
@@ -475,7 +470,9 @@ class UserController {
       const { startDate, endDate, search } = req.query;
 
       const userData = await UserRepository.findUserByUserId(userId);
-      const hierarchy = Array.isArray(userData.hierarchy) ? userData.hierarchy : [];
+      const hierarchy = Array.isArray(userData.hierarchy)
+        ? userData.hierarchy
+        : [];
 
       let downline = await UserRepository.getUserDownlines(userId, hierarchy);
 
@@ -495,7 +492,9 @@ class UserController {
       if (search && search.trim() !== "") {
         const lowerSearch = search.toLowerCase();
         downline = downline.filter((user) => {
-          const fullNameMatch = user.fullName?.toLowerCase().includes(lowerSearch);
+          const fullNameMatch = user.fullName
+            ?.toLowerCase()
+            .includes(lowerSearch);
           const statusLabel = user.status ? "active" : "inactive";
           const statusMatch = statusLabel === lowerSearch;
           const userIdMatch = user.userId.toString() === search;
@@ -510,15 +509,17 @@ class UserController {
           level: user.level,
           state: user.state,
           status: user.status ? "Active" : "Inactive",
-          createDate: new Date(user.createdAt).toLocaleString("en-GB", {
-            timeZone: "Asia/Kolkata",
-            year: "numeric",
-            month: "short",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true,
-          }).replace(",", ""),
+          createDate: new Date(user.createdAt)
+            .toLocaleString("en-GB", {
+              timeZone: "Asia/Kolkata",
+              year: "numeric",
+              month: "short",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: true,
+            })
+            .replace(",", ""),
         }));
 
         return res.status(200).json({
@@ -544,10 +545,7 @@ class UserController {
     }
   }
 
-
-
   /////////////////// This use for Admin Only ////////////////////////
-
 
   async getUserDownline(req, res) {
     try {
@@ -568,7 +566,9 @@ class UserController {
         });
       }
 
-      const hierarchy = Array.isArray(userData.hierarchy) ? userData.hierarchy : [];
+      const hierarchy = Array.isArray(userData.hierarchy)
+        ? userData.hierarchy
+        : [];
 
       let downline = await UserRepository.getUserDownlines(userId, hierarchy);
 
@@ -588,7 +588,9 @@ class UserController {
       if (search && search.trim() !== "") {
         const lowerSearch = search.toLowerCase();
         downline = downline.filter((user) => {
-          const fullNameMatch = user.fullName?.toLowerCase().includes(lowerSearch);
+          const fullNameMatch = user.fullName
+            ?.toLowerCase()
+            .includes(lowerSearch);
           const statusLabel = user.status ? "active" : "inactive";
           const statusMatch = statusLabel === lowerSearch;
           const userIdMatch = user.userId.toString() === search;
@@ -603,15 +605,17 @@ class UserController {
           level: user.level,
           state: user.state,
           status: user.status ? "Active" : "Inactive",
-          createDate: new Date(user.createdAt).toLocaleString("en-GB", {
-            timeZone: "Asia/Kolkata",
-            year: "numeric",
-            month: "short",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true,
-          }).replace(",", ""),
+          createDate: new Date(user.createdAt)
+            .toLocaleString("en-GB", {
+              timeZone: "Asia/Kolkata",
+              year: "numeric",
+              month: "short",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: true,
+            })
+            .replace(",", ""),
         }));
 
         return res.status(200).json({
@@ -675,38 +679,36 @@ class UserController {
     }
   }
   // Get users by rank
-async getUsersByRank(req, res) {
-  try {
-    const { rank } = req.query; 
+  async getUsersByRank(req, res) {
+    try {
+      const { rank } = req.query;
 
-    if (!rank) {
-      return res.status(400).json({
-        statusCode: 400,
+      if (!rank) {
+        return res.status(400).json({
+          statusCode: 400,
+          success: false,
+          message: "Rank parameter is required",
+        });
+      }
+
+      const users = await UserModel.find({ rank });
+
+      res.status(200).json({
+        statusCode: 200,
+        success: true,
+        message: "Users fetched by rank successfully",
+        data: users,
+      });
+    } catch (error) {
+      console.error("Error fetching users by rank:", error.message);
+      res.status(500).json({
+        statusCode: 500,
         success: false,
-        message: "Rank parameter is required",
+        message: "Error fetching users by rank",
+        error: error.message,
       });
     }
-
-    const users = await UserModel.find({ rank }); 
-
-    res.status(200).json({
-      statusCode: 200,
-      success: true,
-      message: "Users fetched by rank successfully",
-      data: users,
-    });
-  } catch (error) {
-    console.error("Error fetching users by rank:", error.message);
-    res.status(500).json({
-      statusCode: 500,
-      success: false,
-      message: "Error fetching users by rank",
-      error: error.message,
-    });
   }
 }
-}
-
-
 
 export default new UserController();
