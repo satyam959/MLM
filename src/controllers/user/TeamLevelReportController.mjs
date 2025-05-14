@@ -45,20 +45,21 @@ class TeamLevelReportController {
         });
       }
   
-      const users = await UserRepository.getUsersByLevel(numericLevel);
+      const userId = req.user.userId;
   
-      if (!users || users.length === 0) {
-        return res.status(404).json({
-          success: false,
-          statusCode: 404,
-          message: `Level ${numericLevel} not found`,
-        });
-      }
+      // Get current user and hierarchy (if needed)
+      const userData = await UserRepository.findUserByUserId(userId);
+      const hierarchy = Array.isArray(userData.hierarchy) ? userData.hierarchy : [];
+  
+      // Only get downline of the logged-in user
+      const downlineUsers = await UserRepository.getUserDownlines(userId, hierarchy);
+  
+      // Filter users by level within the downline
+      const levelUsers = downlineUsers.filter(user => user.level === numericLevel);
   
       const formattedUsers = await Promise.all(
-        users.map(async (user) => {
+        levelUsers.map(async (user) => {
           const teamCount = await UserRepository.getTotalCountUserDownlines(user.userId);
-  
           return {
             fullName: user.fullName,
             userId: user.userId,
@@ -66,9 +67,9 @@ class TeamLevelReportController {
             level: user.level,
             totalTeam: {
               active: teamCount.active,
-              inActive: teamCount.nonActive
+              inActive: teamCount.nonActive,
             },
-            status: user.status === true ? "Active" : "Inactive",
+            status: user.status ? "Active" : "Inactive",
           };
         })
       );
@@ -76,7 +77,11 @@ class TeamLevelReportController {
       return res.status(200).json({
         success: true,
         statusCode: 200,
-        message: `Users at level ${numericLevel} fetched successfully`,
+        message:
+          formattedUsers.length > 0
+            ? `Users at level ${numericLevel} fetched successfully`
+            : `No users found at level ${numericLevel} under your downline`,
+        totalMember: formattedUsers.length,
         data: formattedUsers,
       });
     } catch (error) {
@@ -88,6 +93,7 @@ class TeamLevelReportController {
       });
     }
   }
+  
   
 }
 
