@@ -9,6 +9,136 @@ import UserBenefits from "../services/UserBenefits.mjs";
 import { getUploadMiddleware } from "../middelware/UploadImage.mjs";
 
 class UserController {
+  // async registerUser(req, res) {
+  //   const {
+  //     fullName,
+  //     email,
+  //     phone,
+  //     address,
+  //     city,
+  //     pincode,
+  //     state,
+  //     dob,
+  //     whatsapp,
+  //     role,
+  //     referralCode,
+  //   } = req.body;
+
+  //   const image = req.file ? req.file.fullUrl : null;
+
+  //   try {
+  //     const existingUser = await UserRepository.findUserByPhone(phone);
+  //     if (existingUser) {
+  //       return res.status(400).json({
+  //         statusCode: 400,
+  //         success: false,
+  //         message: "Phone number already exists",
+  //       });
+  //     }
+
+  //     let referredBy = null;
+  //     let referrerName = null;
+  //     let hierarchy = [];
+  //     let walletBalance = 0;
+  //     let level = 1; // Default level is always 1
+
+  //     if (referralCode) {
+  //       console.log("1111");
+  //       const referrer = await UserModel.findOne({ referralCode });
+
+  //       if (!referrer) {
+  //         return res.status(400).json({
+  //           statusCode: 400,
+  //           success: false,
+  //           message: "Invalid referral code",
+  //         });
+  //       }
+
+  //       referredBy = referrer.userId;
+  //       referrerName = referrer.fullName || referrer.name || null;
+  //       hierarchy = [referredBy, ...(referrer.hierarchy || [])];
+
+  //       // ✅ If referrer has level >= 1, assign new level = referrer.level + 1
+  //       // if (typeof referrer.level === "number" && referrer.level >= 1) {
+  //       level = referrer.level + 1;
+  //       // }
+  //       console.log("level 64--", level);
+
+  //       // // ✅ If referrer has active membership, give wallet bonus
+  //       // if (
+  //       //   referrer.membership &&
+  //       //   typeof referrer.membership === "object" &&
+  //       //   referrer.membership.status &&
+  //       //   referrer.membership.status.toLowerCase() === "active"
+  //       // ) {
+  //       //   walletBalance = 200;
+  //       // }
+
+  //       // ✅ Ensure referrer level is at least 1
+  //     }
+  //     console.log("22222");
+
+  //     const newUserData = {
+  //       fullName,
+  //       email,
+  //       phone,
+  //       address,
+  //       city,
+  //       pincode,
+  //       state,
+  //       dob,
+  //       whatsapp,
+  //       role,
+  //       image,
+  //       referredBy,
+  //       referrerName,
+  //       hierarchy,
+  //     };
+
+  //     const user = await UserRepository.createUser(newUserData);
+  //     if (!user || !user.userId) {
+  //       return res.status(500).json({
+  //         statusCode: 500,
+  //         success: false,
+  //         message: "User creation failed",
+  //       });
+  //     } else {
+  //       console.log("userId --", user.userId);
+  //       console.log("level 107 --", level);
+
+  //       await UserModel.updateOne(
+  //         { userId: user.userId },
+  //         { $set: { level: level } }
+  //       );
+  //     }
+  //     // ✅ Fetch full latest user from DB
+  //     const savedUser = await UserModel.findOne({ userId: user.userId });
+
+  //     return res.status(201).json({
+  //       statusCode: 201,
+  //       success: true,
+  //       message: "User registered successfully, wallet created",
+  //       user: {
+  //         fullName: user.fullName,
+  //         email: user.email,
+  //         dob: user.dob,
+  //         phone: user.phone,
+  //         whatsapp: user.whatsapp,
+  //         referralCode: user.referralCode,
+  //         level: savedUser.level,
+  //       },
+  //     });
+  //   } catch (error) {
+  //     console.log("error  -- ", error);
+  //     return res.status(500).json({
+  //       statusCode: 500,
+  //       success: false,
+  //       message: "Error registering user",
+  //       error: error.message,
+  //     });
+  //   }
+  // }
+
   async registerUser(req, res) {
     const {
       fullName,
@@ -23,9 +153,9 @@ class UserController {
       role,
       referralCode,
     } = req.body;
-
+  
     const image = req.file ? req.file.fullUrl : null;
-
+  
     try {
       const existingUser = await UserRepository.findUserByPhone(phone);
       if (existingUser) {
@@ -35,17 +165,15 @@ class UserController {
           message: "Phone number already exists",
         });
       }
-
+  
       let referredBy = null;
       let referrerName = null;
       let hierarchy = [];
-      let walletBalance = 0;
-      let level = 1; // Default level is always 1
-
+      let level = 1; // Default level is 1
+  
       if (referralCode) {
-        console.log("1111");
         const referrer = await UserModel.findOne({ referralCode });
-
+  
         if (!referrer) {
           return res.status(400).json({
             statusCode: 400,
@@ -53,31 +181,21 @@ class UserController {
             message: "Invalid referral code",
           });
         }
-
+  
         referredBy = referrer.userId;
         referrerName = referrer.fullName || referrer.name || null;
         hierarchy = [referredBy, ...(referrer.hierarchy || [])];
-
-        // ✅ If referrer has level >= 1, assign new level = referrer.level + 1
-        // if (typeof referrer.level === "number" && referrer.level >= 1) {
-        level = referrer.level + 1;
-        // }
-        console.log("level 64--", level);
-
-        // // ✅ If referrer has active membership, give wallet bonus
-        // if (
-        //   referrer.membership &&
-        //   typeof referrer.membership === "object" &&
-        //   referrer.membership.status &&
-        //   referrer.membership.status.toLowerCase() === "active"
-        // ) {
-        //   walletBalance = 200;
-        // }
-
-        // ✅ Ensure referrer level is at least 1
+  
+        // ✅ Corrected level logic
+        if (!referrer.hierarchy || referrer.hierarchy.length === 0) {
+          level = 1;
+        } else {
+          level = (typeof referrer.level === "number" && referrer.level >= 1)
+            ? referrer.level + 1
+            : 2;
+        }
       }
-      console.log("22222");
-
+  
       const newUserData = {
         fullName,
         email,
@@ -94,7 +212,7 @@ class UserController {
         referrerName,
         hierarchy,
       };
-
+  
       const user = await UserRepository.createUser(newUserData);
       if (!user || !user.userId) {
         return res.status(500).json({
@@ -102,34 +220,32 @@ class UserController {
           success: false,
           message: "User creation failed",
         });
-      } else {
-        console.log("userId --", user.userId);
-        console.log("level 107 --", level);
-
-        await UserModel.updateOne(
-          { userId: user.userId },
-          { $set: { level: level } }
-        );
       }
-      // ✅ Fetch full latest user from DB
+  
+      // Update level
+      await UserModel.updateOne(
+        { userId: user.userId },
+        { $set: { level: level } }
+      );
+  
       const savedUser = await UserModel.findOne({ userId: user.userId });
-
+  
       return res.status(201).json({
         statusCode: 201,
         success: true,
-        message: "User registered successfully, wallet created",
+        message: "User registered successfully",
         user: {
-          fullName: user.fullName,
-          email: user.email,
-          dob: user.dob,
-          phone: user.phone,
-          whatsapp: user.whatsapp,
-          referralCode: user.referralCode,
+          fullName: savedUser.fullName,
+          email: savedUser.email,
+          dob: savedUser.dob,
+          phone: savedUser.phone,
+          whatsapp: savedUser.whatsapp,
+          referralCode: savedUser.referralCode,
           level: savedUser.level,
         },
       });
     } catch (error) {
-      console.log("error  -- ", error);
+      console.log("error --", error);
       return res.status(500).json({
         statusCode: 500,
         success: false,
@@ -138,6 +254,7 @@ class UserController {
       });
     }
   }
+  
 
   // Step 1: Send OTP
   async requestOTP(req, res) {
@@ -464,87 +581,6 @@ class UserController {
       });
     }
   }
-  // async getUserDownline(req, res) {
-  //   try {
-  //     const userId = req.user.userId;
-  //     const { startDate, endDate, search } = req.query;
-
-  //     const userData = await UserRepository.findUserByUserId(userId);
-  //     const hierarchy = Array.isArray(userData.hierarchy)
-  //       ? userData.hierarchy
-  //       : [];
-
-  //     let downline = await UserRepository.getUserDownlines(userId, hierarchy);
-
-  //     if (startDate && endDate) {
-  //       const start = new Date(startDate);
-  //       const end = new Date(endDate);
-  //       end.setHours(23, 59, 59, 999);
-
-  //       if (!isNaN(start) && !isNaN(end)) {
-  //         downline = downline.filter((user) => {
-  //           const createdAt = new Date(user.createdAt);
-  //           return createdAt >= start && createdAt <= end;
-  //         });
-  //       }
-  //     }
-
-  //     if (search && search.trim() !== "") {
-  //       const lowerSearch = search.toLowerCase();
-  //       downline = downline.filter((user) => {
-  //         const fullNameMatch = user.fullName
-  //           ?.toLowerCase()
-  //           .includes(lowerSearch);
-  //         const statusLabel = user.status ? "active" : "inactive";
-  //         const statusMatch = statusLabel === lowerSearch;
-  //         const userIdMatch = user.userId.toString() === search;
-  //         return fullNameMatch || statusMatch || userIdMatch;
-  //       });
-  //     }
-
-  //     if (downline.length > 0) {
-  //       const formatted = downline.map((user) => ({
-  //         fullName: user.fullName,
-  //         userId: user.userId,
-  //         level: user.level,
-  //         state: user.state,
-  //         status: user.status ? "Active" : "Inactive",
-  //         createDate: new Date(user.createdAt)
-  //           .toLocaleString("en-GB", {
-  //             timeZone: "Asia/Kolkata",
-  //             year: "numeric",
-  //             month: "short",
-  //             day: "2-digit",
-  //             hour: "2-digit",
-  //             minute: "2-digit",
-  //             hour12: true,
-  //           })
-  //           .replace(",", ""),
-  //       }));
-
-  //       return res.status(200).json({
-  //         statusCode: 200,
-  //         message: "Downline retrieved successfully",
-  //         totalMember: formatted.length,
-  //         data: formatted,
-  //       });
-  //     } else {
-  //       return res.status(200).json({
-  //         statusCode: 200,
-  //         message: "No Downline found",
-  //         data: [],
-  //       });
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching user downline:", error);
-  //     return res.status(500).json({
-  //       statusCode: 500,
-  //       message: "Error fetching user downline",
-  //       error: error.message,
-  //     });
-  //   }
-  // }
-
   /////////////////// This use for Admin Only ////////////////////////
 
   async getUserDownline(req, res) {
