@@ -4,9 +4,7 @@ class TeamLevelReportController {
 
     static async getUserTeamLevelReport(req, res) {
         try {
-
             const userTokenData = req.user;
-
             const teamCount = await UserRepository.getTotalCountUserDownlines(userTokenData.userId);
             const level = await UserRepository.getTotalTeamByLevel(userTokenData.userId);
             return res.status(200).json({

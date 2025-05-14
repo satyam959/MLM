@@ -55,14 +55,14 @@ class userRepository {
             const user = await UserModel.findOne({ userId: userId });
             if (!user) throw new Error("User not found");
 
-            const basePath = user.hierarchy || [];  // ensure it's an array
+            const basePath = user.hierarchy || [];
             const baseDepth = basePath.length;
 
             const result = await UserModel.aggregate([
                 {
                     $match: {
-                        hierarchy: { $ne: null },  // make sure it's present
-                        hierarchy: { $elemMatch: { $eq: userId } }  // includes this user in hierarchy
+                        hierarchy: { $ne: null },
+                        hierarchy: { $elemMatch: { $eq: userId } }
                     }
                 },
                 {
