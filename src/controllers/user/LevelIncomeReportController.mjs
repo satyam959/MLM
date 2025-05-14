@@ -6,7 +6,7 @@ class LevelIncomeController {
     try {
       const userId = req.user.userId;
 
-      // ✅ Get wallet by userId (No wallet creation here, just fetching)
+      //  Get wallet by userId (No wallet creation here, just fetching)
       const wallet = await WalletRepository.findByUserId(userId);
       console.log("wallet", wallet); // Debugging log
 
@@ -21,7 +21,7 @@ class LevelIncomeController {
 
       const totalAmount = wallet.balance; // Ensure you're accessing the correct field
 
-      // ✅ Get user level safely
+      //  Get user level safely
       const user = await UserRepository.findByUserId(userId);
       const userLevel = user?.level ?? 1;
 
