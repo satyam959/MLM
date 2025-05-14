@@ -11,6 +11,10 @@ const walletSchema = new mongoose.Schema(
             type: Number,
             unique: true,
         },
+        transactionId: {
+            type: String,
+            unique: true
+        },
         amount: { type: Number, required: true }, // transaction amount
         type: { type: String, enum: ['credit', 'debit'], required: true },
         transactionType: { type: String, enum: ['membership', 'dailyPayout'], required: true },

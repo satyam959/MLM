@@ -12,28 +12,29 @@ class BuyMembershipController {
 
             const amountToAdd = req.body.amount;
             let finalAmount = 0
-            // if (adminWallet) {
-            //     // ✅ Update existing wallet
-            //     adminWallet.balance += amountToAdd;
-            //     finalAmount = await adminWallet.save();
-            // } else {
-            //     // ✅ Create new wallet
-            //     finalAmount = await UserWalletRepository.createWallet({
-            //         userId: userTokenData.userId,
-            //         balance: amountToAdd,
-            //     });
-            // }
             if (adminWallet) {
-                // Ensure balance is a number
-                adminWallet.balance = Number(adminWallet.balance) + amountToAdd;
+                // ✅ Update existing wallet
+                adminWallet.balance += amountToAdd;
                 finalAmount = await adminWallet.save();
             } else {
-                // Create new wallet for admin
+                // ✅ Create new wallet
                 finalAmount = await UserWalletRepository.createWallet({
-                    userId: adminUserId, // fix: this was mistakenly set to userTokenData.userId earlier
+                    userId: userTokenData.userId,
                     balance: amountToAdd,
                 });
             }
+            // if (adminWallet) {
+            //     // Ensure balance is a number
+            //     adminWallet.balance = Number(adminWallet.balance) + amountToAdd;
+            //     finalAmount = await adminWallet.save();
+            // } else {
+            //     // Create new wallet for admin
+            //     finalAmount = await UserWalletRepository.createWallet({
+            //         userId: adminUserId, // fix: this was mistakenly set to userTokenData.userId earlier
+            //         balance: amountToAdd,
+            //     });
+            // }
+
             const walletHistoryData = {
 
                 userId: userTokenData.userId,
