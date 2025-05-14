@@ -3,10 +3,10 @@ import mongoose from 'mongoose';
 const walletSchema = new mongoose.Schema(
   {
     balance: {
-      type: Number,
-      default: 0,
+      type: mongoose.Schema.Types.Decimal128,
+      required: true,
     },
-    
+
     status: {
       type: Boolean,
       default: true,
@@ -17,7 +17,7 @@ const walletSchema = new mongoose.Schema(
       unique: true,
     },
     userId: {
-      type: String,
+      type: Number,
       ref: 'User',
       required: true,
     },
