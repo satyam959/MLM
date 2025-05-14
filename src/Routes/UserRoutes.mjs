@@ -38,7 +38,7 @@ router.get('/getUserDownline', verifyToken, UserController.getUserDownline);
 
 
 ///This Routes For Admin /////
-router.get("/downline", UserController.getUserDownline);
+router.get('/downline', UserController.getUserDownline);
 
 
 

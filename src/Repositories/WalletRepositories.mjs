@@ -14,16 +14,16 @@ const WalletRepository = {
   // ✅ Updated findByUserId with logging and wallet creation if not found
   async findByUserId(userId) {
     try {
-      console.log("Searching for wallet with userId:", userId);  // Debugging log
+      console.log("Searching for wallet with userId:", userId); 
       let wallet = await WalletModel.findOne({ userId });
 
       if (!wallet) {
-        console.log("No wallet found for userId:", userId);  // Debugging log
+        console.log("No wallet found for userId:", userId); 
         // Automatically create a wallet if none exists
         wallet = await WalletModel.create({ userId, balance: 0 });
-        console.log("Created a new wallet for userId:", userId);  // Debugging log
+        console.log("Created a new wallet for userId:", userId);  
       } else {
-        console.log("Found wallet:", wallet);  // Debugging log
+        console.log("Found wallet:", wallet);  
       }
       
       return wallet;

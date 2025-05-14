@@ -3,7 +3,8 @@ import mongoose from 'mongoose';
 const walletSchema = new mongoose.Schema(
   {
     balance: {
-      type: mongoose.Schema.Types.Decimal128,
+      type: String,
+      // mongoose.Schema.Types.Decimal128,
       required: true,
     },
 
