@@ -209,29 +209,6 @@ class userRepository {
                         count: { $sum: 1 }
                     }
                 }
-    }
-
-    // Get detailed user info
-    static async getUserDetails(userId) {
-        try {
-            return await UserModel.findOne({ userId });
-        } catch (error) {
-            console.error("Error finding user by userId:", error.message);
-            throw new Error(`Failed to find user by userId: ${error.message}`);
-        }
-    }
-
-    // Get total count of direct downlines
-    static async getTotalCountUserDownlines(userId) {
-        try {
-            const result = await UserModel.aggregate([
-                { $match: { hierarchy: userId } },
-                {
-                    $group: {
-                        _id: "$status",
-                        count: { $sum: 1 }
-                    }
-                }
             ]);
 
             let total = 0;
