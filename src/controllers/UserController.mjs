@@ -169,21 +169,11 @@ class UserController {
       let referredBy = null;
       let referrerName = null;
       let hierarchy = [];
-<<<<<<< HEAD
       let level = 1; // Default level is 1
 
       if (referralCode) {
         const referrer = await UserModel.findOne({ referralCode });
 
-=======
-      let walletBalance = 0;
-      let level = 1; // Default level is always 1
-
-      if (referralCode) {
-        console.log("1111");
-        const referrer = await UserModel.findOne({ referralCode });
-
->>>>>>> 0fc9ee1 (resolve conflict)
         if (!referrer) {
           return res.status(400).json({
             statusCode: 400,
