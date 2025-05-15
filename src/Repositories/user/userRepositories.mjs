@@ -1,45 +1,34 @@
 import UserModel from "../../Models/UserModels.mjs";
 
 class userRepository {
-  // Fetch user by userId
+  // Get user by userId
   static async findUserByUserId(userId) {
     try {
-      return await UserModel.findOne({ userId: userId });
+      return await UserModel.findOne({ userId });
     } catch (error) {
-      throw new Error(`Error fetching user with userId ${userId}: ${error.message}`);
+      console.error("Error finding user by userId:", error.message);
+      throw new Error("Failed to fetch user");
     }
   }
 
-  // Get downline users for a given user
-  static async getUserDownlines(userId) {
-    try {
-      return await UserModel.find({
-        hierarchy: userId  // Finds users whose hierarchy contains the given userId
-      }).select("fullName userId state level referredBy status createdAt");
-    } catch (error) {
-      console.error("Error fetching downline:", error.message);
-      throw new Error(`Error fetching downline: ${error.message}`);
-    }
-  }
-
-  // Get user details by userId
+  // Get detailed user info
   static async getUserDetails(userId) {
     try {
-      return await UserModel.findOne({ userId: userId });
+      return await UserModel.findOne({ userId });
     } catch (error) {
-      console.error('Error finding user by userId:', error.message);
+      console.error("Error finding user by userId:", error.message);
       throw new Error(`Failed to find user by userId: ${error.message}`);
     }
   }
 
-  // Get total count of downlines based on userId (active and inactive)
+  // Get total count of direct downlines
   static async getTotalCountUserDownlines(userId) {
     try {
       const result = await UserModel.aggregate([
-        { $match: { hierarchy: userId } }, // Match users whose hierarchy contains userId
+        { $match: { hierarchy: userId } },
         {
           $group: {
-            _id: "$status", // Group by status (active/inactive)
+            _id: "$status",
             count: { $sum: 1 }
           }
         }
@@ -62,7 +51,7 @@ class userRepository {
     }
   }
 
-  // Fetch admin userId
+  // Get admin's userId
   static async getAdminUserId() {
     try {
       const admin = await UserModel.findOne({ role: 'admin' }).select('userId');
@@ -73,10 +62,10 @@ class userRepository {
     }
   }
 
-  // Get total count of users and their levels
+  // Get total team by level for a user
   static async getTotalTeamByLevel(userId) {
     try {
-      const user = await UserModel.findOne({ userId: userId });
+      const user = await UserModel.findOne({ userId });
       if (!user) throw new Error("User not found");
 
       const basePath = user.hierarchy || [];
@@ -92,10 +81,7 @@ class userRepository {
         {
           $addFields: {
             level: {
-              $subtract: [
-                { $size: "$hierarchy" },
-                baseDepth
-              ]
+              $subtract: [{ $size: "$hierarchy" }, baseDepth]
             }
           }
         },
@@ -142,19 +128,28 @@ class userRepository {
   static async getUsersByLevel(level) {
     try {
       const users = await UserModel.find({ level });
-
-      if (!users || users.length === 0) {
-        return [];
-      }
-
-      return users;
+      return users || [];
     } catch (error) {
       console.error("Error fetching users by level:", error.message);
       throw new Error("Error fetching users by level");
     }
   }
 
-  // Get downline users and add referrer name
+  // ✅ Get downline users and include required fields
+  static async getUserDownlines(userId, hierarchy) {
+    try {
+      return await UserModel.find({
+        hierarchy: userId
+      }).select(
+        "fullName userId level state referredBy dob phone whatsapp email status createdAt"
+      );
+    } catch (error) {
+      console.error("Error fetching downline:", error.message);
+      throw new Error(`Error fetching downline: ${error.message}`);
+    }
+  }
+
+  // Optional: Get users with referrer name (if needed in a separate place)
   static async getUsersWithReferrerName(level) {
     try {
       const users = await UserModel.find({ level });
@@ -163,22 +158,27 @@ class userRepository {
         return [];
       }
 
-      const formattedUsers = await Promise.all(
+      return await Promise.all(
         users.map(async (user) => {
-          const referrer = user.referredBy ? await this.findUserByUserId(user.referredBy) : null;
+          const referrer = user.referredBy
+            ? await this.findUserByUserId(user.referredBy)
+            : null;
           const referrerName = referrer ? referrer.fullName : "Unknown";
+
           return {
             fullName: user.fullName,
             userId: user.userId,
             state: user.state,
             level: user.level,
             referredBy: referrerName,
-            status: user.status ? "Active" : "Inactive"
+            dob: user.dob,
+            phone: user.phone,
+            whatsapp: user.whatsapp,
+            email: user.email,
+            status: user.status ? "Active" : "Inactive",
           };
         })
       );
-
-      return formattedUsers;
     } catch (error) {
       console.error("Error fetching users with referrer name:", error.message);
       throw new Error("Error fetching users with referrer name");
