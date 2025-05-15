@@ -175,6 +175,38 @@ class userRepository {
       throw new Error("Error fetching users with referrer name");
     }
   }
+
+  static async getReferalUser(userId) {
+    try {
+      const users = await UserModel.find({ userId: userId });
+
+      if (!users || users.length === 0) {
+        return [];
+      }
+
+      return await Promise.all(
+        users.map(async (user) => {
+          // Call the existing utility function
+          const downlineCounts = await userRepository.getTotalCountUserDownlines(user.userId);
+
+          return {
+            fullName: user.fullName,
+            userId: user.userId,
+            phone: user.phone,
+            whatsapp: user.whatsapp,
+            email: user.email,
+            status: user.status === true ? "Active" : "Inactive",
+            activeCount: downlineCounts.active,
+            inactiveCount: downlineCounts.nonActive,
+            totalDownlines: downlineCounts.total,
+          };
+        })
+      );
+    } catch (error) {
+      console.error("Error fetching users with referrer code:", error.message);
+      throw new Error("Error fetching users with referrer code");
+    }
+  }
 }
 
 export default userRepository;
