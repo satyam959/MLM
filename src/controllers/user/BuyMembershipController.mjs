@@ -9,7 +9,7 @@ class BuyMembershipController {
             const userDetails = await UserRepository.getUserDetails(userTokenData.userId);
             const adminUserId = await UserRepository.getAdminUserId();
             let adminWallet = await UserWalletRepository.findWalletByUserId(adminUserId);
-
+            console.log("adminWallet -- ", adminWallet);
             const amountToAdd = req.body.amount;
             let finalAmount = 0
             if (adminWallet) {
@@ -42,7 +42,7 @@ class BuyMembershipController {
                 type: "debit",
                 transactionType: "membership",
                 source: "wallet",
-                balanceAfter: finalAmount
+                balanceAfter: finalAmount.balance
             }
             console.log(walletHistoryData);
             // await UserWalletRepository.createWalletHistory(walletHistoryData)

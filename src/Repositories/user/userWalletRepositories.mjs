@@ -9,6 +9,12 @@ const UserWalletRepository = {
             throw error;
         }
     },
+
+    async createWallet(walletData) {
+        const wallet = new Wallet(walletData);
+        return await wallet.save();
+    },
+
 };
 
 export default UserWalletRepository;
