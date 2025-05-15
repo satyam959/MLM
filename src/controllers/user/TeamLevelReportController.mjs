@@ -46,7 +46,7 @@ class TeamLevelReportController {
       }
   
       const userId = req.user.userId;
-      const userData = await UserRepository.findUserByUserId(userId);
+      const userData = await UserRepository.getUserDetails(userId);
       const hierarchy = Array.isArray(userData.hierarchy) ? userData.hierarchy : [];
   
       const downlineUsers = await UserRepository.getUserDownlines(userId, hierarchy);
@@ -58,7 +58,7 @@ class TeamLevelReportController {
   
           let referrerName = "Unknown";
           if (user.referredBy) {
-            const referrer = await UserRepository.findUserByUserId(user.referredBy);
+            const referrer = await UserRepository.getUserDetails(user.referredBy);
             if (referrer) {
               referrerName = referrer.fullName || referrer.name || "Unknown";
             }

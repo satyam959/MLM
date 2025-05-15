@@ -2,14 +2,14 @@ import UserModel from "../../Models/UserModels.mjs";
 
 class userRepository {
   // Get user by userId
-  static async findUserByUserId(userId) {
-    try {
-      return await UserModel.findOne({ userId });
-    } catch (error) {
-      console.error("Error finding user by userId:", error.message);
-      throw new Error("Failed to fetch user");
-    }
-  }
+//   static async findUserByUserId(userId) {
+//     try {
+//       return await UserModel.findOne({ userId });
+//     } catch (error) {
+//       console.error("Error finding user by userId:", error.message);
+//       throw new Error("Failed to fetch user");
+//     }
+//   }
 
   // Get detailed user info
   static async getUserDetails(userId) {

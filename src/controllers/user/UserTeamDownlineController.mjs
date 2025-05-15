@@ -6,7 +6,7 @@ class UserTeamDownline {
       const userId = req.user.userId;
       const { startDate, endDate, search } = req.query;
 
-      const userData = await UserRepository.findUserByUserId(userId);
+      const userData = await UserRepository.getUserDetails(userId);
       const hierarchy = Array.isArray(userData.hierarchy)
         ? userData.hierarchy
         : [];
@@ -47,7 +47,7 @@ class UserTeamDownline {
           let referrerName = null;
 
           if (user.referredBy) {
-            const referrer = await UserRepository.findUserByUserId(
+            const referrer = await UserRepository.getUserDetails(
               user.referredBy
             );
             if (referrer) {
