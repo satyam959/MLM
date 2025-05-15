@@ -13,6 +13,7 @@ class UserTeamDownline{
       
           let downline = await UserRepository.getUserDownlines(userId, hierarchy);
       
+          // Filter by date range
           if (startDate && endDate) {
             const start = new Date(startDate);
             const end = new Date(endDate);
@@ -26,6 +27,7 @@ class UserTeamDownline{
             }
           }
       
+          // Filter by search
           if (search && search.trim() !== "") {
             const lowerSearch = search.toLowerCase();
             downline = downline.filter((user) => {
@@ -37,24 +39,39 @@ class UserTeamDownline{
             });
           }
       
-          const formatted = downline.map((user) => ({
-            fullName: user.fullName,
-            userId: user.userId,
-            level: user.level,
-            state: user.state,
-            status: user.status ? "Active" : "Inactive",
-            createDate: new Date(user.createdAt)
-              .toLocaleString("en-GB", {
-                timeZone: "Asia/Kolkata",
-                year: "numeric",
-                month: "short",
-                day: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: true,
-              })
-              .replace(",", ""),
-          }));
+          // Format result with referrer name
+          const formatted = await Promise.all(
+            downline.map(async (user) => {
+              let referrerName = null;
+      
+              if (user.referredBy) {
+                const referrer = await UserRepository.findUserByUserId(user.referredBy);
+                if (referrer) {
+                  referrerName = referrer.fullName || referrer.name || null;
+                }
+              }
+      
+              return {
+                fullName: user.fullName,
+                userId: user.userId,
+                level: user.level,
+                state: user.state,
+                referredBy: referrerName,
+                status: user.status ? "Active" : "Inactive",
+                createDate: new Date(user.createdAt)
+                  .toLocaleString("en-GB", {
+                    timeZone: "Asia/Kolkata",
+                    year: "numeric",
+                    month: "short",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: true,
+                  })
+                  .replace(",", ""),
+              };
+            })
+          );
       
           return res.status(200).json({
             statusCode: 200,
@@ -71,6 +88,7 @@ class UserTeamDownline{
           });
         }
       }
+      
       
 }
 
