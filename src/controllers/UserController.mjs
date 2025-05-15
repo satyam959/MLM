@@ -153,9 +153,9 @@ class UserController {
       role,
       referralCode,
     } = req.body;
-  
+
     const image = req.file ? req.file.fullUrl : null;
-  
+
     try {
       const existingUser = await UserRepository.findUserByPhone(phone);
       if (existingUser) {
@@ -165,15 +165,25 @@ class UserController {
           message: "Phone number already exists",
         });
       }
-  
+
       let referredBy = null;
       let referrerName = null;
       let hierarchy = [];
+<<<<<<< HEAD
       let level = 1; // Default level is 1
-  
+
       if (referralCode) {
         const referrer = await UserModel.findOne({ referralCode });
-  
+
+=======
+      let walletBalance = 0;
+      let level = 1; // Default level is always 1
+
+      if (referralCode) {
+        console.log("1111");
+        const referrer = await UserModel.findOne({ referralCode });
+
+>>>>>>> 0fc9ee1 (resolve conflict)
         if (!referrer) {
           return res.status(400).json({
             statusCode: 400,
@@ -181,11 +191,11 @@ class UserController {
             message: "Invalid referral code",
           });
         }
-  
+
         referredBy = referrer.userId;
         referrerName = referrer.fullName || referrer.name || null;
         hierarchy = [referredBy, ...(referrer.hierarchy || [])];
-  
+
         // ✅ Corrected level logic
         if (!referrer.hierarchy || referrer.hierarchy.length === 0) {
           level = 1;
@@ -195,7 +205,7 @@ class UserController {
             : 2;
         }
       }
-  
+
       const newUserData = {
         fullName,
         email,
@@ -212,7 +222,7 @@ class UserController {
         referrerName,
         hierarchy,
       };
-  
+
       const user = await UserRepository.createUser(newUserData);
       if (!user || !user.userId) {
         return res.status(500).json({
@@ -221,15 +231,15 @@ class UserController {
           message: "User creation failed",
         });
       }
-  
+
       // Update level
       await UserModel.updateOne(
         { userId: user.userId },
         { $set: { level: level } }
       );
-  
+
       const savedUser = await UserModel.findOne({ userId: user.userId });
-  
+
       return res.status(201).json({
         statusCode: 201,
         success: true,
@@ -254,7 +264,7 @@ class UserController {
       });
     }
   }
-  
+
 
   // Step 1: Send OTP
   async requestOTP(req, res) {
@@ -745,7 +755,7 @@ class UserController {
       });
     }
   }
-  
+
 }
 
 export default new UserController();

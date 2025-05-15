@@ -2,6 +2,7 @@ import WalletRepository from '../Repositories/WalletRepositories.mjs';
 
 class WalletController {
   // ✅ Create wallet
+<<<<<<< HEAD
   // ✅ Create wallet only if it doesn't exist already
   static async create(req, res) {
     try {
@@ -15,6 +16,15 @@ class WalletController {
           message: "Wallet already exists for this user",
           data: existingWallet,  // Returning the existing wallet
         });
+=======
+  static async create(req, res) {
+    try {
+      const { balance } = req.body;
+
+      const parsedBalance = Number(balance);
+      if (isNaN(parsedBalance)) {
+        return res.status(400).json({ message: 'Balance must be a valid number' });
+>>>>>>> 0fc9ee1 (resolve conflict)
       }
 
       // If no wallet found, create a new one
@@ -39,7 +49,10 @@ class WalletController {
     }
   }
 
+<<<<<<< HEAD
   
+=======
+>>>>>>> 0fc9ee1 (resolve conflict)
   // ✅ Get all wallets
   static async getAll(req, res) {
     try {
@@ -53,7 +66,11 @@ class WalletController {
     }
   }
 
+<<<<<<< HEAD
   // ✅ Get wallet by ID (Updated with debugging)
+=======
+  // ✅ Get wallet by ID
+>>>>>>> 0fc9ee1 (resolve conflict)
   static async getById(req, res) {
     try {
       const userId = req.user.userId; // Assuming userId comes from the authentication middleware
@@ -80,6 +97,10 @@ class WalletController {
       const { balance } = req.body;
       const parsedBalance = Number(balance);
 
+<<<<<<< HEAD
+=======
+      const parsedBalance = Number(balance);
+>>>>>>> 0fc9ee1 (resolve conflict)
       if (isNaN(parsedBalance)) {
         return res.status(400).json({ message: 'Balance must be a valid number' });
       }

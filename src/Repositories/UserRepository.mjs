@@ -263,7 +263,11 @@ class UserRepository {
       throw new Error(`Failed to fetch user by userId: ${error.message}`);
     }
   }
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> 0fc9ee1 (resolve conflict)
   // Create a new user
   static async createUser(userData) {
     try {

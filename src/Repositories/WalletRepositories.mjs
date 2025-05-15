@@ -14,25 +14,25 @@ const WalletRepository = {
   // ✅ Updated findByUserId with logging and wallet creation if not found
   async findByUserId(userId) {
     try {
-      console.log("Searching for wallet with userId:", userId); 
+      console.log("Searching for wallet with userId:", userId);
       let wallet = await WalletModel.findOne({ userId });
 
       if (!wallet) {
-        console.log("No wallet found for userId:", userId); 
+        console.log("No wallet found for userId:", userId);
         // Automatically create a wallet if none exists
         wallet = await WalletModel.create({ userId, balance: 0 });
-        console.log("Created a new wallet for userId:", userId);  
+        console.log("Created a new wallet for userId:", userId);
       } else {
-        console.log("Found wallet:", wallet);  
+        console.log("Found wallet:", wallet);
       }
-      
+
       return wallet;
     } catch (error) {
       console.error("Error finding wallet by userId:", error.message);
       throw new Error("Error finding wallet");
     }
   },
-  
+
   async create(data) {
     const wallet = new WalletModel(data);
     return await wallet.save();
