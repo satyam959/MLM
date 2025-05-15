@@ -23,7 +23,8 @@ class userRepository {
                         count: { $sum: 1 }
                     }
                 }
-    }
+            ])
+        }
 
     // Get detailed user info
     static async getUserDetails(userId) {
