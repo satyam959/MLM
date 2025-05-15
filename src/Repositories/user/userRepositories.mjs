@@ -176,9 +176,9 @@ class userRepository {
     }
   }
 
-  static async getReferalUser(userId) {
+  static async getReferalUser(filters) {
     try {
-      const users = await UserModel.find({ userId: userId });
+      const users = await UserModel.find(filters);
 
       if (!users || users.length === 0) {
         return [];
@@ -188,9 +188,16 @@ class userRepository {
         users.map(async (user) => {
           // Call the existing utility function
           const downlineCounts = await userRepository.getTotalCountUserDownlines(user.userId);
+          const indiaTime = new Date(user.createdAt).toLocaleString("en-US", {
+            timeZone: "Asia/Kolkata"
+          });
+          const dateObj = new Date(indiaTime);
 
+          const formattedDate = `${dateObj.getDate().toString().padStart(2, '0')} ${dateObj.toLocaleString("en-GB", { month: "long" })} ${dateObj.getFullYear()} | ${dateObj.toTimeString().split(" ")[0]}`;
+          console.log("formattedDate --", formattedDate);
           return {
             fullName: user.fullName,
+            image: user.image,
             userId: user.userId,
             phone: user.phone,
             whatsapp: user.whatsapp,
@@ -199,6 +206,7 @@ class userRepository {
             activeCount: downlineCounts.active,
             inactiveCount: downlineCounts.nonActive,
             totalDownlines: downlineCounts.total,
+            createdAt: formattedDate
           };
         })
       );
