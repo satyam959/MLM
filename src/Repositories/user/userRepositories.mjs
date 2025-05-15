@@ -65,7 +65,10 @@ class userRepository {
         }
     }
 
+<<<<<<< HEAD
     // Get admin's userId
+=======
+>>>>>>> 54bcf5d (level api)
     static async getAdminUserId() {
         try {
             const admin = await UserModel.findOne({ role: 'admin' }).select('userId');
@@ -76,6 +79,7 @@ class userRepository {
         }
     }
 
+<<<<<<< HEAD
     // Get total team by level for a user
     static async getTotalTeamByLevel(userId) {
         try {
@@ -83,19 +87,39 @@ class userRepository {
             if (!user) throw new Error("User not found");
 
             const basePath = user.hierarchy || [];
+=======
+    static async getTotalTeamByLevel(userId) {
+        try {
+            const user = await UserModel.findOne({ userId: userId });
+            if (!user) throw new Error("User not found");
+
+            const basePath = user.hierarchy || [];  // ensure it's an array
+>>>>>>> 54bcf5d (level api)
             const baseDepth = basePath.length;
 
             const result = await UserModel.aggregate([
                 {
                     $match: {
+<<<<<<< HEAD
                         hierarchy: { $ne: null },
                         hierarchy: { $elemMatch: { $eq: userId } }
+=======
+                        hierarchy: { $ne: null },  // make sure it's present
+                        hierarchy: { $elemMatch: { $eq: userId } }  // includes this user in hierarchy
+>>>>>>> 54bcf5d (level api)
                     }
                 },
                 {
                     $addFields: {
                         level: {
+<<<<<<< HEAD
                             $subtract: [{ $size: "$hierarchy" }, baseDepth]
+=======
+                            $subtract: [
+                                { $size: "$hierarchy" },
+                                baseDepth
+                            ]
+>>>>>>> 54bcf5d (level api)
                         }
                     }
                 },
@@ -126,11 +150,17 @@ class userRepository {
                 else levelMap[level].nonActive += item.count;
             });
 
+<<<<<<< HEAD
             return Object.entries(levelMap).map(([level, data]) => ({
+=======
+            // Convert to array of objects
+            const levelArray = Object.entries(levelMap).map(([level, data]) => ({
+>>>>>>> 54bcf5d (level api)
                 level: parseInt(level),
                 total: data.total,
                 active: data.active,
                 inActive: data.nonActive
+<<<<<<< HEAD
             })).sort((a, b) => a.level - b.level);
         } catch (error) {
             console.error('Error fetching team by level:', error.message);
@@ -196,6 +226,17 @@ class userRepository {
         } catch (error) {
             console.error("Error fetching users with referrer name:", error.message);
             throw new Error("Error fetching users with referrer name");
+=======
+            }));
+
+            // Sort by level (optional)
+            levelArray.sort((a, b) => a.level - b.level);
+
+            return levelArray;
+        } catch (error) {
+            console.error('Error fetching downline counts:', error.message);
+            throw new Error(`Error fetching downline counts: ${error.message}`);
+>>>>>>> 54bcf5d (level api)
         }
     }
 }

@@ -4,7 +4,6 @@ const walletSchema = new mongoose.Schema(
   {
     balance: {
       type: String,
-      // mongoose.Schema.Types.Decimal128,
       required: true,
     },
 
