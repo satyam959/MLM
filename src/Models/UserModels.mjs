@@ -96,7 +96,7 @@ const userSchema = new mongoose.Schema(
       default: () => ({}),
     },
     // ✅ Added rank field
-    rank: {
+    rankId: {
       type: String,
       default: null, // ✅ stores null in DB if rank is not set
     }

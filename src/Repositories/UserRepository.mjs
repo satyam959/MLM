@@ -189,15 +189,20 @@ class UserRepository {
     }
   }
 
-  static async getUsersByRank({ level, referredBy }) {
-    const filter = { referredBy };
-
-    if (level !== null) {
-      filter.level = level;
-    }
-
-    return await UserModel.find(filter);
+  // UserRepository.js
+static async getUsersByRank({ rankId }) {
+  if (!rankId) {
+    throw new Error("rankId is required");
   }
+
+  try {
+    const users = await UserModel.find({ rankId });
+    return users;
+  } catch (error) {
+    console.error("Error in getUsersByRank:", error.message);
+    throw new Error("Failed to fetch users by rankId");
+  }
+}
 
   static async findAllUserByReferredId(referredBy) {
     try {
