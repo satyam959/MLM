@@ -7,6 +7,8 @@ import IncomeLevelModel from "../Models/IncomeLevelModel.mjs";
 import UserBenefits from "../services/UserBenefits.mjs";
 // import upload from "../middelware/UploadImage.mjs";
 import { getUploadMiddleware } from "../middelware/UploadImage.mjs";
+import WalletModel from '../Models/WalletModels.mjs'; 
+
 
 class UserController {
   async registerUser(req, res) {
@@ -56,7 +58,7 @@ class UserController {
         referrerName = referrer.fullName || referrer.name || null;
         hierarchy = [referredBy, ...(referrer.hierarchy || [])];
 
-        // ✅ Corrected level logic
+        // Corrected level logic
         if (!referrer.hierarchy || referrer.hierarchy.length === 0) {
           level = 1;
         } else {
@@ -90,6 +92,15 @@ class UserController {
           statusCode: 500,
           success: false,
           message: "User creation failed",
+        });
+      }
+
+      // ✅ Create Wallet with 0 balance
+      const existingWallet = await WalletModel.findOne({ userId: user.userId });
+      if (!existingWallet) {
+        await WalletModel.create({
+          userId: user.userId,
+          balance: 0,
         });
       }
 
@@ -129,27 +140,27 @@ class UserController {
   // Step 1: Send OTP
   async requestOTP(req, res) {
     const { phone } = req.body;
-  
+
     // Validate phone number (must be 10 digits)
     if (!phone || !/^\d{10}$/.test(phone)) {
       return res
         .status(400)
         .json({ message: "Phone number must be 10 digits" });
     }
-  
+
     try {
       const user = await UserRepository.findUserByPhone(phone);
-  
+
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-  
+
       // ✅ Check for either boolean true or string "active"
       const isActive =
         user.status === true ||
         (typeof user.status === "string" &&
           user.status.toLowerCase().trim() === "active");
-  
+
       if (!isActive) {
         return res.status(403).json({
           statusCode: 403,
@@ -158,15 +169,15 @@ class UserController {
             "Your login has been disabled by the administrator. Please contact the administrator for assistance.",
         });
       }
-  
+
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
       const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
-  
+
       await UserRepository.saveOTP(user._id, otp, otpExpiry);
-  
+
       // Simulate sending OTP
       console.log(`OTP for ${phone}: ${otp}`);
-  
+
       return res.status(200).json({
         statusCode: 200,
         success: true,
@@ -179,8 +190,7 @@ class UserController {
       });
     }
   }
-  
-  
+
   // Step 2: Verify OTP and Login
   async verifyOTPLogin(req, res) {
     const { phone, otp } = req.body;
