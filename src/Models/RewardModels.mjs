@@ -4,7 +4,7 @@ const rewardSchema = new mongoose.Schema(
   {
     rankId: {
       type: Number,
-      ref: 'Rank', // This should be the model name as a string
+      ref: 'Rank',
       required: true,
     },
     benefits: {
@@ -14,6 +14,12 @@ const rewardSchema = new mongoose.Schema(
     dailyRoyalty: {
       type: Number,
       required: true,
+    },
+    description: {
+      type: String,
+    },
+    image: {
+      type: String, // this will store the file path or URL
     },
     status: {
       type: String,
@@ -29,6 +35,7 @@ const rewardSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
 
 const Reward = mongoose.model("Reward", rewardSchema);
 

@@ -1,30 +1,41 @@
 import RewardRepositories from '../Repositories/RewardRepositories.mjs';
 import Reward from '../Models/RewardModels.mjs';
-
+import { getUploadMiddleware } from '../middelware/UploadImage.mjs';
 class RewardController {
   static async createReward(req, res) {
     try {
-      const {  benefits, rankId, dailyRoyalty } = req.body;
+      const { benefits, rankId, dailyRoyalty, description } = req.body;
   
-      if ( !dailyRoyalty || !benefits || !rankId) {
-        return res.status(400).json({ message: 'rank, equivalentRank, benefits, and rankId are required.' });
+      if (!dailyRoyalty || !benefits || !rankId) {
+        return res.status(400).json({
+          message: "rankId, benefits, and dailyRoyalty are required.",
+        });
       }
+  
+      const image = req.file?.fullUrl || null;
   
       const reward = await RewardRepositories.createReward({
         dailyRoyalty,
         benefits,
         rankId,
+        description,
+        image,
       });
   
       res.status(201).json({
-        message: 'Reward created successfully!',
+        message: "Reward created successfully!",
         data: reward,
       });
     } catch (error) {
-      console.error('Error creating reward:', error);
-      res.status(500).json({ message: 'Failed to create reward', error: error.message });
+      console.error("Error creating reward:", error);
+      res.status(500).json({
+        message: "Failed to create reward",
+        error: error.message,
+      });
     }
   }
+  
+  
   
 
 
