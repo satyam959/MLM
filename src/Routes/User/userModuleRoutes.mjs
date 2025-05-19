@@ -28,6 +28,6 @@ router.get('/getAllUserRewards', verifyToken, UserRewardController.getAllUserRew
 
 router.post('/createRewards', verifyToken, UserRewardController.createUserReward);
 
-router.get('/MonthlyReport',verifyToken, MonthlyReportController.getIncomeTransactions);
+router.get('/MonthlyReport',verifyToken, MonthlyReportController.getMonthlyIncomeSummary);
 
 export default router;
