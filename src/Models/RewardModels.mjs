@@ -13,7 +13,7 @@ const rewardSchema = new mongoose.Schema(
     },
     dailyRoyalty: {
       type: Number,
-      required: true,
+      default: false,
     },
     description: {
       type: String,

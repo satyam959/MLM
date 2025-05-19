@@ -12,15 +12,28 @@ const walletSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+
     walletId: {
       type: Number,
-      default: () => Math.floor(100000 + Math.random() * 900000),
       unique: true,
+      default: () => Math.floor(100000 + Math.random() * 900000), // 6-digit random
     },
+
     userId: {
       type: Number,
       ref: 'User',
       required: true,
+    },
+
+    // ✅ New fields for top-up control
+    dailyTopupsCount: {
+      type: Number,
+      default: 0,
+    },
+
+    lastTopupDate: {
+      type: Date,
+      default: null,
     },
   },
   { timestamps: true }
