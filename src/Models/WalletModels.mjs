@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const walletSchema = new mongoose.Schema(
   {
     balance: {
-      type: String,
+      type: Number,
       required: true,
       default: 0,
     },

@@ -45,8 +45,9 @@ router.get('/downline', UserController.getUserDownline);
 // Get users by rank (Protected)
 router.get('/getUsersByRank', verifyToken, UserController.getUsersByRank);
 
-// router.get("/level-income",verifyToken, UserController.getLevelIncomeReport);
 
+//Admin DashBoad
+router.get('/getAllUser', UserController.getAllUser);
 
 
 export default router;

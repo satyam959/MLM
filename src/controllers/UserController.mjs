@@ -642,6 +642,24 @@ class UserController {
       });
     }
   }
+  async getAllUser(req, res) {
+    try {
+      const stats = await UserRepository.getAllUser();
+      res.status(200).json({
+        success: true,
+        statusCode: 200,
+        data: stats,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        statusCode: 500,
+        message: error.message,
+      });
+    }
+  }
+  
+
 }
 
 export default new UserController();

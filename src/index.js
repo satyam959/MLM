@@ -30,6 +30,10 @@ import userModuleRoutes from './Routes/User/userModuleRoutes.mjs'
 import LevelIncomeRoutes from './Routes/User/LevelIncomeRoutes.mjs'
 import AdminRoutes from './Routes/AdminRoutes.mjs'
 import UserReward from './Routes/User/UserRewardRoutes.mjs'
+import WalletTopupCron from './CronJobs/walletTopupCron.mjs';
+
+WalletTopupCron.startCron();
+
 dotenv.config();
 
 const app = express();

@@ -224,7 +224,26 @@ static async getUsersByRank({ rankId }) {
       throw new Error("Error updating referred user wallets");
     }
   }
+  static async getAllUser() {
+    try {
+      const totalUsers = await UserModel.countDocuments();
+      const activeUsers = await UserModel.countDocuments({ status: true });
+      const inactiveUsers = await UserModel.countDocuments({ status: false });
+      const membershipUsers = await UserModel.countDocuments({ "membership.type": 1 });
+ 
+      return {
+        totalUsers,
+        activeUsers,
+        inactiveUsers,
+        membershipUsers
+      };
+    } catch (error) {
+      console.error("Error getting user stats:", error.message);
+      throw new Error("Failed to fetch user statistics");
+    }
+  }
 }
+
 
 // Generate Referral Code
 function generateReferralCode() {
