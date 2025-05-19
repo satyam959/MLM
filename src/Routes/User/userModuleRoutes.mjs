@@ -6,7 +6,7 @@ import TeamLevelReport from '../../controllers/user/TeamLevelReportController.mj
 import UserTeamDownline from '../../controllers/user/UserTeamDownlineController.mjs'
 import UserDirectDetails from '../../controllers/user/UserDirectDetailsController.mjs'
 import UserRewardController from '../../controllers/user/UserRewardController.mjs';
-
+import MonthlyReportController from '../../controllers/user/MonthlyReportController.mjs';
 import verifyToken from '../../middelware/authMiddleware.mjs'
 
 
@@ -28,5 +28,6 @@ router.get('/getAllUserRewards', verifyToken, UserRewardController.getAllUserRew
 
 router.post('/createRewards', verifyToken, UserRewardController.createUserReward);
 
+router.get('/MonthlyReport',verifyToken, MonthlyReportController.getMonthlyIncomeSummary);
 
 export default router;

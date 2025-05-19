@@ -29,7 +29,6 @@ import HomeDashboard from './Routes/HomeDashboardRoutes.mjs';
 import userModuleRoutes from './Routes/User/userModuleRoutes.mjs'
 import LevelIncomeRoutes from './Routes/User/LevelIncomeRoutes.mjs'
 import AdminRoutes from './Routes/AdminRoutes.mjs'
-import UserReward from './Routes/User/UserRewardRoutes.mjs'
 import WalletTopupCron from './CronJobs/walletTopupCron.mjs';
 
 WalletTopupCron.startCron();
@@ -79,7 +78,6 @@ app.use('/api/Withdrawal', WithdrawalRoutes);
 app.use('/api/homeDashboard', HomeDashboard)
 app.use('/api',LevelIncomeRoutes)
 app.use('/api',AdminRoutes)
-app.use('/api', UserReward);
 
 
 // Start server
