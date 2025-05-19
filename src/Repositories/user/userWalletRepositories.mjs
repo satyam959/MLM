@@ -1,4 +1,5 @@
 import Wallet from '../../Models/WalletModels.mjs';
+import WalletHistory from '../../Models/WalletHistory.mjs';
 
 const UserWalletRepository = {
     async findWalletByUserId(userId) {
@@ -14,6 +15,11 @@ const UserWalletRepository = {
         const wallet = new Wallet(walletData);
         return await wallet.save();
     },
+
+    async createWalletHistory(walletHistory) {
+        const wallet = new WalletHistory(walletHistory);
+        return await wallet.save();
+    }
 
 };
 

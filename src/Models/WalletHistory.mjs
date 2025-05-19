@@ -9,17 +9,17 @@ const walletSchema = new mongoose.Schema(
         },
         userId: {
             type: Number,
-            unique: true,
         },
         transactionId: {
             type: String,
-            unique: true
+            unique: true,
+            default: () => `TXN${Date.now()}${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
         },
-        amount: { type: Number, required: true }, // transaction amount
+        amount: { type: String, required: true }, // transaction amount
         type: { type: String, enum: ['credit', 'debit'], required: true },
         transactionType: { type: String, enum: ['membership', 'dailyPayout'], required: true },
         source: { type: String }, // like 'bank', 'paypal', 'betting', 'referral', etc.
-        balanceAfter: { type: Number }, // wallet balance after transaction (for history)
+        balanceAfter: { type: String }, // wallet balance after transaction (for history)
         status: {
             type: String, enum: ['pending', 'completed', 'failed'], default: 'completed'
         },

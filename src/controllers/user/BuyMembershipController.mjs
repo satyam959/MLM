@@ -6,52 +6,62 @@ class BuyMembershipController {
     static async buyMembership(req, res) {
         try {
             const userTokenData = req.user;
-            const userDetails = await UserRepository.getUserDetails(userTokenData.userId);
             const adminUserId = await UserRepository.getAdminUserId();
+            let userWallet = await UserWalletRepository.findWalletByUserId(userTokenData.userId);
+
             let adminWallet = await UserWalletRepository.findWalletByUserId(adminUserId);
-            console.log("adminWallet -- ", adminWallet);
             const amountToAdd = req.body.amount;
-            let finalAmount = 0
+
+            if (!userWallet || Number(userWallet.balance) < amountToAdd) {
+                return res.status(400).json({
+                    message: "Insufficient wallet balance. Please top-up your wallet.",
+                    userBalance: userWallet ? Number(userWallet.balance) : 0,
+                    required: amountToAdd
+                });
+            }
+
+            let finalAdminWallet;
             if (adminWallet) {
-                // ✅ Update existing wallet
-                adminWallet.balance += amountToAdd;
-                finalAmount = await adminWallet.save();
+                adminWallet.balance = Number(adminWallet.balance) + amountToAdd;
+                finalAdminWallet = await adminWallet.save();
             } else {
-                // ✅ Create new wallet
-                finalAmount = await UserWalletRepository.createWallet({
-                    userId: userTokenData.userId,
+                finalAdminWallet = await UserWalletRepository.createWallet({
+                    userId: adminUserId,
                     balance: amountToAdd,
                 });
             }
-            // if (adminWallet) {
-            //     // Ensure balance is a number
-            //     adminWallet.balance = Number(adminWallet.balance) + amountToAdd;
-            //     finalAmount = await adminWallet.save();
-            // } else {
-            //     // Create new wallet for admin
-            //     finalAmount = await UserWalletRepository.createWallet({
-            //         userId: adminUserId, // fix: this was mistakenly set to userTokenData.userId earlier
-            //         balance: amountToAdd,
-            //     });
-            // }
 
-            const walletHistoryData = {
-
+            userWallet.balance = Number(userWallet.balance) - amountToAdd;
+            await userWallet.save();
+            // 🧾 1. User Wallet History Entry (DEBIT)
+            await UserWalletRepository.createWalletHistory({
                 userId: userTokenData.userId,
                 amount: amountToAdd,
                 type: "debit",
                 transactionType: "membership",
                 source: "wallet",
-                balanceAfter: finalAmount.balance
-            }
-            console.log(walletHistoryData);
-            // await UserWalletRepository.createWalletHistory(walletHistoryData)
-            res.status(200).json({
-                message: "Membership purchased and admin wallet updated.",
-                adminWallet,
+                balanceAfter: 100, // if user wallet exists, fill actual balance after debit
+                status: "completed",
             });
+
+            // 🧾 2. Admin Wallet History Entry (CREDIT)
+            await UserWalletRepository.createWalletHistory({
+                userId: adminUserId,
+                amount: amountToAdd,
+                type: "credit",
+                transactionType: "membership",
+                source: "wallet",
+                balanceAfter: finalAdminWallet.balance,
+                status: "completed",
+            });
+
+            res.status(200).json({
+                message: "Membership purchased and wallet histories updated..",
+                adminWallet: finalAdminWallet,
+            });
+
         } catch (error) {
-            console.error("Error in buyMembership:", error.message);
+            console.error("Error in buyMembership:", error);
             res.status(500).json({
                 message: "Error processing membership purchase",
                 error: error.message,
