@@ -10,8 +10,8 @@ const userRewardSchema = new mongoose.Schema(
     },
     status: {
         type: String,
-        enum: ['achieve', 'not achieve'],
-        default: 'not achieve',
+        enum: ['Achieved', 'Unachieved'],
+        default: 'Unachieved',
       },
       
   },
