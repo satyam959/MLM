@@ -5,6 +5,8 @@ import BuyMembership from '../../controllers/user/BuyMembershipController.mjs';
 import TeamLevelReport from '../../controllers/user/TeamLevelReportController.mjs';
 import UserTeamDownline from '../../controllers/user/UserTeamDownlineController.mjs'
 import UserDirectDetails from '../../controllers/user/UserDirectDetailsController.mjs'
+import UserRewardController from '../../controllers/user/UserRewardController.mjs';
+
 import verifyToken from '../../middelware/authMiddleware.mjs'
 
 
@@ -20,5 +22,11 @@ router.get('/getDirectDetails', verifyToken, UserDirectDetails.getUserReferalMem
 
 //  New routes: Get users by level
 router.get('/usersLevel/:level', verifyToken, TeamLevelReport.getUsersByLevel);
+
+//reward route
+router.get('/getAllUserRewards', verifyToken, UserRewardController.getAllUserRewards);
+
+router.post('/createRewards', verifyToken, UserRewardController.createUserReward);
+
 
 export default router;

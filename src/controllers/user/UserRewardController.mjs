@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
 import UserReward from "../../Models/UserRewardModels.mjs";
 import userRewardRepo from "../../Repositories/user/UserRewardRepositories.mjs";
-// import RewardRepositories from '../../Repositories/RewardRepositories.mjs';
+import RewardRepositories from '../../Repositories/RewardRepositories.mjs';
+
 class UserRewardController {
   static async createUserReward(req, res) {
     try {
@@ -57,39 +58,29 @@ class UserRewardController {
   // Get all user rewards filtered by userId and rewardId
   static async getAllUserRewards(req, res) {
     try {
-      const userId = req.user?.id || req.user?.userId;
+      const userId = req.user?.userId;
+      const getUserRewards = await userRewardRepo.getAllByUserId(userId);
+      const allRewards = await RewardRepositories.getAllRewards();
 
-      if (!userId) {
-        return res.status(401).json({
-          success: false,
-          message: "Unauthorized: User ID missing in token",
-          statusCode: 401,
-        });
-      }
+      const achievedRewardIds = new Set(getUserRewards.map(r => r.rewardId.toString()));
 
-      const userRewards = await UserReward.aggregate([
-        { $match: { userId: userId } },
-        {
-          $lookup: {
-            from: "rewards",
-            localField: "rewardId",
-            foreignField: "_id",
-            as: "rewardDetails",
-          },
-        },
-        {
-          $unwind: { path: "$rewardDetails", preserveNullAndEmptyArrays: true },
-        },
-        { $addFields: { rewardName: "$rewardDetails.name" } },
-        { $project: { rewardDetails: 0 } },
-      ]);
+      const userRewards = allRewards.map(r => {
+        const reward = r.toObject(); // remove mongoose internal fields
+        return {
+          ...reward,
+          rewardStatus: achievedRewardIds.has(reward.rewardId.toString())
+            ? 'Achieved'
+            : 'Unachieved'
+        };
+      });
 
-      res.status(200).json({
+      res.json({
         success: true,
         message: "User rewards fetched successfully",
         statusCode: 200,
-        data: userRewards,
+        data: userRewards
       });
+
     } catch (error) {
       console.error("Error fetching user rewards:", error);
       res.status(500).json({
