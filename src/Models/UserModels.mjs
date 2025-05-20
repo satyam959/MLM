@@ -98,17 +98,13 @@ const userSchema = new mongoose.Schema(
     // ✅ Added rank field
     rankId: {
       type: String,
-      default: null, // ✅ stores null in DB if rank is not set
-    }
-
-
-
+      default: null,
+    },
   },
   {
     timestamps: true,
   }
 );
-
 // Static method
 userSchema.statics.findByEmail = async function (email) {
   return this.findOne({ email });
@@ -117,59 +113,6 @@ userSchema.statics.findByEmail = async function (email) {
 userSchema.statics.getUsersByRank = async function (rank) {
   return this.find({ rank });
 };
-// Post-save hook
-// userSchema.post("save", async function (doc, next) {
-//   try {
-//     if (doc.referredBy) {
-//       const User = mongoose.model("User");
-
-//       const directReferrals = await User.countDocuments({
-//         referredBy: doc.referredBy,
-//       });
-
-//       const levels = {
-//         2: 1,
-//         25: 2,
-//         125: 3,
-//         625: 4,
-//         3125: 5,
-//         15625: 6,
-//         78125: 7,
-//         390625: 8,
-//         1953125: 9,
-//         9765625: 10,
-//       };
-//       // const levelValue = levels[directReferrals] || 0;
-
-//       // Map level to rank
-//       const rankMapping = {
-//         1: "Bronze",
-//         2: "Silver",
-//         3: "Gold",
-//         4: "Platinum",
-//         5: "Diamond",
-//         6: "Black Diamond",
-//       };
-//       const rankValue = levelValue >= 7 ? "Kohinoor" : rankMapping[levelValue] || "Unranked";
-
-//       const updateFields = {
-//         level: levelValue,
-//         rank: rankValue,
-//       };
-
-//       await User.updateOne({ userId: doc.referredBy }, updateFields);
-
-//     //   console.log(
-//     //     `Level updated for userId ${doc.referredBy} to ${levelValue}, Rank: ${rankValue}`
-//     //   );
-//      }
-
-//     next();
-//   } catch (err) {
-//     console.error("Error in post-save hook:", err);
-//     next(err);
-//   }
-// });
 
 const UserModel = mongoose.model("User", userSchema);
 export default UserModel;

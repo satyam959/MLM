@@ -242,9 +242,8 @@ static async getUsersByRank({ rankId }) {
       throw new Error("Failed to fetch user statistics");
     }
   }
+  
 }
-
-
 // Generate Referral Code
 function generateReferralCode() {
   return Math.random().toString(36).substr(2, 8).toUpperCase();

@@ -14,7 +14,7 @@ const rankHistorySchema = new mongoose.Schema(
   {
     timestamps: {
       createdAt: "adt",  
-      updatedAt: "atd",  
+      updatedAt: "utd",  
     },
   }
 );
