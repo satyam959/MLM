@@ -1,5 +1,4 @@
 import RankRepository from '../Repositories/RankRepository.mjs';
-import mongoose from 'mongoose';
 class RankController {
   
   // Create a new rank
@@ -76,6 +75,24 @@ static async delete(req, res) {
     });
   }
 }
+// async updateRank(req, res) {
+//   try {
+//     const { rankId } = req.params;
+//     const userId = req.user.userId; 
+//     const updateData = req.body;
+
+//     updateData.userId = userId; 
+//     const updatedRank = await RankRepository.update(Number(rankId), updateData);
+
+//     res.json({ message: 'Rank updated successfully', data: updatedRank });
+//   } catch (err) {
+//     res.status(500).json({ message: err.message });
+//   }
+// }
 }
+
+
+
+
 
 export default RankController;

@@ -239,6 +239,7 @@ class UserController {
             { userId: referredBy },
             { $set: { rankId: matchedRank.rankId } }
           );
+          
           console.log(" Rank updated for referrer. Update result:", updateResult);
   
           const updatedReferrer = await UserModel.findOne({ userId: referredBy });

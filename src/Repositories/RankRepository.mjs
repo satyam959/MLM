@@ -16,23 +16,23 @@ class RankRepository {
   // Get all ranks
   static async findAll() {
     try {
-      return await Rank.find();
+      return await Rank.find().sort({ createdAt: -1 });
     } catch (error) {
       console.error('Error fetching ranks:', error);
       throw new Error('Error fetching ranks: ' + error.message);
     }
   }
 
-  // Find a rank by ID
+  // Find a rank by custom rankId (number)
   static async findById(rankId) {
     try {
-      const rank = await Rank.findById(rankId);
+      const rank = await Rank.findOne({ rankId });
       if (!rank) {
         throw new Error('Rank not found');
       }
       return rank;
     } catch (error) {
-      console.error('Error finding rank by ID:', error);
+      console.error('Error finding rank by rankId:', error);
       throw new Error('Error finding rank: ' + error.message);
     }
   }
@@ -51,27 +51,7 @@ class RankRepository {
     }
   }
 
-  
-  // Update by custom rankId
-  static async update(rankId, data) {
-    try {
-      const updated = await Rank.findOneAndUpdate({ rankId }, data, {
-        new: true,
-        runValidators: true,
-      });
-
-      if (!updated) {
-        throw new Error('Rank not found for update');
-      }
-
-      return updated;
-    } catch (error) {
-      console.error(`Error updating rank with rankId (${rankId}):`, error);
-      throw new Error('Error updating rank: ' + error.message);
-    }
-  }
-
-  // Delete by custom rankId
+  // Delete rank by custom rankId
   static async delete(rankId) {
     try {
       const deleted = await Rank.findOneAndDelete({ rankId });
@@ -87,7 +67,5 @@ class RankRepository {
     }
   }
 }
-
-
 
 export default RankRepository;
