@@ -31,7 +31,7 @@ class BuyMembershipController {
                 });
             }
 
-            userWallet.balance = Number(userWallet.balance) - amountToAdd;
+            const userRemainingBalance = userWallet.balance = Number(userWallet.balance) - amountToAdd;
             await userWallet.save();
             // 🧾 1. User Wallet History Entry (DEBIT)
             await UserWalletRepository.createWalletHistory({
@@ -40,7 +40,7 @@ class BuyMembershipController {
                 type: "debit",
                 transactionType: "membership",
                 source: "wallet",
-                balanceAfter: 100, // if user wallet exists, fill actual balance after debit
+                balanceAfter: userRemainingBalance, // if user wallet exists, fill actual balance after debit
                 status: "completed",
             });
 
@@ -54,6 +54,7 @@ class BuyMembershipController {
                 balanceAfter: finalAdminWallet.balance,
                 status: "completed",
             });
+            await BuyMembershipController.activateMembership(userTokenData.userId);
 
             res.status(200).json({
                 message: "Membership purchased and wallet histories updated..",
@@ -67,6 +68,21 @@ class BuyMembershipController {
                 error: error.message,
             });
         }
+    }
+
+    static async activateMembership(userId) {
+        const startDate = new Date();
+        const endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate() + 30); // 30-day membership
+
+        const membershipDetails = {
+            type: 1, // Premium
+            startDate,
+            endDate,
+            lastPayoutDate: null
+        };
+
+        await UserRepository.updateUserMembership(userId, { membership: membershipDetails });
     }
 }
 
