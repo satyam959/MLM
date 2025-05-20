@@ -7,10 +7,136 @@ import IncomeLevelModel from "../Models/IncomeLevelModel.mjs";
 import UserBenefits from "../services/UserBenefits.mjs";
 // import upload from "../middelware/UploadImage.mjs";
 import { getUploadMiddleware } from "../middelware/UploadImage.mjs";
-import WalletModel from '../Models/WalletModels.mjs'; 
-
+import WalletModel from "../Models/WalletModels.mjs";
+import RankModel from "../Models/RankModels.mjs";
 
 class UserController {
+  // async registerUser(req, res) {
+  //   const {
+  //     fullName,
+  //     email,
+  //     phone,
+  //     address,
+  //     city,
+  //     pincode,
+  //     state,
+  //     dob,
+  //     whatsapp,
+  //     role,
+  //     referralCode,
+  //   } = req.body;
+
+  //   const image = req.file ? req.file.fullUrl : null;
+
+  //   try {
+  //     const existingUser = await UserRepository.findUserByPhone(phone);
+  //     if (existingUser) {
+  //       return res.status(400).json({
+  //         statusCode: 400,
+  //         success: false,
+  //         message: "Phone number already exists",
+  //       });
+  //     }
+
+  //     let referredBy = null;
+  //     let referrerName = null;
+  //     let hierarchy = [];
+  //     let level = 1; // Default level is 1
+
+  //     if (referralCode) {
+  //       const referrer = await UserModel.findOne({ referralCode });
+
+  //       if (!referrer) {
+  //         return res.status(400).json({
+  //           statusCode: 400,
+  //           success: false,
+  //           message: "Invalid referral code",
+  //         });
+  //       }
+
+  //       referredBy = referrer.userId;
+  //       referrerName = referrer.fullName || referrer.name || null;
+  //       hierarchy = [referredBy, ...(referrer.hierarchy || [])];
+
+  //       // Corrected level logic
+  //       if (!referrer.hierarchy || referrer.hierarchy.length === 0) {
+  //         level = 1;
+  //       } else {
+  //         level =
+  //           typeof referrer.level === "number" && referrer.level >= 1
+  //             ? referrer.level + 1
+  //             : 2;
+  //       }
+  //     }
+
+  //     const newUserData = {
+  //       fullName,
+  //       email,
+  //       phone,
+  //       address,
+  //       city,
+  //       pincode,
+  //       state,
+  //       dob,
+  //       whatsapp,
+  //       role,
+  //       image,
+  //       referredBy,
+  //       referrerName,
+  //       hierarchy,
+  //     };
+
+  //     const user = await UserRepository.createUser(newUserData);
+  //     if (!user || !user.userId) {
+  //       return res.status(500).json({
+  //         statusCode: 500,
+  //         success: false,
+  //         message: "User creation failed",
+  //       });
+  //     }
+
+  //     // ✅ Create Wallet with 0 balance
+  //     const existingWallet = await WalletModel.findOne({ userId: user.userId });
+  //     if (!existingWallet) {
+  //       await WalletModel.create({
+  //         userId: user.userId,
+  //         balance: 0,
+  //       });
+  //     }
+
+  //     // Update level
+  //     await UserModel.updateOne(
+  //       { userId: user.userId },
+  //       { $set: { level: level } }
+  //     );
+
+  //     const savedUser = await UserModel.findOne({ userId: user.userId });
+
+  //     return res.status(201).json({
+  //       statusCode: 201,
+  //       success: true,
+  //       message: "User registered successfully",
+  //       user: {
+  //         fullName: savedUser.fullName,
+  //         email: savedUser.email,
+  //         dob: savedUser.dob,
+  //         phone: savedUser.phone,
+  //         whatsapp: savedUser.whatsapp,
+  //         referralCode: savedUser.referralCode,
+  //         level: savedUser.level,
+  //       },
+  //     });
+  //   } catch (error) {
+  //     console.log("error --", error);
+  //     return res.status(500).json({
+  //       statusCode: 500,
+  //       success: false,
+  //       message: "Error registering user",
+  //       error: error.message,
+  //     });
+  //   }
+  // }
+
   async registerUser(req, res) {
     const {
       fullName,
@@ -25,9 +151,9 @@ class UserController {
       role,
       referralCode,
     } = req.body;
-
+  
     const image = req.file ? req.file.fullUrl : null;
-
+  
     try {
       const existingUser = await UserRepository.findUserByPhone(phone);
       if (existingUser) {
@@ -37,15 +163,13 @@ class UserController {
           message: "Phone number already exists",
         });
       }
-
+  
       let referredBy = null;
       let referrerName = null;
       let hierarchy = [];
-      let level = 1; // Default level is 1
-
+  
       if (referralCode) {
         const referrer = await UserModel.findOne({ referralCode });
-
         if (!referrer) {
           return res.status(400).json({
             statusCode: 400,
@@ -53,22 +177,12 @@ class UserController {
             message: "Invalid referral code",
           });
         }
-
+  
         referredBy = referrer.userId;
         referrerName = referrer.fullName || referrer.name || null;
         hierarchy = [referredBy, ...(referrer.hierarchy || [])];
-
-        // Corrected level logic
-        if (!referrer.hierarchy || referrer.hierarchy.length === 0) {
-          level = 1;
-        } else {
-          level =
-            typeof referrer.level === "number" && referrer.level >= 1
-              ? referrer.level + 1
-              : 2;
-        }
       }
-
+  
       const newUserData = {
         fullName,
         email,
@@ -85,7 +199,7 @@ class UserController {
         referrerName,
         hierarchy,
       };
-
+  
       const user = await UserRepository.createUser(newUserData);
       if (!user || !user.userId) {
         return res.status(500).json({
@@ -94,24 +208,48 @@ class UserController {
           message: "User creation failed",
         });
       }
-
-      // ✅ Create Wallet with 0 balance
+  
+      // ✅ Create wallet
       const existingWallet = await WalletModel.findOne({ userId: user.userId });
       if (!existingWallet) {
-        await WalletModel.create({
-          userId: user.userId,
-          balance: 0,
-        });
+        await WalletModel.create({ userId: user.userId, balance: 0 });
       }
-
-      // Update level
-      await UserModel.updateOne(
-        { userId: user.userId },
-        { $set: { level: level } }
-      );
-
+  
+      // ✅ Rank logic if user was referred
+      if (referredBy) {
+        const directReferralsCount = await UserModel.countDocuments({ referredBy });
+        console.log(` Direct referrals count for userId ${referredBy}: ${directReferralsCount}`);
+  
+        const allRanks = await RankModel.find({}).sort({ referral: -1 });
+        console.log(
+          " All available ranks:",
+          allRanks.map(r => ({
+            name: r.name,
+            id: r.rankId,
+            required: r.referral,
+          }))
+        );
+  
+        let matchedRank = allRanks.find(rank => directReferralsCount >= parseInt(rank.referral));
+  
+        if (matchedRank) {
+          console.log(` Matched Rank: ${matchedRank.name} (ID: ${matchedRank.rankId}) for referrals: ${directReferralsCount}`);
+  
+          const updateResult = await UserModel.updateOne(
+            { userId: referredBy },
+            { $set: { rankId: matchedRank.rankId } }
+          );
+          console.log(" Rank updated for referrer. Update result:", updateResult);
+  
+          const updatedReferrer = await UserModel.findOne({ userId: referredBy });
+          console.log(" Final Referrer Rank after update:", updatedReferrer.rankId);
+        } else {
+          console.log("No rank update needed. Either no match or already same rank.");
+        }
+      }
+  
       const savedUser = await UserModel.findOne({ userId: user.userId });
-
+  
       return res.status(201).json({
         statusCode: 201,
         success: true,
@@ -123,11 +261,10 @@ class UserController {
           phone: savedUser.phone,
           whatsapp: savedUser.whatsapp,
           referralCode: savedUser.referralCode,
-          level: savedUser.level,
+          rankId: savedUser.rankId || null,
         },
       });
     } catch (error) {
-      console.log("error --", error);
       return res.status(500).json({
         statusCode: 500,
         success: false,
@@ -136,7 +273,6 @@ class UserController {
       });
     }
   }
-
   // Step 1: Send OTP
   async requestOTP(req, res) {
     const { phone } = req.body;
@@ -658,8 +794,6 @@ class UserController {
       });
     }
   }
-  
-
 }
 
 export default new UserController();
