@@ -9,6 +9,8 @@ import UserBenefits from "../services/UserBenefits.mjs";
 import { getUploadMiddleware } from "../middelware/UploadImage.mjs";
 import WalletModel from "../Models/WalletModels.mjs";
 import RankModel from "../Models/RankModels.mjs";
+import UserRankHistoryRepo from "../Repositories/UserRankHistory.mjs";
+
 
 class UserController {
   // async registerUser(req, res) {
@@ -151,9 +153,9 @@ class UserController {
       role,
       referralCode,
     } = req.body;
-  
+
     const image = req.file ? req.file.fullUrl : null;
-  
+
     try {
       const existingUser = await UserRepository.findUserByPhone(phone);
       if (existingUser) {
@@ -163,11 +165,11 @@ class UserController {
           message: "Phone number already exists",
         });
       }
-  
+
       let referredBy = null;
       let referrerName = null;
       let hierarchy = [];
-  
+
       if (referralCode) {
         const referrer = await UserModel.findOne({ referralCode });
         if (!referrer) {
@@ -177,12 +179,12 @@ class UserController {
             message: "Invalid referral code",
           });
         }
-  
+
         referredBy = referrer.userId;
         referrerName = referrer.fullName || referrer.name || null;
         hierarchy = [referredBy, ...(referrer.hierarchy || [])];
       }
-  
+
       const newUserData = {
         fullName,
         email,
@@ -199,7 +201,7 @@ class UserController {
         referrerName,
         hierarchy,
       };
-  
+
       const user = await UserRepository.createUser(newUserData);
       if (!user || !user.userId) {
         return res.status(500).json({
@@ -208,18 +210,18 @@ class UserController {
           message: "User creation failed",
         });
       }
-  
+
       // ✅ Create wallet
       const existingWallet = await WalletModel.findOne({ userId: user.userId });
       if (!existingWallet) {
         await WalletModel.create({ userId: user.userId, balance: 0 });
       }
-  
+
       // ✅ Rank logic if user was referred
       if (referredBy) {
         const directReferralsCount = await UserModel.countDocuments({ referredBy });
         console.log(` Direct referrals count for userId ${referredBy}: ${directReferralsCount}`);
-  
+
         const allRanks = await RankModel.find({}).sort({ referral: -1 });
         console.log(
           " All available ranks:",
@@ -229,28 +231,29 @@ class UserController {
             required: r.referral,
           }))
         );
-  
+
         let matchedRank = allRanks.find(rank => directReferralsCount >= parseInt(rank.referral));
-  
+
         if (matchedRank) {
           console.log(` Matched Rank: ${matchedRank.name} (ID: ${matchedRank.rankId}) for referrals: ${directReferralsCount}`);
-  
+
           const updateResult = await UserModel.updateOne(
             { userId: referredBy },
             { $set: { rankId: matchedRank.rankId } }
           );
-          
+          await UserRankHistoryRepo.createUserRankHistory({ userId: referredBy, rankId: matchedRank.rankId })
+
           console.log(" Rank updated for referrer. Update result:", updateResult);
-  
+
           const updatedReferrer = await UserModel.findOne({ userId: referredBy });
           console.log(" Final Referrer Rank after update:", updatedReferrer.rankId);
         } else {
           console.log("No rank update needed. Either no match or already same rank.");
         }
       }
-  
+
       const savedUser = await UserModel.findOne({ userId: user.userId });
-  
+
       return res.status(201).json({
         statusCode: 201,
         success: true,

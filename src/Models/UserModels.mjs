@@ -78,7 +78,7 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 1,
     },
-        // membership: { type: Number, default: 0 },
+    // membership: { type: Number, default: 0 },
     membership: {
       type: new mongoose.Schema(
         {
@@ -100,9 +100,9 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: null, // ✅ stores null in DB if rank is not set
     }
-    
-    
-    
+
+
+
   },
   {
     timestamps: true,
