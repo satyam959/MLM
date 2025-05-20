@@ -1,6 +1,7 @@
 import cron from 'node-cron';
 import WalletModel from '../Models/WalletModels.mjs';
-import UserModel from '../Models/UserModels.mjs'; 
+import UserModel from '../Models/UserModels.mjs';
+
 class WalletTopupCron {
   constructor() {
     this.task = null;
@@ -14,9 +15,10 @@ class WalletTopupCron {
 
     console.log('✅ Starting Wallet Topup Cron');
 
-    this.task = cron.schedule('* * * * *', async () => {
+    // ✅ Runs daily at 12 PM
+    this.task = cron.schedule('0 12 * * *', async () => {
       try {
-        console.log('🕐 Cron Running: ₹1 top-up for eligible wallets...');
+        console.log('🕛 Cron Running (12 PM): ₹1 top-up for eligible wallets...');
 
         const wallets = await WalletModel.find();
         const now = new Date();
@@ -24,36 +26,19 @@ class WalletTopupCron {
         for (const wallet of wallets) {
           const user = await UserModel.findOne({ userId: wallet.userId });
 
-          // ✅ Check if user exists and has membership.type === 1
           if (!user || user.membership?.type !== 1) {
             console.log(`🚫 Skipping userId ${wallet.userId} (No membership or type !== 1)`);
             continue;
           }
 
-          const isSameDay =
-            wallet.lastTopupDate &&
-            now.toDateString() === wallet.lastTopupDate.toDateString();
+          // Reset daily count and top-up
+          wallet.balance += 1;
+          wallet.dailyTopupsCount = 1; // Since it's once per day now
+          wallet.lastTopupDate = now;
 
-          // ✅ If new day, reset daily count
-          if (!isSameDay) {
-            wallet.dailyTopupsCount = 0;
-            wallet.lastTopupDate = now;
-          }
+          await wallet.save();
 
-          // ✅ Only allow 5 top-ups per 24hr
-          if (wallet.dailyTopupsCount < 5) {
-            wallet.balance += 1;
-            wallet.dailyTopupsCount += 1;
-            wallet.lastTopupDate = now;
-
-            await wallet.save();
-
-            console.log(
-              `💰 ₹1 added to userId ${wallet.userId}. Total today: ₹${wallet.dailyTopupsCount}`
-            );
-          } else {
-            console.log(`⛔ userId ${wallet.userId} already reached ₹5 today.`);
-          }
+          console.log(`💰 ₹1 added to userId ${wallet.userId}.`);
         }
       } catch (error) {
         console.error('❌ Error in Wallet Topup Cron:', error.message);
