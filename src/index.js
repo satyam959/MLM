@@ -30,6 +30,8 @@ import userModuleRoutes from './Routes/User/userModuleRoutes.mjs'
 import LevelIncomeRoutes from './Routes/User/LevelIncomeRoutes.mjs'
 import AdminRoutes from './Routes/AdminRoutes.mjs'
 import WalletTopupCron from './CronJobs/walletTopupCron.mjs';
+import ServiceAPI from './Routes/User/thirdPartyRoute/thirdPartyRoutes.mjs';
+
 
 WalletTopupCron.startCron();
 
@@ -76,14 +78,17 @@ app.use('/api/ranks', rankRoutes);
 app.use('/api/royalties', royaltyRoutes);
 app.use('/api/Withdrawal', WithdrawalRoutes);
 app.use('/api/homeDashboard', HomeDashboard)
-app.use('/api',LevelIncomeRoutes)
-app.use('/api',AdminRoutes)
-
+app.use('/api', LevelIncomeRoutes)
+app.use('/api', AdminRoutes)
 
 // Start server
 
 //user routes
 app.use('/api', userModuleRoutes);
+
+/// third party routes starts ///
+app.use('/api', ServiceAPI)
+/// third party routes ends ///
 
 // Start the server
 app.listen(port, () => {
