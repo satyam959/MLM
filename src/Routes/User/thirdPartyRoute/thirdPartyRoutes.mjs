@@ -7,6 +7,7 @@ import providerService from "../../../thirdPartyAPI/ThirdPartyService.mjs";
 const router = express.Router();
 
 router.get('/allProviderList', providerService.getProvider);
+router.post('/providerValidation', providerService.providerValidation);
 
 
 export default router;

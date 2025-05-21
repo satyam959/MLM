@@ -30,6 +30,22 @@ class ThirdPartyService {
             throw new Error('Failed to get Provider Data');
         }
     }
+
+    static async providerValidation(req, res) {
+        try {
+            console.log("reqbody --", req.query.provider_id);
+            const postData = { api_token: API_TOKEN, provider_id: req.query.provider_id };
+            const response = await apiClient.postMethod(`${API_URL}telecom/v1/provider-validation`, postData);
+            console.log("response -- ", response);
+            return res.status(200).json({
+                data: response
+            });
+
+        } catch (error) {
+            console.error('Error Getting Provider Data:', error.response?.data || error.message);
+            throw new Error('Failed to get Provider Data');
+        }
+    }
 }
 
 export default ThirdPartyService;
