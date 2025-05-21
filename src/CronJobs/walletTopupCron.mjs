@@ -1,10 +1,6 @@
 import cron from 'node-cron';
 import WalletModel from '../Models/WalletModels.mjs';
 import UserModel from '../Models/UserModels.mjs';
-<<<<<<< HEAD
-
-=======
->>>>>>> 9ceb5ea (services code added)
 class WalletTopupCron {
   constructor() {
     this.task = null;
@@ -21,11 +17,7 @@ class WalletTopupCron {
     // ✅ Runs daily at 12 PM
     this.task = cron.schedule('0 12 * * *', async () => {
       try {
-<<<<<<< HEAD
-        console.log('🕛 Cron Running (12 PM): ₹1 top-up for eligible wallets...');
-=======
         // console.log('🕐 Cron Running: ₹1 top-up for eligible wallets...');
->>>>>>> 9ceb5ea (services code added)
 
         const wallets = await WalletModel.find();
         const now = new Date();
