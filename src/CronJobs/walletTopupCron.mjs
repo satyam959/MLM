@@ -12,18 +12,17 @@ class WalletTopupCron {
   }
 
   startCron() {
-    if (this.task) {
-      // console.log('⏳ Cron already running');
-      return;
-    }
+    if (this.task) return;
 
-    // console.log('✅ Starting Wallet Topup Cron');
-
-    this.task = cron.schedule('* * * * *', async () => {
+    // Schedule to run every day at 12:01 AM IST
+    this.task = cron.schedule('1 0 * * *', async () => {
       try {
-        console.log('\n🕐 Cron Running: Checking eligible wallets...');
+        const now = new Date(); 
+        const istNow = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
 
-        const now = new Date();
+        console.log('\n🕐 Cron Running (IST): Checking eligible wallets...');
+        console.log(`📅 Current IST Time: ${istNow.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}`);
+
         const adminWallet = await WalletModel.findOne({ userId: ADMIN_USER_ID });
 
         if (!adminWallet || adminWallet.balance < 1) {
@@ -41,36 +40,38 @@ class WalletTopupCron {
           }
 
           const endDate = new Date(user.membership.endDate);
+          const istEndDate = new Date(endDate.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
 
-          // Log IST and UTC for debugging
           console.log(`🔍 userId ${wallet.userId}`);
-          console.log(`   ➤ Now (UTC): ${now.toISOString()}`);
-          console.log(`   ➤ Now (IST): ${now.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}`);
-          console.log(`   ➤ EndDate (UTC): ${endDate.toISOString()}`);
-          console.log(`   ➤ EndDate (IST): ${endDate.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}`);
+          console.log(`   ➤ Now (IST): ${istNow.toISOString()}`);
+          console.log(`   ➤ EndDate (IST): ${istEndDate.toISOString()}`);
 
-          if (now.getTime() >= endDate.getTime()) {
+          // Mark payoutCompleted = 1 if now has reached or passed endDate
+          if (istNow.getTime() >= istEndDate.getTime()) {
+            if (!user.membership.payoutCompleted) {
+              user.membership.payoutCompleted = 1;
+              await user.save();
+              console.log(`✅ payoutCompleted set to 1 for userId ${wallet.userId}`);
+            }
             console.log(`⛔ End date and time passed for userId ${wallet.userId} - Skipping top-up`);
             continue;
           }
 
-          // Proceed with daily top-up
           const amountToAdd = 1;
           const userRemainingBalance = wallet.balance + amountToAdd;
           const adminRemainingBalance = adminWallet.balance - amountToAdd;
 
-          // 💰 Update balances
           wallet.balance = userRemainingBalance;
           wallet.dailyTopupsCount = (wallet.dailyTopupsCount || 0) + 1;
-          wallet.lastTopupDate = now;
-          user.membership.lastPayoutDate = now;
+          wallet.lastTopupDate = istNow;
+
+          user.membership.lastPayoutDate = istNow;
           adminWallet.balance = adminRemainingBalance;
 
           await wallet.save();
           await user.save();
           await adminWallet.save();
 
-          // 🧾 Create history entries
           await UserWalletRepository.createWalletHistory({
             userId: wallet.userId,
             amount: amountToAdd,
@@ -95,7 +96,7 @@ class WalletTopupCron {
         }
 
       } catch (error) {
-        // console.error('❌ Error in Wallet Topup Cron:', error.message);
+        console.error('❌ Error in Wallet Topup Cron:', error.message);
       }
     });
   }
@@ -104,9 +105,6 @@ class WalletTopupCron {
     if (this.task) {
       this.task.stop();
       this.task = null;
-      // console.log('⏹️ Wallet Topup Cron stopped');
-    } else {
-      /// console.log('ℹ️ Cron is not running');
     }
   }
 

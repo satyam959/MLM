@@ -90,6 +90,7 @@ const userSchema = new mongoose.Schema(
           startDate: { type: Date, default: null },
           endDate: { type: Date, default: null },
           lastPayoutDate: { type: Date, default: null },
+          payoutCompleted:{type:Number, enum: [0, 1],default: 0,}
         },
         { _id: false }
       ),
