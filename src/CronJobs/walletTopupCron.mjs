@@ -1,6 +1,11 @@
-import cron from 'node-cron';
-import WalletModel from '../Models/WalletModels.mjs';
-import UserModel from '../Models/UserModels.mjs';
+import cron from "node-cron";
+import WalletModel from "../Models/WalletModels.mjs";
+import UserModel from "../Models/UserModels.mjs";
+import UserWalletRepository from "../Repositories/user/userWalletRepositories.mjs"; // Adjust path
+import { Types } from "mongoose";
+
+const ADMIN_USER_ID = 355470;
+
 class WalletTopupCron {
   constructor() {
     this.task = null;
@@ -14,44 +19,81 @@ class WalletTopupCron {
 
     // console.log('✅ Starting Wallet Topup Cron');
 
-    // ✅ Runs daily at 12 PM
-    this.task = cron.schedule('0 12 * * *', async () => {
+    this.task = cron.schedule('* * * * *', async () => {
       try {
-        // console.log('🕐 Cron Running: ₹1 top-up for eligible wallets...');
+        console.log('\n🕐 Cron Running: Checking eligible wallets...');
+
+        const now = new Date();
+        const adminWallet = await WalletModel.findOne({ userId: ADMIN_USER_ID });
+
+        if (!adminWallet || adminWallet.balance < 1) {
+          console.log('❌ Admin wallet not found or insufficient balance');
+          return;
+        }
 
         const wallets = await WalletModel.find();
-        const now = new Date();
 
         for (const wallet of wallets) {
           const user = await UserModel.findOne({ userId: wallet.userId });
 
-          if (!user || user.membership?.type !== 1) {
-            // console.log(`🚫 Skipping userId ${wallet.userId} (No membership or type !== 1)`);
+          if (!user || !user.membership || user.membership.type !== 1) {
             continue;
           }
 
-          // Reset daily count and top-up
-          wallet.balance += 1;
-          wallet.dailyTopupsCount = 1; // Since it's once per day now
+          const endDate = new Date(user.membership.endDate);
+
+          // Log IST and UTC for debugging
+          console.log(`🔍 userId ${wallet.userId}`);
+          console.log(`   ➤ Now (UTC): ${now.toISOString()}`);
+          console.log(`   ➤ Now (IST): ${now.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}`);
+          console.log(`   ➤ EndDate (UTC): ${endDate.toISOString()}`);
+          console.log(`   ➤ EndDate (IST): ${endDate.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}`);
+
+          if (now.getTime() >= endDate.getTime()) {
+            console.log(`⛔ End date and time passed for userId ${wallet.userId} - Skipping top-up`);
+            continue;
+          }
+
+          // Proceed with daily top-up
+          const amountToAdd = 1;
+          const userRemainingBalance = wallet.balance + amountToAdd;
+          const adminRemainingBalance = adminWallet.balance - amountToAdd;
+
+          // 💰 Update balances
+          wallet.balance = userRemainingBalance;
+          wallet.dailyTopupsCount = (wallet.dailyTopupsCount || 0) + 1;
           wallet.lastTopupDate = now;
+          user.membership.lastPayoutDate = now;
+          adminWallet.balance = adminRemainingBalance;
 
           await wallet.save();
+          await user.save();
+          await adminWallet.save();
 
-          // ✅ Only allow 5 top-ups per 24hr
-          if (wallet.dailyTopupsCount < 5) {
-            wallet.balance += 1;
-            wallet.dailyTopupsCount += 1;
-            wallet.lastTopupDate = now;
+          // 🧾 Create history entries
+          await UserWalletRepository.createWalletHistory({
+            userId: wallet.userId,
+            amount: amountToAdd,
+            type: "credit",
+            transactionType: "dailyPayout",
+            source: "wallet",
+            balanceAfter: userRemainingBalance,
+            status: "completed",
+          });
 
-            await wallet.save();
+          await UserWalletRepository.createWalletHistory({
+            userId: ADMIN_USER_ID,
+            amount: amountToAdd,
+            type: "debit",
+            transactionType: "dailyPayout",
+            source: "wallet",
+            balanceAfter: adminRemainingBalance,
+            status: "completed",
+          });
 
-            // console.log(
-            //   `💰 ₹1 added to userId ${wallet.userId}. Total today: ₹${wallet.dailyTopupsCount}`
-            // );
-          } else {
-            //console.log(`⛔ userId ${wallet.userId} already reached ₹5 today.`);
-          }
+          console.log(`💰 ₹${amountToAdd} transferred to userId ${wallet.userId}`);
         }
+
       } catch (error) {
         // console.error('❌ Error in Wallet Topup Cron:', error.message);
       }
