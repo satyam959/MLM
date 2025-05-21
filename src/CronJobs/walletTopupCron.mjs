@@ -15,7 +15,7 @@ class WalletTopupCron {
     if (this.task) return;
 
     // Schedule to run every day at 12:01 AM IST
-    this.task = cron.schedule('1 0 * * *', async () => {
+    this.task = cron.schedule(' 01 1 * * *', async () => {
       try {
         const now = new Date(); 
         const istNow = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
@@ -47,15 +47,17 @@ class WalletTopupCron {
           console.log(`   ➤ EndDate (IST): ${istEndDate.toISOString()}`);
 
           // Mark payoutCompleted = 1 if now has reached or passed endDate
-          if (istNow.getTime() >= istEndDate.getTime()) {
+          if (istNow >= istEndDate) {
             if (!user.membership.payoutCompleted) {
               user.membership.payoutCompleted = 1;
               await user.save();
-              console.log(`✅ payoutCompleted set to 1 for userId ${wallet.userId}`);
+              console.log(`✅ payoutCompleted set to 1 and top-up stopped for userId ${wallet.userId}`);
+            } else {
+              console.log(`⛔ End date passed for userId ${wallet.userId} - Skipping top-up`);
             }
-            console.log(`⛔ End date and time passed for userId ${wallet.userId} - Skipping top-up`);
             continue;
           }
+          
 
           const amountToAdd = 1;
           const userRemainingBalance = wallet.balance + amountToAdd;
