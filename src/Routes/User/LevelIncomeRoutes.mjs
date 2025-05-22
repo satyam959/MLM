@@ -9,6 +9,4 @@ const router = express.Router();
 
 router.get("/LevelIncome", verify, LevelIncomeReportController.getWalletSummary);
 
-
-
 export default router;

@@ -101,16 +101,23 @@ class ThirdPartyService {
 
             const postData = {
                 api_token: API_TOKEN,
+                type: 1,
                 ...parsedBody
             };
             const response = await apiClient.postMethod(`${API_URL}telecom/v1/bill-verify`, postData);
 
-            return res.status(200).json({
-                data: response
-            });
+            if (response) {
+                return res.status(200).json({
+                    success: true,
+                    message: "Bill verified successfully",
+                    data: response
+
+                });
+            }
+
 
         } catch (error) {
-            console.log('Error in bill verification wwww:', error);
+            console.log('Error in bill verification :', error);
             throw new Error('Failed to verify bill');
         }
     }
