@@ -27,14 +27,7 @@ class TeamSuperPerformanceCron {
     console.log("✅ TeamSuperPerformanceCron started");
 
     this.task = cron.schedule(
-        "10 12 * * *",
-        () => {
-          // your job logic here
-        },
-        {
-          timezone: "Asia/Kolkata", // ensure it's aligned with IST
-        },
-      
+      '10 0 * * *', // Every day at 12:10 PM IST
       async () => {
         const now = new Date();
         const todayIST = getISTDateString(now);
@@ -53,7 +46,7 @@ class TeamSuperPerformanceCron {
             { rankId: { $in: silverRankIds } },
             { userId: 1, name: 1, rankId: 1, teamRewardCount: 1 }
           );
-          
+
           if (!silverUsers.length) return console.log("⚠️ No Silver users found");
 
           for (const user of silverUsers) {
@@ -70,8 +63,6 @@ class TeamSuperPerformanceCron {
             }
 
             const lastReward = wallet.lastTeamRewardDate;
-            console.log(`👁️ lastReward: ${lastReward}, todayIST: ${todayIST}`);
-
             if (lastReward && lastReward === todayIST) {
               console.log(`⏳ Already rewarded today for userId ${user.userId}`);
               continue;
@@ -83,9 +74,7 @@ class TeamSuperPerformanceCron {
 
             wallet.balance += DAILY_REWARD_AMOUNT;
             wallet.lastTeamRewardDate = todayIST;
-
             user.teamRewardCount = rewardCount + 1;
-
             adminWallet.balance -= DAILY_REWARD_AMOUNT;
 
             await wallet.save();
@@ -102,6 +91,7 @@ class TeamSuperPerformanceCron {
               balanceAfter: wallet.balance,
               status: "completed",
             });
+
             await UserWalletRepository.createWalletHistory({
               userId: ADMIN_USER_ID,
               amount: DAILY_REWARD_AMOUNT,
