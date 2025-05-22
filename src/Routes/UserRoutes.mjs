@@ -2,6 +2,7 @@ import express from 'express';
 import UserController from '../controllers/UserController.mjs';
 import { getUploadMiddleware } from "../middelware/UploadImage.mjs"; 
 import verifyToken from '../middelware/authMiddleware.mjs';  
+import AdminAuth from '../middelware/verifyAdminRole.mjs';  // <-- IMPORT AdminAuth here
 
 const router = express.Router();
 
@@ -30,9 +31,8 @@ router.get('/getAllUser', UserController.getAllUser);
 // Add verifyToken here if you want protection:
 router.get('/rankHistory', verifyToken, UserController.getUserRankHistory);
 
-router.get('/membership/type1', UserController.getMembershipUsers);
+router.get('/membership', UserController.getMembershipUsers);
 
-router.get("/walletHistory",verifyToken, UserController.getUserTransactions);
-
+router.get('/walletHistory', AdminAuth.verifyAdminRole, UserController.getUserTransactions);
 
 export default router;

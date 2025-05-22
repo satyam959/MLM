@@ -25,7 +25,7 @@ const UserWalletRepository = {
         return await WalletHistory.aggregate([
           {
             $match: {
-              userId: userId,
+              userId: Number(userId),
               transactionType: transactionType,
             },
           },
@@ -62,13 +62,23 @@ const UserWalletRepository = {
                 ]
               },
               ampm: {
+                $cond: [{ $lt: ["$hour", 12] }, "AM", "PM"]
+              },
+              paddedMinute: {
                 $cond: [
-                  { $lt: ["$hour", 12] },
-                  "AM",
-                  "PM"
+                  { $lt: ["$minute", 10] },
+                  { $concat: ["0", { $toString: "$minute" }] },
+                  { $toString: "$minute" }
                 ]
               },
-            },
+              paddedSecond: {
+                $cond: [
+                  { $lt: ["$second", 10] },
+                  { $concat: ["0", { $toString: "$second" }] },
+                  { $toString: "$second" }
+                ]
+              }
+            }
           },
           {
             $project: {
@@ -82,21 +92,9 @@ const UserWalletRepository = {
                   " ",
                   { $toString: "$hour12" },
                   ":",
-                  {
-                    $cond: [
-                      { $lt: ["$minute", 10] },
-                      { $concat: ["0", { $toString: "$minute" }] },
-                      { $toString: "$minute" }
-                    ]
-                  },
+                  "$paddedMinute",
                   ":",
-                  {
-                    $cond: [
-                      { $lt: ["$second", 10] },
-                      { $concat: ["0", { $toString: "$second" }] },
-                      { $toString: "$second" }
-                    ]
-                  },
+                  "$paddedSecond",
                   " ",
                   "$ampm"
                 ]

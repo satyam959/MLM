@@ -18,7 +18,7 @@ async function seedAdmin() {
             console.log('Admin user already exists');
             return process.exit(0);
         }
-
+        
         const adminUser = new User({
             fullName: 'Admin User',
             email: 'admin@example.com',

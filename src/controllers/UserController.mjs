@@ -725,11 +725,12 @@ class UserController {
   
   async getUserTransactions(req, res) {
     try {
-      const userId = req.user.userId;
+      // Allow admin to pass userId via query; otherwise fallback to the logged-in user's ID
+      const userId = req.query.userId || req.user.userId;
       const transactionType = req.query.transactionType || 'dailyPayout';
-
+  
       const data = await UserWalletRepository.getUserTransactions(userId, transactionType);
-
+  
       res.status(200).json({
         statusCode: 200,
         success: true,
@@ -745,6 +746,7 @@ class UserController {
       });
     }
   }
+  
 }
 
 export default new UserController();

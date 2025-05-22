@@ -1,10 +1,13 @@
 import User from '../Models/UserModels.mjs';
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+
 
 class AdminController {
     // Admin Login with Email & Password
     static async loginWithEmail(req, res) {
         const { email, password } = req.body;
+        const secret = process.env.ADMIN_JWT_SECRET;
 
         console.log('Login Request Body:', req.body);
 
@@ -41,9 +44,9 @@ class AdminController {
 
             // Generate JWT token
             const token = jwt.sign(
-                { id: user._id, role: user.role },
-                'your_jwt_secret',
-                { expiresIn: '1h' }
+                { userId: user.userId, name:user.fullName, role: user.role },
+                secret,
+                { expiresIn: '365d' }
             );
 
             return res.status(200).json({
