@@ -30,4 +30,9 @@ router.get('/getAllUser', UserController.getAllUser);
 // Add verifyToken here if you want protection:
 router.get('/rankHistory', verifyToken, UserController.getUserRankHistory);
 
+router.get('/membership/type1', UserController.getMembershipUsers);
+
+router.get("/walletHistory",verifyToken, UserController.getUserTransactions);
+
+
 export default router;

@@ -31,9 +31,12 @@ import LevelIncomeRoutes from './Routes/User/LevelIncomeRoutes.mjs'
 import AdminRoutes from './Routes/AdminRoutes.mjs'
 import WalletTopupCron from './CronJobs/walletTopupCron.mjs';
 import ServiceAPI from './Routes/User/thirdPartyRoute/thirdPartyRoutes.mjs';
+import teamSuperPerformanceCron from './CronJobs/teamSuperPerformanceCron.mjs';
 
 
+// Start Cron Jobs
 WalletTopupCron.startCron();
+teamSuperPerformanceCron.startCron(); // ✅ Don't forget this line!
 
 dotenv.config();
 

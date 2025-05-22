@@ -15,7 +15,7 @@ class WalletTopupCron {
     if (this.task) return;
 
     // Schedule to run every day at 12:01 AM IST
-    this.task = cron.schedule(' 01 1 * * *', async () => {
+    this.task = cron.schedule('01 0 * * *', async () => {
       try {
         const now = new Date(); 
         const istNow = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));

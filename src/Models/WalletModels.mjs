@@ -35,6 +35,11 @@ const walletSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    lastTeamRewardDate: {
+      type: String,
+      default: null, // Or leave it undefined initially
+    },
+    
   },
   { timestamps: true }
 );

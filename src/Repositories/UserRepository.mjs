@@ -186,8 +186,15 @@ class UserRepository {
     } catch (error) {
       console.error("Error finding wallet:", error.message);
       throw new Error("Error finding wallet");
-    }
+    } 
   }
+  static async getMembershipUsers() {
+    return await UserModel.find(
+      { "membership.type": 1 },
+      { fullName: 1, userId: 1, _id: 0 } // Only fullName and userId
+    );
+  }
+
 
   // UserRepository.js
 static async getUsersByRank({ rankId }) {

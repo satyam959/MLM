@@ -9,6 +9,7 @@ import { getUploadMiddleware } from "../middelware/UploadImage.mjs";
 import WalletModel from "../Models/WalletModels.mjs";
 import RankModel from "../Models/RankModels.mjs";
 import UserRankHistoryRepo from "../Repositories/UserRankHistory.mjs";
+import UserWalletRepository from "../Repositories/user/userWalletRepositories.mjs";
 
 
 class UserController {
@@ -702,9 +703,48 @@ class UserController {
       });
     }
   }
+  // In UserController
+  async getMembershipUsers(req, res) {
+    try {
+      const users = await UserRepository.getMembershipUsers();
+      res.status(200).json({
+        statusCode: 200,
+        success: true,
+        message: "Membership type 1 users fetched successfully",
+        data: users,
+      });
+    } catch (error) {
+      res.status(500).json({
+        statusCode: 500,
+        success: false,
+        message: "Error fetching users",
+        error: error.message,
+      });
+    }
+  }
   
+  async getUserTransactions(req, res) {
+    try {
+      const userId = req.user.userId;
+      const transactionType = req.query.transactionType || 'dailyPayout';
+
+      const data = await UserWalletRepository.getUserTransactions(userId, transactionType);
+
+      res.status(200).json({
+        statusCode: 200,
+        success: true,
+        message: `Your ${transactionType} details fetched successfully`,
+        data: data,
+      });
+    } catch (error) {
+      res.status(500).json({
+        statusCode: 500,
+        success: false,
+        message: "Error fetching transactions",
+        error: error.message,
+      });
+    }
+  }
 }
-
-
 
 export default new UserController();
