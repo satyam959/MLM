@@ -87,6 +87,38 @@ class ThirdPartyService {
             throw new Error('Failed to get Provider Data');
         }
     }
+
+    static async billVerification(req, res) {
+        try {
+            const rawBody = req.body;
+
+            const parsedBody = {};
+            for (const key in rawBody) {
+                const value = rawBody[key];
+                // Convert to number only if it's a valid number string
+                parsedBody[key] = await ThirdPartyService.isNumeric(value) ? Number(value) : value;
+            }
+
+            const postData = {
+                api_token: API_TOKEN,
+                ...parsedBody
+            };
+            const response = await apiClient.postMethod(`${API_URL}telecom/v1/bill-verify`, postData);
+
+            return res.status(200).json({
+                data: response
+            });
+
+        } catch (error) {
+            console.log('Error in bill verification wwww:', error);
+            throw new Error('Failed to verify bill');
+        }
+    }
+
+    static async isNumeric(value) {
+        return !isNaN(value) && !isNaN(parseFloat(value));
+    }
+
 }
 
 export default ThirdPartyService;

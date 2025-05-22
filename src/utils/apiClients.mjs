@@ -2,7 +2,7 @@ import axios from 'axios';
 
 class ApiClient {
     static client = axios.create({
-        timeout: 5000,
+        timeout: 10000,
         headers: {
             'Content-Type': 'application/json',
         },
@@ -23,7 +23,7 @@ class ApiClient {
             const response = await this.client.post(url, data, config);
             return response.data;
         } catch (error) {
-            console.error('POST Error:', error.response?.data || error.message);
+            console.error('POST Error:', error);
             throw error;
         }
     }
