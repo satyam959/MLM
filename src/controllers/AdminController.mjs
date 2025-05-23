@@ -46,7 +46,7 @@ class AdminController {
             const token = jwt.sign(
                 { userId: user.userId, name:user.fullName, role: user.role },
                 secret,
-                { expiresIn: '365d' }
+                { expiresIn: "365d" }
             );
 
             return res.status(200).json({

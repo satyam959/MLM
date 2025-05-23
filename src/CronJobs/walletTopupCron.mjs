@@ -13,7 +13,8 @@ class WalletTopupCron {
 
   startCron() {
     if (this.task) return;
-
+    console.log("✅ WalletTopupCron started");
+    
     // Schedule to run every day at 12:05 AM IST
     this.task = cron.schedule('5 0 * * *', async () => {
       try {
