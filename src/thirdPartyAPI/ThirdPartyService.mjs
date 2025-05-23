@@ -104,13 +104,6 @@ class ThirdPartyService {
             const userId = req.user.userId;
             const rawBody = req.body;
 
-            // const parsedBody = {};
-            // for (const key in rawBody) {
-            //     const value = rawBody[key];
-            //     // Convert to number only if it's a valid number string
-            //     parsedBody[key] = value ? Number(value) : value;
-            // }
-
             const postData = {
                 api_token: API_TOKEN,
                 type: 1,
@@ -119,19 +112,65 @@ class ThirdPartyService {
             };
             const response = await apiClient.postMethod(`${API_URL}telecom/v1/payment`, postData);
             if (response) {
+                const status = response.status == "success" ? true : false;
+                const message = status == true ? "Bill processed successfully" : "Something went wrong in bill processing";
                 return res.status(200).json({
-                    success: true,
-                    message: "Bill processed successfully",
+                    status: status,
+                    message: message,
                     data: response
                 });
             }
         } catch (error) {
-            console.log('Error in bill verification :', error);
-            throw new Error('Failed to verify bill');
+            console.log('Error in bill payment :', error);
+            throw new Error('Bill payment failed');
         }
     }
 
+    static async findOperator(req, res) {
+        try {
+            const rawBody = req.body;
+            const postData = {
+                api_token: API_TOKEN,
+                ...rawBody
+            };
+            const response = await apiClient.postMethod(`${API_URL}plan/v1/find-operator`, postData);
+            if (response) {
+                const status = response.status == "success" ? true : false;
+                const message = status == true ? "Operator list fetched successfully" : "Something went wrong !!";
+                return res.status(200).json({
+                    status: status,
+                    message: message,
+                    data: response
+                });
+            }
+        } catch (error) {
+            console.log('Error in Operator list :', error);
+            throw new Error('Operator list fetching error');
+        }
+    }
 
+    static async prepaidPlan(req, res) {
+        try {
+            const rawBody = req.body;
+            const postData = {
+                api_token: API_TOKEN,
+                ...rawBody
+            };
+            const response = await apiClient.postMethod(`${API_URL}plan/v1/prepaid-plan2`, postData);
+            if (response) {
+                const status = response.status == "success" ? true : false;
+                const message = status == true ? "Prepaid plan fetched successfully" : "Something went wrong !!";
+                return res.status(200).json({
+                    status: status,
+                    message: message,
+                    data: response
+                });
+            }
+        } catch (error) {
+            console.log('Error in prepaid plan :', error);
+            throw new Error('prepaid plan fetching error');
+        }
+    }
 }
 
 export default ThirdPartyService;
