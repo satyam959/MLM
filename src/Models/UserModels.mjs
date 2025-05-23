@@ -102,10 +102,19 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
     rechargeRecived:{
-      type:{ Number,
-      default:0
-    },
-    lastPayoutDate: { type: Date, default: null },
+      type: new mongoose.Schema(
+        {
+          type: {
+            type: Number,
+            enum: [0, 1], // 0 = Basic, 1 = Premium
+            default: 0,
+          },
+
+          payoutDate: { type: Date, default: null }
+        },
+      
+      ),
+      default: () => ({}),
 
   },
   },
