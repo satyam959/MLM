@@ -32,12 +32,16 @@ import AdminRoutes from './Routes/AdminRoutes.mjs'
 import WalletTopupCron from './CronJobs/walletTopupCron.mjs';
 import ServiceAPI from './Routes/User/thirdPartyRoute/thirdPartyRoutes.mjs';
 import teamSuperPerformanceCron from './CronJobs/teamSuperPerformanceCron.mjs';
+import UserBenefitsCron from './CronJobs/UserBenefitsCron.mjs'; 
+
+
+
 
 
 // Start Cron Jobs
 WalletTopupCron.startCron();
 teamSuperPerformanceCron.startCron(); // ✅ Don't forget this line!
-
+UserBenefitsCron.startCron(); // ✅ Start the referral reward cron
 dotenv.config();
 
 const app = express();
