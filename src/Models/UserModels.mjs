@@ -102,9 +102,12 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
     rechargeRecived:{
-      type: Number,
+      type:{ Number,
       default:0
     },
+    lastPayoutDate: { type: Date, default: null },
+
+  },
   },
   {
     timestamps: true,
