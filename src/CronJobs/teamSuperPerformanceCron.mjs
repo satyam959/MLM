@@ -27,7 +27,7 @@ class TeamSuperPerformanceCron {
     console.log("✅ TeamSuperPerformanceCron started");
 
     this.task = cron.schedule(
-      '10 0 * * *', // Every day at 12:10 PM IST
+      '* * * * *', // Every day at 12:10 PM IST
       async () => {
         const now = new Date();
         const todayIST = getISTDateString(now);

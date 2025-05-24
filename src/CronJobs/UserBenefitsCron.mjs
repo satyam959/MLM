@@ -23,7 +23,7 @@ class UserBenefitsCron {
     this.task = cron.schedule('* * * * *', async () => {
       console.log('[Cron] userBenefit started');
       await this.runReferralCheck();
-       console.log('[Cron] userBenefit completed');
+      console.log('[Cron] userBenefit completed');
     }, {
       scheduled: true,
       timezone: 'Asia/Kolkata'
@@ -46,11 +46,13 @@ class UserBenefitsCron {
     try {
       const referrers = await UserModel.find({
         referralBonusGiven: { $ne: true },
-        rechargeRecived: 1 // ✅ Only users who have received recharge
+        "rechargeRecived.type": 1 // ✅ Fixed subdocument query
       });
 
       for (const referrer of referrers) {
-        const referredCount = await UserModel.countDocuments({ referredBy: referrer.userId });
+        const referredCount = await UserModel.countDocuments({
+          referredBy: referrer.userId
+        });
 
         if (referredCount >= 10) {
           const userWallet = await UserWalletRepository.findWalletByUserId(referrer.userId);

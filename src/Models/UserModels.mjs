@@ -78,7 +78,7 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 1,
     },
-    // membership: { type: Number, default: 0 },
+
     membership: {
       type: new mongoose.Schema(
         {
@@ -90,39 +90,39 @@ const userSchema = new mongoose.Schema(
           startDate: { type: Date, default: null },
           endDate: { type: Date, default: null },
           lastPayoutDate: { type: Date, default: null },
-          payoutCompleted:{type:Number, enum: [0, 1],default: 0,}
+          payoutCompleted: { type: Number, enum: [0, 1], default: 0 },
         },
         { _id: false }
       ),
       default: () => ({}),
     },
-    // ✅ Added rank field
+
     rankId: {
       type: String,
       default: null,
     },
-    rechargeRecived:{
+
+    rechargeRecived: {
       type: new mongoose.Schema(
         {
           type: {
             type: Number,
-            enum: [0, 1], // 0 = Basic, 1 = Premium
+            enum: [0, 1],
             default: 0,
           },
-
-          payoutDate: { type: Date, default: null }
+          payoutDate: { type: Date, default: null },
         },
-      
+        { _id: false }
       ),
       default: () => ({}),
-
-  },
+    },
   },
   {
     timestamps: true,
   }
 );
-// Static method
+
+// Static methods
 userSchema.statics.findByEmail = async function (email) {
   return this.findOne({ email });
 };
