@@ -1,6 +1,8 @@
+import UserWalletRepository from '../Repositories/user/userWalletRepositories.mjs';
 import apiClient from '../utils/apiClients.mjs';
 import dotenv from 'dotenv';
 dotenv.config(); // Load .env variables first
+
 
 const { API_URL, API_TOKEN } = process.env;
 
@@ -102,8 +104,15 @@ class ThirdPartyService {
     static async payBill(req, res) {
         try {
             const userId = req.user.userId;
+            const userWallet = await UserWalletRepository.findWalletByUserId(userId);
             const rawBody = req.body;
-
+            if (!userWallet || Number(userWallet.balance) < rawBody.amount) {
+                return res.status(400).json({
+                    message: "Insufficient wallet balance. Please top-up your wallet.",
+                    userBalance: userWallet ? Number(userWallet.balance) : 0,
+                    required: Number(rawBody.amount)
+                });
+            }
             const postData = {
                 api_token: API_TOKEN,
                 type: 1,
@@ -176,7 +185,17 @@ class ThirdPartyService {
     static async rechargeNow(req, res) {
         try {
             const userId = req.user.userId;
+            const userWallet = await UserWalletRepository.findWalletByUserId(userId);
+
             const rawBody = req.query;
+
+            if (!userWallet || Number(userWallet.balance) < rawBody.amount) {
+                return res.status(400).json({
+                    message: "Insufficient wallet balance. Please top-up your wallet.",
+                    userBalance: userWallet ? Number(userWallet.balance) : 0,
+                    required: Number(rawBody.amount)
+                });
+            }
 
             const postData = {
                 api_token: API_TOKEN,
