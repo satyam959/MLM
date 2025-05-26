@@ -108,9 +108,9 @@ class ThirdPartyService {
             const rawBody = req.body;
             if (!userWallet || Number(userWallet.balance) < rawBody.amount) {
                 return res.status(400).json({
+                    status: false,
                     message: "Insufficient wallet balance. Please top-up your wallet.",
-                    userBalance: userWallet ? Number(userWallet.balance) : 0,
-                    required: Number(rawBody.amount)
+                    data: {},
                 });
             }
             const postData = {
@@ -196,9 +196,9 @@ class ThirdPartyService {
 
             if (!userWallet || Number(userWallet.balance) < rawBody.amount) {
                 return res.status(400).json({
+                    status: false,
                     message: "Insufficient wallet balance. Please top-up your wallet.",
-                    userBalance: userWallet ? Number(userWallet.balance) : 0,
-                    required: Number(rawBody.amount)
+                    data: {},
                 });
             }
 
