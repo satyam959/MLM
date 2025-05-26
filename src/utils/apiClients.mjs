@@ -2,7 +2,7 @@ import axios from 'axios';
 
 class ApiClient {
     static client = axios.create({
-        timeout: 10000,
+        timeout: 300000,
         headers: {
             'Content-Type': 'application/json',
         },

@@ -110,6 +110,7 @@ class ThirdPartyService {
                 client_id: userId,
                 ...rawBody
             };
+            console.log("postData -- ", postData);
             const response = await apiClient.postMethod(`${API_URL}telecom/v1/payment`, postData);
             if (response) {
                 const status = response.status == "success" ? true : false;
@@ -169,6 +170,36 @@ class ThirdPartyService {
         } catch (error) {
             console.log('Error in prepaid plan :', error);
             throw new Error('prepaid plan fetching error');
+        }
+    }
+
+    static async rechargeNow(req, res) {
+        try {
+            const userId = req.user.userId;
+            const rawBody = req.query;
+
+            const postData = {
+                api_token: API_TOKEN,
+                type: 1,
+                client_id: userId,
+                ...rawBody
+            };
+            console.log("postData -- ", postData);
+            const queryString = new URLSearchParams(postData).toString();
+            const fullUrl = `${API_URL}telecom/v1/payment?${queryString}`;
+            const response = await apiClient.getMethod(fullUrl);
+            if (response) {
+                const status = response.status == "success" ? true : false;
+                const message = status == true ? "Bill processed successfully" : "Something went wrong in bill processing";
+                return res.status(200).json({
+                    status: status,
+                    message: message,
+                    data: response
+                });
+            }
+        } catch (error) {
+            console.log('Error in bill payment :', error);
+            throw new Error('Bill payment failed');
         }
     }
 }

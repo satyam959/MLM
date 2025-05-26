@@ -13,5 +13,6 @@ router.post('/billVerification', verifyToken, formDataWithMulter.none(), thirdPa
 router.post('/payBill', verifyToken, formDataWithMulter.none(), thirdPartyService.payBill)
 router.post('/findOperator', verifyToken, formDataWithMulter.none(), thirdPartyService.findOperator)
 router.post('/prepaidPlan', verifyToken, formDataWithMulter.none(), thirdPartyService.prepaidPlan)
+router.get('/rechargeNow', verifyToken, thirdPartyService.rechargeNow)
 
 export default router;
