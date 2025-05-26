@@ -119,10 +119,15 @@ class ThirdPartyService {
                 client_id: userId,
                 ...rawBody
             };
-            console.log("postData -- ", postData);
             const response = await apiClient.postMethod(`${API_URL}telecom/v1/payment`, postData);
             if (response) {
                 const status = response.status == "success" ? true : false;
+
+                if (status == true) {
+                    const userUpdatedBalance = Number(userWallet.balance) - Number(rawBody.amount)
+                    await UserWalletRepository.updateUserWallet({ userId: userId }, { balance: userUpdatedBalance })
+                }
+
                 const message = status == true ? "Bill processed successfully" : "Something went wrong in bill processing";
                 return res.status(200).json({
                     status: status,
@@ -203,12 +208,15 @@ class ThirdPartyService {
                 client_id: userId,
                 ...rawBody
             };
-            console.log("postData -- ", postData);
             const queryString = new URLSearchParams(postData).toString();
             const fullUrl = `${API_URL}telecom/v1/payment?${queryString}`;
             const response = await apiClient.getMethod(fullUrl);
             if (response) {
                 const status = response.status == "success" ? true : false;
+                if (status == true) {
+                    const userUpdatedBalance = Number(userWallet.balance) - Number(rawBody.amount)
+                    await UserWalletRepository.updateUserWallet({ userId: userId }, { balance: userUpdatedBalance })
+                }
                 const message = status == true ? "Bill processed successfully" : "Something went wrong in bill processing";
                 return res.status(200).json({
                     status: status,
