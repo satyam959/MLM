@@ -3,7 +3,7 @@ import UserController from '../controllers/UserController.mjs';
 import { getUploadMiddleware } from "../middelware/UploadImage.mjs"; 
 import verifyToken from '../middelware/authMiddleware.mjs';  
 import AdminAuth from '../middelware/verifyAdminRole.mjs';  // <-- IMPORT AdminAuth here
-
+import BuyMembershipController from '../controllers/user/BuyMembershipController.mjs';
 const router = express.Router();
 
 router.post('/register', getUploadMiddleware('image'), UserController.registerUser); 
@@ -34,5 +34,8 @@ router.get('/rankHistory', verifyToken, UserController.getUserRankHistory);
 router.get('/membership', UserController.getMembershipUsers);
 
 router.get('/walletHistory', AdminAuth.verifyAdminRole, UserController.getUserTransactions);
+
+router.post('/sendReceipt', BuyMembershipController.sendMembershipReceiptForUser);
+
 
 export default router;

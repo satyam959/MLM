@@ -15,7 +15,7 @@ class UserBenefitsCron {
   startCron() {
     if (this.task) {
       console.log('⏳ UserBenefitsCron is already running');
-      return;
+      return; 
     }
 
     console.log('✅ UserBenefitsCron started');

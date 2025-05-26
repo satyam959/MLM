@@ -33,6 +33,8 @@ import WalletTopupCron from './CronJobs/walletTopupCron.mjs';
 import ServiceAPI from './Routes/User/thirdPartyRoute/thirdPartyRoutes.mjs';
 import teamSuperPerformanceCron from './CronJobs/teamSuperPerformanceCron.mjs';
 import UserBenefitsCron from './CronJobs/UserBenefitsCron.mjs'; 
+import RoyaltyIncomeCron from './CronJobs/RoyaltyIncomeCron.mjs';
+
 
 
 
@@ -42,6 +44,7 @@ import UserBenefitsCron from './CronJobs/UserBenefitsCron.mjs';
 WalletTopupCron.startCron();
 teamSuperPerformanceCron.startCron(); // ✅ Don't forget this line!
 UserBenefitsCron.startCron(); // ✅ Start the referral reward cron
+RoyaltyIncomeCron.startCron();
 dotenv.config();
 
 const app = express();
