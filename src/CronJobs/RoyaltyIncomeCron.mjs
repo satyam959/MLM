@@ -13,7 +13,6 @@ class RoyaltyIncomeCron {
   constructor() {
     this.task = null;
   }
-
   startCron() {
     if (this.task) {
       console.log('⏳ RoyaltyIncomeCron is already running');

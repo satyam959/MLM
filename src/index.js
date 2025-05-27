@@ -34,17 +34,21 @@ import ServiceAPI from './Routes/User/thirdPartyRoute/thirdPartyRoutes.mjs';
 import teamSuperPerformanceCron from './CronJobs/teamSuperPerformanceCron.mjs';
 import UserBenefitsCron from './CronJobs/UserBenefitsCron.mjs'; 
 import RoyaltyIncomeCron from './CronJobs/RoyaltyIncomeCron.mjs';
+import rewardCron from './CronJobs/rewardCron.mjs';
+import contactus from './Routes/User/ContactUsRoutes.mjs'
 
 
-
-
+//-----------------Working Code Don't Delete  ------------------
 
 
 // Start Cron Jobs
-WalletTopupCron.startCron();
-teamSuperPerformanceCron.startCron(); // ✅ Don't forget this line!
-UserBenefitsCron.startCron(); // ✅ Start the referral reward cron
-RoyaltyIncomeCron.startCron();
+// WalletTopupCron.startCron();
+// teamSuperPerformanceCron.startCron(); // ✅ Don't forget this line!
+// UserBenefitsCron.startCron(); // ✅ Start the referral reward cron
+// // RoyaltyIncomeCron.startCron();
+
+// rewardCron.startCron();
+
 dotenv.config();
 
 const app = express();
@@ -90,6 +94,8 @@ app.use('/api/Withdrawal', WithdrawalRoutes);
 app.use('/api/homeDashboard', HomeDashboard)
 app.use('/api', LevelIncomeRoutes)
 app.use('/api', AdminRoutes)
+app.use('/api', contactus)
+
 
 // Start server
 
