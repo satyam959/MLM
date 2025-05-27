@@ -107,7 +107,7 @@ class ThirdPartyService {
             const userWallet = await UserWalletRepository.findWalletByUserId(userId);
             const rawBody = req.body;
             if (!userWallet || Number(userWallet.balance) < rawBody.amount) {
-                return res.status(400).json({
+                return res.status(200).json({
                     statusCode: 400,
                     status: false,
                     message: "Insufficient wallet balance. Please top-up your wallet.",
@@ -131,6 +131,7 @@ class ThirdPartyService {
 
                 const message = status == true ? "Bill processed successfully" : "Something went wrong in bill processing";
                 return res.status(200).json({
+                    statusCode: 200,
                     status: status,
                     message: message,
                     data: response
@@ -196,7 +197,7 @@ class ThirdPartyService {
             const rawBody = req.query;
 
             if (!userWallet || Number(userWallet.balance) < rawBody.amount) {
-                return res.status(400).json({
+                return res.status(200).json({
                     statusCode: 400,
                     status: false,
                     message: "Insufficient wallet balance. Please top-up your wallet.",
@@ -221,6 +222,7 @@ class ThirdPartyService {
                 }
                 const message = status == true ? "Bill processed successfully" : "Something went wrong in bill processing";
                 return res.status(200).json({
+                    statusCode: 200,
                     status: status,
                     message: message,
                     data: response
