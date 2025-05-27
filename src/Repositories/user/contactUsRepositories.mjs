@@ -6,7 +6,7 @@ class ContactUsRepository {
   }
 
   async getAllContactUs() {
-    return await ContactUsModel.find();
+    return await ContactUsModel.findOne();
   }
 
   async getByUserId(userId) {

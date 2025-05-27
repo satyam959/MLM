@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.post("/createContact", authMiddleware, ContactUsController.create);
 router.get("/getByTokenContact", authMiddleware, ContactUsController.getByToken);
-router.get("/getAllContact", ContactUsController.getAll);
+router.get("/getSupport", ContactUsController.getAll);
 router.put("/updateByUserId", authMiddleware, ContactUsController.updateByUserId);
 router.delete("/deleteByUserId", authMiddleware, ContactUsController.deleteByUserId);
 
