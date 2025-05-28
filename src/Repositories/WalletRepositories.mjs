@@ -1,8 +1,9 @@
 import WalletModel from "../Models/WalletModels.mjs";
-import IncomeLevelModel from "../Models/IncomeLevelModel.mjs";
+import IncomeLevelModel from "../Models/IncomeLevelModel.mjs"; // make sure model file name is IncomeLevelModel
 import UserRepository from "./UserRepository.mjs";
-import WalletHistories from "../Models/WalletHistory.mjs";
+import WalletHistory from "../Models/WalletHistory.mjs"; // rename import to singular
 import UserModel from "../Models/UserModels.mjs";
+import Rank from "../Models/RankModels.mjs";
 
 const WalletRepository = {
   async findAll() {
@@ -56,7 +57,7 @@ const WalletRepository = {
   },
 
   async getLevelIncomeByUser(userId) {
-    const incomes = await LevelIncomeModel.find({ userId });
+    const incomes = await IncomeLevelModel.find({ userId });
     let directIncome = 0;
     let teamIncome = 0;
     incomes.forEach((income) => {
@@ -130,60 +131,51 @@ const WalletRepository = {
     return wallet;
   },
 
-  // ✅ Updated method: Get Admin Revenue Stats
-  async getAdminRevenueStats({ fromDate, toDate }) {
-    const pipeline = [
+  // Corrected method: Get daily reward stats
+  async getDailyRewardStats(fromDate, toDate, transactionType) {
+    return WalletHistory.aggregate([
       {
         $match: {
-          type: { $in: ['credit', 'cridit'] }, // support typo too
           createdAt: { $gte: fromDate, $lte: toDate },
+          transactionType,
+          status: "completed"
         }
       },
       {
         $lookup: {
-          from: 'users',
-          localField: 'userId',
-          foreignField: '_id',
-          as: 'userInfo'
+          from: "users",
+          localField: "userId",
+          foreignField: "userId",  // assuming userId is a number field in users collection
+          as: "user"
         }
       },
+      { $unwind: "$user" },
       {
-        $unwind: {
-          path: "$userInfo",
-          preserveNullAndEmptyArrays: true
+        $lookup: {
+          from: "ranks",
+          localField: "user.rankId",
+          foreignField: "rankId",
+          as: "rank"
         }
       },
+      { $unwind: { path: "$rank", preserveNullAndEmptyArrays: true } },
       {
         $project: {
-          _id: 0,
+          userId: 1,
           amount: 1,
+          type: 1,
+          transactionType: 1,
+          source: 1,
+          balanceAfter: 1,
+          status: 1,
           createdAt: 1,
-          userName: { $ifNull: ["$userInfo.name", "Admin"] }
+          userName: "$user.name",
+          rankName: "$rank.name"
         }
-      },
-      { $sort: { createdAt: 1 } }
-    ];
-  
-    const results = await WalletHistories.aggregate(pipeline);
-  
-    let total = 0;
-  
-    const data = results.map(entry => {
-      total += Number(entry.amount);
-      const dt = new Date(entry.createdAt);
-      const iso = dt.toISOString();
-      const dateTime = `${iso.slice(0, 10)} ${iso.slice(11, 19)}`;
-  
-      return {
-        dateTime,
-        amount: Number(entry.amount),
-        userName: entry.userName
-      };
-    });
-  
-    return { data, total };
+      }
+    ]);
   }
   
-};
+};  
 
 export default WalletRepository;
