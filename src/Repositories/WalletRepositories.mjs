@@ -1,7 +1,7 @@
 import WalletModel from "../Models/WalletModels.mjs";
-import IncomeLevelModel from "../Models/IncomeLevelModel.mjs"; // make sure model file name is IncomeLevelModel
+import IncomeLevelModel from "../Models/IncomeLevelModel.mjs";
 import UserRepository from "./UserRepository.mjs";
-import WalletHistory from "../Models/WalletHistory.mjs"; // rename import to singular
+import WalletHistory from "../Models/WalletHistory.mjs"; // singular, fix usage
 import UserModel from "../Models/UserModels.mjs";
 import Rank from "../Models/RankModels.mjs";
 
@@ -131,7 +131,61 @@ const WalletRepository = {
     return wallet;
   },
 
-  // Corrected method: Get daily reward stats
+  // Fix: Use WalletHistory (singular) not WalletHistories
+  async getAdminRevenueStats({ fromDate, toDate }) {
+    const pipeline = [
+      {
+        $match: {
+          type: { $in: ['credit', 'cridit'] }, // support typo too
+          createdAt: { $gte: fromDate, $lte: toDate },
+        }
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'userInfo'
+        }
+      },
+      {
+        $unwind: {
+          path: "$userInfo",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          amount: 1,
+          createdAt: 1,
+          userName: { $ifNull: ["$userInfo.name", "Admin"] }
+        }
+      },
+      { $sort: { createdAt: 1 } }
+    ];
+
+    const results = await WalletHistory.aggregate(pipeline);
+
+    let total = 0;
+
+    const data = results.map(entry => {
+      total += Number(entry.amount);
+      const dt = new Date(entry.createdAt);
+      const iso = dt.toISOString();
+      const dateTime = `${iso.slice(0, 10)} ${iso.slice(11, 19)}`;
+
+      return {
+        dateTime,
+        amount: Number(entry.amount),
+        userName: entry.userName
+      };
+    });
+
+    return { data, total };
+  },
+
+  // Corrected method: Get daily reward stats with user and rank details
   async getDailyRewardStats(fromDate, toDate, transactionType) {
     return WalletHistory.aggregate([
       {
@@ -176,6 +230,6 @@ const WalletRepository = {
     ]);
   }
   
-};  
+};
 
 export default WalletRepository;
