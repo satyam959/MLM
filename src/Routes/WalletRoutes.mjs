@@ -1,23 +1,17 @@
-import express from 'express';
-import WalletController from '../controllers/WalletController.mjs';
+import express from "express";
+import WalletController from "../controllers/WalletController.mjs";
+import AdminAuth from "../middelware/verifyAdminRole.mjs";      // ✅ Admin role middleware
 
 const router = express.Router();
 
-// Create a new wallet (only balance required)
-router.post('/createWallet', WalletController.create);
+// Public or Authenticated Routes (as needed)
+router.post("/createWallet", WalletController.create);
+router.get("/getAll", WalletController.getAll);
+router.get("/getById/:walletId", WalletController.getById);
+router.put("/update/:walletId", WalletController.update);
+router.delete("/delete/:walletId", WalletController.delete);
 
-// Get all wallets
-router.get('/getAll', WalletController.getAll);
-
-// Get a wallet by ID
-router.get('/getById/:walletId', WalletController.getById);
-
-// Update a wallet's balance
-router.put('/update/:walletId', WalletController.update);
-
-// Delete a wallet by ID
-router.delete('/delete/:walletId', WalletController.delete);
-
-
+// Admin-only route, protected by token + admin role
+router.get("/adminRevenue",AdminAuth.verifyAdminRole,WalletController.getAdminRevenue);
 
 export default router;

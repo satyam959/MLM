@@ -1,6 +1,8 @@
 import WalletModel from "../Models/WalletModels.mjs";
 import IncomeLevelModel from "../Models/IncomeLevelModel.mjs";
 import UserRepository from "./UserRepository.mjs";
+import WalletHistories from "../Models/WalletHistory.mjs";
+import UserModel from "../Models/UserModels.mjs";
 
 const WalletRepository = {
   async findAll() {
@@ -11,24 +13,14 @@ const WalletRepository = {
     return await WalletModel.findById(walletId);
   },
 
-  // ✅ Updated findByUserId with logging and wallet creation if not found
   async findByUserId(userId) {
     try {
-      console.log("Searching for wallet with userId:", userId);
       let wallet = await WalletModel.findOne({ userId });
-
       if (!wallet) {
-        console.log("No wallet found for userId:", userId);
-        // Automatically create a wallet if none exists
         wallet = await WalletModel.create({ userId, balance: 0 });
-        console.log("Created a new wallet for userId:", userId);
-      } else {
-        console.log("Found wallet:", wallet);
       }
-
       return wallet;
     } catch (error) {
-      console.error("Error finding wallet by userId:", error.message);
       throw new Error("Error finding wallet");
     }
   },
@@ -64,38 +56,19 @@ const WalletRepository = {
   },
 
   async getLevelIncomeByUser(userId) {
-    try {
-      const incomes = await LevelIncomeModel.find({ userId });
-
-      let directIncome = 0;
-      let teamIncome = 0;
-
-      incomes.forEach((income) => {
-        if (income.source === "direct") {
-          directIncome += income.amount;
-        } else if (income.source === "team") {
-          teamIncome += income.amount;
-        }
-      });
-
-      return {
-        directIncome,
-        teamIncome,
-      };
-    } catch (error) {
-      console.error("Error fetching level income by userId:", error);
-      throw error;
-    }
+    const incomes = await LevelIncomeModel.find({ userId });
+    let directIncome = 0;
+    let teamIncome = 0;
+    incomes.forEach((income) => {
+      if (income.source === "direct") directIncome += income.amount;
+      else if (income.source === "team") teamIncome += income.amount;
+    });
+    return { directIncome, teamIncome };
   },
 
   async getUserLevel(userId) {
-    try {
-      const user = await UserRepository.findById(userId);
-      return user?.level ?? 1;
-    } catch (error) {
-      console.error("Error fetching user level:", error);
-      throw error;
-    }
+    const user = await UserRepository.findById(userId);
+    return user?.level ?? 1;
   },
 
   async updateReferredUserWallet(userIds, amount) {
@@ -116,7 +89,6 @@ const WalletRepository = {
     try {
       const downline = await UserRepository.getUserDownlines(userId);
       const actualTeamSize = downline.length;
-
       const incomeLevels = await IncomeLevelModel.find().sort({ team: -1 });
       let teamReward = 0;
 
@@ -136,7 +108,6 @@ const WalletRepository = {
 
       return { success: true, reward: teamReward, teamSize: actualTeamSize };
     } catch (error) {
-      console.error("Error in rewardBasedOnTeamSize:", error);
       throw error;
     }
   },
@@ -148,23 +119,71 @@ const WalletRepository = {
 
   async hasReferralBonus(userId) {
     const wallet = await WalletModel.findOne({ userId });
-    if (!wallet) return false;
-
-    return wallet.balance >= 399;
+    return wallet?.balance >= 399;
   },
 
   async creditToWallet({ userId, amount }) {
     const wallet = await WalletModel.findOne({ userId });
-
-    if (!wallet) {
-      throw new Error(`Wallet not found for user ${userId}`);
-    }
-
+    if (!wallet) throw new Error(`Wallet not found for user ${userId}`);
     wallet.balance += amount;
     await wallet.save();
-
     return wallet;
+  },
+
+  // ✅ Updated method: Get Admin Revenue Stats
+  async getAdminRevenueStats({ fromDate, toDate }) {
+    const pipeline = [
+      {
+        $match: {
+          type: { $in: ['credit', 'cridit'] }, // support typo too
+          createdAt: { $gte: fromDate, $lte: toDate },
+        }
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'userInfo'
+        }
+      },
+      {
+        $unwind: {
+          path: "$userInfo",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          amount: 1,
+          createdAt: 1,
+          userName: { $ifNull: ["$userInfo.name", "Admin"] }
+        }
+      },
+      { $sort: { createdAt: 1 } }
+    ];
+  
+    const results = await WalletHistories.aggregate(pipeline);
+  
+    let total = 0;
+  
+    const data = results.map(entry => {
+      total += Number(entry.amount);
+      const dt = new Date(entry.createdAt);
+      const iso = dt.toISOString();
+      const dateTime = `${iso.slice(0, 10)} ${iso.slice(11, 19)}`;
+  
+      return {
+        dateTime,
+        amount: Number(entry.amount),
+        userName: entry.userName
+      };
+    });
+  
+    return { data, total };
   }
+  
 };
 
 export default WalletRepository;
