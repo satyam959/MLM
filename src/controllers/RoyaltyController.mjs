@@ -132,7 +132,7 @@ class RoyaltyController {
       const userMap = new Map();
       for (const user of users) {
         userMap.set(user.userId, {
-          name: user.name || 'User',
+          name: user.fullName || 'User',   // fullName yahan le rahe hain
           rankName: user.rankId ? user.rankId.rankName : null
         });
       }
