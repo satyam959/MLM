@@ -145,23 +145,23 @@ class RewardController {
       const groupMap = new Map();
   
       for (const credit of credits) {
-        const key = credit.createdAt.toISOString();
+        const dateKey = credit.createdAt.toISOString().split("T")[0]; // Group by just the date
   
-        if (!groupMap.has(key)) {
-          groupMap.set(key, {
-            dateTime: key,
+        if (!groupMap.has(dateKey)) {
+          groupMap.set(dateKey, {
             amountGiven: 0,
-            receivers: [],
-            totalAmountDistributed: 0
+            totalAmountDistributed: 0,
+            receivers: []
           });
         }
   
-        const group = groupMap.get(key);
+        const group = groupMap.get(dateKey);
         group.receivers.push({
           userId: credit.userId,
           userName: credit.userName || "User",
           amount: Number(credit.amount),
           rankName: credit.rankName || null,
+          dateTime: credit.createdAt
         });
   
         group.amountGiven += Number(credit.amount);
@@ -181,6 +181,7 @@ class RewardController {
       console.error(err);
       res.status(500).json({ message: "Failed to fetch daily reward stats", error: err.message });
     }
-  }  
+  }
+  
 }  
 export default RewardController;

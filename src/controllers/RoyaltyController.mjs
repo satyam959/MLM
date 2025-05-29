@@ -94,26 +94,25 @@ class RoyaltyController {
   static async getRoyaltyDistributionStats(req, res) {
     try {
       const { fromDate, toDate } = req.query;
-
+  
       if (!fromDate || !toDate) {
         return res.status(400).json({
           message: "fromDate and toDate are required"
         });
       }
-
+  
       function toUTC(dateStr, isStart) {
         const [d, m, y] = dateStr.split("-").map(Number);
         return isStart
           ? new Date(Date.UTC(y, m - 1, d, 0, 0, 0))
           : new Date(Date.UTC(y, m - 1, d, 23, 59, 59));
       }
-
+  
       const start = toUTC(fromDate, true);
       const end = toUTC(toDate, false);
-
-      // Fetch royalty credit transactions from WalletHistory repo method
+  
       const records = await WalletRepository.getRoyaltyHistory(start, end);
-
+  
       if (!records.length) {
         return res.status(200).json({
           message: "No royalty transactions found in the given date range",
@@ -121,60 +120,58 @@ class RoyaltyController {
           totalUserRoyalty: 0
         });
       }
-
-      // Extract unique numeric userIds from records
+  
       const userIds = [...new Set(records.map(r => r.userId))];
-
-      // Query users by numeric userId field (NOT _id)
+  
+      // 🔥 FIXED: changed UserModel to User
       const users = await User.find({ userId: { $in: userIds } }).populate('rankId');
-
-      // Map userId to user info (name, rankName)
+  
       const userMap = new Map();
       for (const user of users) {
         userMap.set(user.userId, {
-          name: user.fullName || 'User',   // fullName yahan le rahe hain
+          name: user.fullName || user.name || 'User',
           rankName: user.rankId ? user.rankId.rankName : null
         });
       }
-
-      // Group transactions by date yyyy-mm-dd
+  
       const grouped = new Map();
-
+  
       for (const tx of records) {
         const dateKey = new Date(tx.createdAt).toISOString().split("T")[0];
-
+  
         if (!grouped.has(dateKey)) {
           grouped.set(dateKey, {
-            dateTime: tx.createdAt,
             amountGiven: 0,
-            receivers: [],
-            totalAmountDistributed: 0
+            totalAmountDistributed: 0,
+            receivers: []
           });
         }
-
+        
+  
         const group = grouped.get(dateKey);
         const userInfo = userMap.get(tx.userId) || { name: 'User', rankName: null };
-
+  
         group.receivers.push({
           userId: tx.userId,
           userName: userInfo.name,
           amount: Number(tx.amount),
-          rankName: userInfo.rankName
+          rankName: userInfo.rankName,
+          dateTime: tx.createdAt  // ⏱ individual record timestamp
         });
-
+  
         group.totalAmountDistributed += Number(tx.amount);
         group.amountGiven += Number(tx.amount);
       }
-
+  
       const responseData = Array.from(grouped.values());
-
+  
       return res.status(200).json({
         message: "Royalty distribution stats fetched successfully",
         statusCode: 200,
         data: responseData,
         totalUserRoyalty: records.length
       });
-
+  
     } catch (error) {
       console.error(error);
       return res.status(500).json({
@@ -183,6 +180,7 @@ class RoyaltyController {
       });
     }
   }
+  
 }
 
 export default RoyaltyController;
