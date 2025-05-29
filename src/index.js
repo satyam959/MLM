@@ -45,7 +45,7 @@ import contactus from './Routes/User/ContactUsRoutes.mjs'
 // WalletTopupCron.startCron();
 // teamSuperPerformanceCron.startCron(); // ✅ Don't forget this line!
 // UserBenefitsCron.startCron(); // ✅ Start the referral reward cron
-// // RoyaltyIncomeCron.startCron();
+// RoyaltyIncomeCron.startCron();
 
 // rewardCron.startCron();
 

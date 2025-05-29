@@ -3,8 +3,8 @@ import WalletModel from "../Models/WalletModels.mjs";
 import UserModel from "../Models/UserModels.mjs";
 import RankModel from "../Models/RankModels.mjs";
 import UserWalletRepository from "../Repositories/user/userWalletRepositories.mjs";
+import userRepository from "../Repositories/user/userRepositories.mjs";
 
-const ADMIN_USER_ID = 355470;
 const DAILY_REWARD_AMOUNT = 5;
 const MAX_DAYS = 50;
 
@@ -30,11 +30,12 @@ class TeamSuperPerformanceCron {
       '* * * * *', // Every day at 12:10 PM IST
       async () => {
         const now = new Date();
+        const adminUserId = await userRepository.getAdminUserId();
         const todayIST = getISTDateString(now);
         console.log(`🕐 Cron Triggered at (IST): ${now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" })}`);
 
         try {
-          const adminWallet = await WalletModel.findOne({ userId: ADMIN_USER_ID });
+          const adminWallet = await WalletModel.findOne({ userId: adminUserId });
           if (!adminWallet) return console.log("❌ Admin wallet not found");
           if (adminWallet.balance < DAILY_REWARD_AMOUNT) return console.log("❌ Admin wallet has insufficient balance");
 
@@ -93,7 +94,7 @@ class TeamSuperPerformanceCron {
             });
 
             await UserWalletRepository.createWalletHistory({
-              userId: ADMIN_USER_ID,
+              userId: adminUserId,
               amount: DAILY_REWARD_AMOUNT,
               type: "debit",
               transactionType: "dailyPayout",

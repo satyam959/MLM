@@ -140,7 +140,6 @@ class RewardController {
       const end = toUTCDate(toDate, false);
   
       const records = await WalletRepositories.getDailyRewardStats(start, end, transactionType);
-  
       const credits = records.filter(r => r.type === 'credit');
   
       const groupMap = new Map();
@@ -151,9 +150,8 @@ class RewardController {
         if (!groupMap.has(key)) {
           groupMap.set(key, {
             dateTime: key,
-            amountGiven: Number(credit.amount),
+            amountGiven: 0,
             receivers: [],
-            totalUsersRewarded: 0,
             totalAmountDistributed: 0
           });
         }
@@ -166,7 +164,7 @@ class RewardController {
           rankName: credit.rankName || null,
         });
   
-        group.totalUsersRewarded += 1;
+        group.amountGiven += Number(credit.amount);
         group.totalAmountDistributed += Number(credit.amount);
       }
   
@@ -183,7 +181,6 @@ class RewardController {
       console.error(err);
       res.status(500).json({ message: "Failed to fetch daily reward stats", error: err.message });
     }
-  }
-  
+  }  
 }  
 export default RewardController;

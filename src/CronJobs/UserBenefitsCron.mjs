@@ -2,9 +2,9 @@ import cron from 'node-cron';
 import UserModel from '../Models/UserModels.mjs';
 import UserWalletRepository from '../Repositories/user/userWalletRepositories.mjs';
 import WalletHistories from '../Models/WalletHistory.mjs';
+import userRepository from '../Repositories/user/userRepositories.mjs';
 
 const REFERRAL_REWARD_AMOUNT = 199;
-const ADMIN_USER_ID = 355470;
 const REFERRAL_REWARD_TYPE = 'referral_bonus_10_users';
 
 class UserBenefitsCron {
@@ -48,6 +48,7 @@ class UserBenefitsCron {
         referralBonusGiven: { $ne: true },
         "rechargeRecived.type": 1 // ✅ Fixed subdocument query
       });
+      const adminUserId = await userRepository.getAdminUserId();
 
       for (const referrer of referrers) {
         const referredCount = await UserModel.countDocuments({
@@ -56,7 +57,7 @@ class UserBenefitsCron {
 
         if (referredCount >= 10) {
           const userWallet = await UserWalletRepository.findWalletByUserId(referrer.userId);
-          const adminWallet = await UserWalletRepository.findWalletByUserId(ADMIN_USER_ID);
+          const adminWallet = await UserWalletRepository.findWalletByUserId(adminUserId);
 
           if (!userWallet || !adminWallet) {
             console.log(`❌ Wallet missing for user ${referrer.userId} or admin`);
@@ -92,7 +93,7 @@ class UserBenefitsCron {
 
           // 🧾 Save transaction history for admin
           await WalletHistories.create({
-            userId: ADMIN_USER_ID,
+            userId: adminUserId,
             type: "debit",
             transactionType: REFERRAL_REWARD_TYPE,
             amount: REFERRAL_REWARD_AMOUNT,

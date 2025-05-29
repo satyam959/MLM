@@ -2,9 +2,10 @@ import cron from "node-cron";
 import WalletModel from "../Models/WalletModels.mjs";
 import UserModel from "../Models/UserModels.mjs";
 import UserWalletRepository from "../Repositories/user/userWalletRepositories.mjs"; // Adjust path
+import userRepository from "../Repositories/user/userRepositories.mjs";
 import { Types } from "mongoose";
 
-const ADMIN_USER_ID = 355470;
+
 
 class WalletTopupCron {
   constructor() {
@@ -19,12 +20,14 @@ class WalletTopupCron {
     this.task = cron.schedule('* * * * *', async () => {
       try {
         const now = new Date(); 
+        const adminUserId = await userRepository.getAdminUserId();
+
         const istNow = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
 
         console.log('\n🕐 Cron Running (IST): Checking eligible wallets...');
         console.log(`📅 Current IST Time: ${istNow.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}`);
 
-        const adminWallet = await WalletModel.findOne({ userId: ADMIN_USER_ID });
+        const adminWallet = await WalletModel.findOne({ userId: adminUserId });
 
         if (!adminWallet || adminWallet.balance < 1) {
           console.log('❌ Admin wallet not found or insufficient balance');
@@ -86,7 +89,7 @@ class WalletTopupCron {
           });
 
           await UserWalletRepository.createWalletHistory({
-            userId: ADMIN_USER_ID,
+            userId: adminUserId,
             amount: amountToAdd,
             type: "debit",
             transactionType: "dailyPayout",
