@@ -228,8 +228,51 @@ const WalletRepository = {
         }
       }
     ]);
+    
+  },
+  async getRoyaltyHistory(startDate, endDate) {
+    return WalletHistory.aggregate([
+      {
+        $match: {
+          type: 'credit',
+          transactionType: 'royaltyIncome',
+          createdAt: { $gte: startDate, $lte: endDate },
+          status: 'completed'
+        }
+      },
+      {
+        // Join WalletHistory.userId (number) with Users.userId (number)
+        $lookup: {
+          from: "users",
+          localField: "userId",    // number
+          foreignField: "userId",  // number
+          as: "user"
+        }
+      },
+      { $unwind: "$user" },
+      {
+        // Join user.rankId (ObjectId) with ranks._id (ObjectId)
+        $lookup: {
+          from: "ranks",
+          localField: "user.rankId",
+          foreignField: "_id",
+          as: "rank"
+        }
+      },
+      { $unwind: { path: "$rank", preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          userId: "$user.userId",
+          userName: "$user.name",
+          rankName: "$rank.rankName",
+          amount: { $toDouble: "$amount" },
+          createdAt: 1
+        }
+      }
+    ]);
   }
-  
-};
+}  
+
+
 
 export default WalletRepository;
