@@ -204,5 +204,51 @@ class WalletController {
       });
     }
   }
+  
+static async transferFromAdminToUser(req, res) {
+    try {
+      const { userId, amount } = req.body;
+ 
+      if (!userId || !amount) {
+        return res.status(400).json({ message: "userId and amount are required" });
+      }
+ 
+      const transferAmount = Number(amount);
+      if (isNaN(transferAmount) || transferAmount <= 0) {
+        return res.status(400).json({ message: "Amount must be a positive number" });
+      }
+ 
+      // Get admin wallet by req.user.userId (admin's id)
+      const adminWallet = await WalletRepository.findByUserId(req.user.userId);
+      if (!adminWallet) return res.status(404).json({ message: "Admin wallet not found" });
+ 
+      // Get user wallet by given userId string
+      const userWallet = await WalletRepository.findByUserId(userId);
+      if (!userWallet) return res.status(404).json({ message: "User wallet not found" });
+ 
+      if (adminWallet.balance < transferAmount) {
+        return res.status(400).json({ message: "Insufficient funds in admin wallet" });
+      }
+ 
+      // Deduct from admin wallet balance
+      adminWallet.balance -= transferAmount;
+ 
+      // Add to user wallet balance
+      userWallet.balance += transferAmount;
+ 
+      // Save updated wallets
+      await WalletRepository.update(adminWallet._id, { balance: adminWallet.balance });
+      await WalletRepository.update(userWallet._id, { balance: userWallet.balance });
+ 
+      return res.status(200).json({
+        message: "Transfer successful",
+        adminWallet: { userId: adminWallet.userId, balance: adminWallet.balance },
+        userWallet: { userId: userWallet.userId, balance: userWallet.balance }
+      });
+ 
+    } catch (err) {
+      return res.status(500).json({ message: "Server error", error: err.message });
+    }
+  }
 }  
 export default WalletController;
