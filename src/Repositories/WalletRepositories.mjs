@@ -4,6 +4,7 @@ import UserRepository from "./UserRepository.mjs";
 import WalletHistory from "../Models/WalletHistory.mjs"; // singular, fix usage
 import UserModel from "../Models/UserModels.mjs";
 import Rank from "../Models/RankModels.mjs";
+import mongoose from "mongoose";
 
 const WalletRepository = {
   async findAll() {
@@ -270,9 +271,73 @@ const WalletRepository = {
         }
       }
     ]);
+  },
+  // async getDailyPayoutHistory(startDate, endDate) {
+  //   return WalletHistory.aggregate([
+  //     {
+  //       $match: {
+  //         type: 'credit',
+  //         transactionType: 'dailyPayout',
+  //         createdAt: { $gte: startDate, $lte: endDate }
+  //       }
+  //     },
+  //     {
+  //       $lookup: {
+  //         from: "users",
+  //         localField: "userId",       // WalletHistory.userId
+  //         foreignField: "_id",        // users._id
+  //         as: "user"
+  //       }
+  //     },
+  //     { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+  //     {
+  //       $project: {
+  //         _id: 1,
+  //         userName: "$user.name",
+  //         amount: { $toDouble: "$amount" },
+  //         dateTime: "$createdAt",
+  //         status: "$status",
+  //         userName:{$ifNull:["userInfo.name","user"]}
+  //       }
+  //     }
+  //   ]);
+  // }
+  
+  async getDailyPayoutHistory(startDate, endDate) {
+    const result = await WalletHistory.aggregate([
+      {
+        $match: {
+          type: 'credit',
+          transactionType: 'dailyPayout',
+          createdAt: { $gte: startDate, $lte: endDate }
+        }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "userId",
+          as: "user"
+        }
+      },
+      {
+        $unwind: { path: "$user", preserveNullAndEmptyArrays: true }
+      },
+      {
+        $project: {
+          _id: 1,
+          userName: "$user.fullName",     // This ensures actual name is projected
+          amount: { $toDouble: "$amount" },
+          dateTime: "$createdAt",
+          status: "$status"
+          
+        }
+      }
+    ]);
+  console.log ("result", result)
+    return result;
   }
+  
 }  
-
-
 
 export default WalletRepository;

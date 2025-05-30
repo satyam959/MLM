@@ -164,7 +164,45 @@ class WalletController {
       });
     }
   }
+  static async getDailyPayout(req, res) {
+    try {
+      const { fromDate, toDate } = req.query;
   
-}
-
+      if (!fromDate || !toDate) {
+        return res.status(400).json({
+          message: "fromDate and toDate query parameters are required in DD-MM-YYYY format",
+          statusCode: 400,
+        });
+      }
+  
+      const [fd, fm, fy] = fromDate.split("-");
+      const [td, tm, ty] = toDate.split("-");
+  
+      const start = new Date(`${fy}-${fm}-${fd}T00:00:00.000Z`);
+      const end = new Date(`${ty}-${tm}-${td}T23:59:59.999Z`);
+  
+      if (isNaN(start) || isNaN(end)) {
+        return res.status(400).json({
+          message: "Invalid date format. Use DD-MM-YYYY",
+          statusCode: 400,
+        });
+      }
+  
+      const data = await WalletRepository.getDailyPayoutHistory(start, end);
+  
+      return res.status(200).json({
+        message: "Daily payout history fetched successfully",
+        statusCode: 200,
+        data: data
+      });
+  
+    } catch (err) {
+      return res.status(500).json({
+        message: "Server error while fetching daily payout history",
+        statusCode: 500,
+        error: err.message
+      });
+    }
+  }
+}  
 export default WalletController;

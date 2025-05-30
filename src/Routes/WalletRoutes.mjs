@@ -13,5 +13,6 @@ router.delete("/delete/:walletId", WalletController.delete);
 
 // Admin-only route, protected by token + admin role
 router.get("/adminRevenue",AdminAuth.verifyAdminRole,WalletController.getAdminRevenue);
+router.get('/dailyPayout',AdminAuth.verifyAdminRole, WalletController.getDailyPayout);
 
 export default router;

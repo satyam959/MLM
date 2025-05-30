@@ -1,11 +1,8 @@
 import cron from "node-cron";
 import WalletModel from "../Models/WalletModels.mjs";
 import UserModel from "../Models/UserModels.mjs";
-import UserWalletRepository from "../Repositories/user/userWalletRepositories.mjs"; // Adjust path
+import UserWalletRepository from "../Repositories/user/userWalletRepositories.mjs";
 import userRepository from "../Repositories/user/userRepositories.mjs";
-import { Types } from "mongoose";
-
-
 
 class WalletTopupCron {
   constructor() {
@@ -15,11 +12,11 @@ class WalletTopupCron {
   startCron() {
     if (this.task) return;
     console.log("✅ WalletTopupCron started");
-    
-    // Schedule to run every day at 12:05 AM IST
-    this.task = cron.schedule('* * * * *', async () => {
+
+    // Run every minute for testing purposes
+    this.task = cron.schedule("* * * * *", async () => {
       try {
-        const now = new Date(); 
+        const now = new Date();
         const adminUserId = await userRepository.getAdminUserId();
 
         const istNow = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
@@ -46,23 +43,57 @@ class WalletTopupCron {
           const endDate = new Date(user.membership.endDate);
           const istEndDate = new Date(endDate.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
 
-          console.log(`🔍 userId ${wallet.userId}`);
-          console.log(`   ➤ Now (IST): ${istNow.toISOString()}`);
-          console.log(`   ➤ EndDate (IST): ${istEndDate.toISOString()}`);
-
-          // Mark payoutCompleted = 1 if now has reached or passed endDate
           if (istNow >= istEndDate) {
             if (!user.membership.payoutCompleted) {
               user.membership.payoutCompleted = 1;
               await user.save();
               console.log(`✅ payoutCompleted set to 1 and top-up stopped for userId ${wallet.userId}`);
-            } else {
-              console.log(`⛔ End date passed for userId ${wallet.userId} - Skipping top-up`);
             }
             continue;
           }
-          
 
+          const lastTopupDate = wallet.lastTopupDate ? new Date(wallet.lastTopupDate) : null;
+          let missedMinutes = [];
+
+          if (lastTopupDate) {
+            let pointer = new Date(lastTopupDate);
+            pointer.setMinutes(pointer.getMinutes() + 1);
+
+            while (pointer < istNow) {
+              missedMinutes.push(new Date(pointer));
+              pointer.setMinutes(pointer.getMinutes() + 1);
+            }
+          }
+
+          for (const missedTime of missedMinutes) {
+            await UserWalletRepository.createWalletHistory({
+              userId: wallet.userId,
+              amount: 0,
+              type: "credit",
+              transactionType: "dailyPayout",
+              source: "wallet",
+              balanceAfter: wallet.balance,
+              status: "failed",
+              createdAt: missedTime,
+              note: "Missed daily top-up due to downtime"
+            });
+
+            await UserWalletRepository.createWalletHistory({
+              userId: adminUserId,
+              amount: 0,
+              type: "debit",
+              transactionType: "dailyPayout",
+              source: "wallet",
+              balanceAfter: adminWallet.balance,
+              status: "failed",
+              createdAt: missedTime,
+              note: "Missed daily top-up due to downtime"
+            });
+
+            console.log(`⚠️ Missed top-up logged for ${missedTime.toISOString()} for userId ${wallet.userId}`);
+          }
+
+          // Perform current minute's top-up
           const amountToAdd = 1;
           const userRemainingBalance = wallet.balance + amountToAdd;
           const adminRemainingBalance = adminWallet.balance - amountToAdd;
