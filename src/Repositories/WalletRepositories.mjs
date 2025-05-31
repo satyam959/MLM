@@ -338,6 +338,7 @@ const WalletRepository = {
     return result;
   }
   
+  
 }  
 
 export default WalletRepository;

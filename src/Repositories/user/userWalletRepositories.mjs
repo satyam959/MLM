@@ -110,6 +110,22 @@ const UserWalletRepository = {
       new: true,
       runValidators: true
     });
+  },
+  // ✅ ✅ ✅ NEW METHOD to update using custom walletHistoryId (like 222729)
+  async updateWalletHistoryByCustomId(walletHistoryId, updateData) {
+    return await WalletHistories.findOneAndUpdate(
+      { walletHistoryId: Number(walletHistoryId) },
+      updateData,
+      { new: true }
+    );
+  },
+  async createWalletHistory(historyData) {
+    try {
+      const history = new WalletHistory(historyData);
+      return await history.save();
+    } catch (error) {
+      throw new Error(`Failed to create wallet history: ${error.message}`);
+    }
   }
 };
 
