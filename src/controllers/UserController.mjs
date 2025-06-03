@@ -706,7 +706,19 @@ class UserController {
   // In UserController
   async getMembershipUsers(req, res) {
     try {
-      const users = await UserRepository.getMembershipUsers();
+      const { fromDate, toDate } = req.query;
+  
+      // Check if both dates are provided and valid
+      if (!fromDate || !toDate || isNaN(new Date(fromDate)) || isNaN(new Date(toDate))) {
+        return res.status(400).json({
+          statusCode: 400,
+          success: false,
+          message: "Invalid or missing 'fromDate' or 'toDate'. Format should be YYYY-MM-DD",
+        });
+      }
+  
+      const users = await UserRepository.getMembershipUsers(fromDate, toDate);
+  
       res.status(200).json({
         statusCode: 200,
         success: true,
@@ -722,6 +734,8 @@ class UserController {
       });
     }
   }
+  
+  
   
   async getUserTransactions(req, res) {
     try {

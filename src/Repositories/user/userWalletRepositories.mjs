@@ -1,28 +1,54 @@
-import Wallet from '../../Models/WalletModels.mjs';
-import WalletHistory from '../../Models/WalletHistory.mjs';
-import WalletHistories from '../../Models/WalletHistory.mjs';
-
+import WalletModel from '../../Models/WalletModels.mjs';
+import WalletHistoryModel from '../../Models/WalletHistory.mjs';
+import UserModel from '../../Models/UserModels.mjs';
 const UserWalletRepository = {
   async findWalletByUserId(userId) {
     try {
-      return await Wallet.findOne({ userId });
+      return await WalletModel.findOne({ userId });
     } catch (error) {
       console.error('Error fetching wallet by userId:', error);
       throw error;
     }
   },
 
-  async createWallet(walletData) {
-    const wallet = new Wallet(walletData);
-    return await wallet.save();
+  async createWallet({ userId, balance }) {
+    try {
+      const wallet = new WalletModel({ userId, balance });
+      return await wallet.save();
+    } catch (error) {
+      console.error('Error creating wallet:', error);
+      throw error;
+    }
   },
 
-  async createWalletHistory(walletHistory) {
-    const wallet = new WalletHistory(walletHistory);
-    return await wallet.save();
+  async updateUserWallet(userId, updateData) {
+    return await WalletModel.findOneAndUpdate({ userId }, updateData, {
+      new: true,
+      runValidators: true
+    });
   },
+
+  async createWalletHistory(historyData) {
+    try {
+      const history = new WalletHistoryModel(historyData);
+      return await history.save();
+    } catch (error) {
+      console.error('Failed to create wallet history:', error);
+      throw error;
+    }
+  },
+  
+
+  async updateWalletHistoryByCustomId(walletHistoryId, updateData) {
+    return await WalletHistoryModel.findOneAndUpdate(
+      { walletHistoryId: Number(walletHistoryId) },
+      updateData,
+      { new: true }
+    );
+  },
+
   async getUserTransactions(userId, transactionType) {
-    return await WalletHistory.aggregate([
+    return await WalletHistoryModel.aggregate([
       {
         $match: {
           userId: Number(userId),
@@ -104,29 +130,22 @@ const UserWalletRepository = {
       { $sort: { createdAt: -1 } }
     ]);
   },
-
-  async updateUserWallet(userId, updateData) {
-    return await Wallet.findOneAndUpdate(userId, updateData, {
-      new: true,
-      runValidators: true
-    });
-  },
-  // ✅ ✅ ✅ NEW METHOD to update using custom walletHistoryId (like 222729)
-  async updateWalletHistoryByCustomId(walletHistoryId, updateData) {
-    return await WalletHistories.findOneAndUpdate(
-      { walletHistoryId: Number(walletHistoryId) },
-      updateData,
-      { new: true }
-    );
-  },
-  async createWalletHistory(historyData) {
+  // In userWalletRepositories.mjs
+ async findUsersWithMembershipAndReferrer() {
     try {
-      const history = new WalletHistory(historyData);
-      return await history.save();
+      const users = await UserModel.find({
+        'membership.type': 1,
+        referredBy: { $exists: true, $ne: null }
+      });
+  
+      console.log("Matching users found:", users.length);
+      return users;
     } catch (error) {
-      throw new Error(`Failed to create wallet history: ${error.message}`);
+      console.error("Error in findUsersWithMembershipAndReferrer:", error.message);
+      return [];
     }
   }
-};
+}  
+
 
 export default UserWalletRepository;

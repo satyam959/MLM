@@ -128,8 +128,6 @@ static async sendMembershipReceiptEmail({ username, email }) {
     }
 }
 
-
-
 // Testing ke liye sirf membership activate aur receipt bhejne wala function
 static async sendMembershipReceiptForUser(req, res) {
     try {
@@ -147,7 +145,95 @@ static async sendMembershipReceiptForUser(req, res) {
       res.status(500).json({ message: "Internal Server Error", error: error.message });
     }
   }
-
+  // Controller method
+  static async rewardReferrerFromAdmin(req, res) {
+    try {
+      const adminUserId = await UserRepository.getAdminUserId();
+  
+      // Step 1: Find users who have membership and a referrer
+      const usersWithMembership = await UserWalletRepository.findUsersWithMembershipAndReferrer();
+  
+      console.log("Total users with membership and referrer found:", usersWithMembership.length);
+  
+      for (const user of usersWithMembership) {
+        const referrerUserId = user.referredBy;
+        if (!referrerUserId) continue;
+  
+        console.log(`Processing reward for referrerId: ${referrerUserId} from user: ${user._id}`);
+  
+        // Fetch admin wallet
+        const adminWallet = await UserWalletRepository.findWalletByUserId(adminUserId);
+        if (!adminWallet || adminWallet.balance < 200) {
+          console.warn("Admin wallet has insufficient balance.");
+          continue;
+        }
+  
+        // Fetch or create referrer's wallet
+        let referrerWallet = await UserWalletRepository.findWalletByUserId(referrerUserId);
+        if (!referrerWallet) {
+          console.log("Creating wallet for referrer:", referrerUserId);
+          referrerWallet = await UserWalletRepository.createWallet({ userId: referrerUserId, balance: 0 });
+        }
+  
+        // Deduct ₹200 from admin wallet
+        adminWallet.balance -= 200;
+        await adminWallet.save();
+  
+        // Add ₹200 to referrer wallet
+        referrerWallet.balance += 200;
+        const updatedReferrerWallet = await referrerWallet.save();
+  
+        console.log(`₹200 transferred from Admin (${adminUserId}) to Referrer (${referrerUserId})`);
+  
+        // Admin Wallet History - debit
+        try {
+          await UserWalletRepository.createWalletHistory({
+            userId: adminUserId,
+            amount: 200,
+            type: "debit",
+            transactionType: "referralReward",
+            source: "adminRewardCron",
+            balanceAfter: adminWallet.balance,
+            status: "completed",
+          });
+          console.log("Admin wallet history saved.");
+        } catch (error) {
+          console.error("Failed to create admin wallet history:", error.message);
+        }
+  
+        // Referrer Wallet History - credit
+        try {
+          await UserWalletRepository.createWalletHistory({
+            userId: referrerUserId,
+            amount: 200,
+            type: 'credit',
+            transactionType: 'referralReward',
+            source: 'adminWallet',
+            balanceAfter: updatedReferrerWallet.balance,
+            status: 'completed',
+          });
+          console.log("Referrer wallet history saved for:", referrerUserId);
+        } catch (error) {
+          console.error("Failed to create wallet history for referrer:", error.message);
+        }
+      }
+  
+      res.status(200).json({
+        statusCode:200,
+        success:true,
+        message: "Referral rewards distributed successfully."
+      });
+  
+    } catch (error) {
+      console.error("Referral reward distribution failed:", error.message);
+      res.status(500).json({
+        message: "Something went wrong",
+        error: error.message,
+      });
+    }
+  }
+  
+  
 }
 
 export default BuyMembershipController;

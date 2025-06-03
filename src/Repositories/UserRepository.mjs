@@ -188,12 +188,41 @@ class UserRepository {
       throw new Error("Error finding wallet");
     } 
   }
-  static async getMembershipUsers() {
-    return await UserModel.find(
-      { "membership.type": 1 },
-      { fullName: 1, userId: 1, _id: 0 } // Only fullName and userId
+  static async getMembershipUsers(fromDate, toDate) {
+    const start = new Date(fromDate);
+    const end = new Date(toDate);
+    end.setHours(23, 59, 59, 999); // include the full end day
+  
+    const users = await UserModel.find(
+      {
+        "membership.type": 1,
+        createdAt: { $gte: start, $lte: end },
+      },
+      {
+        fullName: 1,
+        userId: 1,
+        createdAt: 1,
+        _id: 0,
+      }
     );
+  
+    // Format createdAt to IST datetime string
+    return users.map(user => ({
+      fullName: user.fullName,
+      userId: user.userId,
+      datetime: new Date(user.createdAt).toLocaleString("en-IN", {
+        timeZone: "Asia/Kolkata",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true
+      }),
+    }));
   }
+  
 
 
   // UserRepository.js
@@ -249,8 +278,13 @@ static async getUsersByRank({ rankId }) {
       throw new Error("Failed to fetch user statistics");
     }
   }
-  
+  static async getAdminUserId() {
+    const adminUser = await UserModel.findOne({ role: 'admin' });
+    return adminUser ? adminUser._id : null;
 }
+
+}
+
 // Generate Referral Code
 function generateReferralCode() {
   return Math.random().toString(36).substr(2, 8).toUpperCase();

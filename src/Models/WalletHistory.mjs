@@ -17,7 +17,7 @@ const walletSchema = new mongoose.Schema(
         },
         amount: { type: String, required: true }, // transaction amount
         type: { type: String, enum: ['credit', 'debit'], required: true },
-        transactionType: { type: String, enum: ['membership', 'dailyPayout','teamPerformance','referral_bonus_10_users','royaltyIncome','monthlyReward','wallet_recharge'], required: true },
+        transactionType: { type: String, enum: ['membership', 'dailyPayout','teamPerformance','referral_bonus_10_users','royaltyIncome','monthlyReward','wallet_recharge','teamPerformancePayout','referralReward'], required: true },
         source: { type: String }, // like 'bank', 'paypal', 'betting', 'referral', etc.
         balanceAfter: { type: String }, // wallet balance after transaction (for history)
         status: {

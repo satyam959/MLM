@@ -37,5 +37,7 @@ router.get('/walletHistory', AdminAuth.verifyAdminRole, UserController.getUserTr
 
 router.post('/sendReceipt', BuyMembershipController.sendMembershipReceiptForUser);
 
+//rewardReferrerFromAdmin
+router.post('/rewardReferrerFromAdmin', verifyToken, BuyMembershipController.rewardReferrerFromAdmin);
 
 export default router;

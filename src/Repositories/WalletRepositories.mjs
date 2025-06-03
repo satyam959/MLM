@@ -272,36 +272,6 @@ const WalletRepository = {
       }
     ]);
   },
-  // async getDailyPayoutHistory(startDate, endDate) {
-  //   return WalletHistory.aggregate([
-  //     {
-  //       $match: {
-  //         type: 'credit',
-  //         transactionType: 'dailyPayout',
-  //         createdAt: { $gte: startDate, $lte: endDate }
-  //       }
-  //     },
-  //     {
-  //       $lookup: {
-  //         from: "users",
-  //         localField: "userId",       // WalletHistory.userId
-  //         foreignField: "_id",        // users._id
-  //         as: "user"
-  //       }
-  //     },
-  //     { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
-  //     {
-  //       $project: {
-  //         _id: 1,
-  //         userName: "$user.name",
-  //         amount: { $toDouble: "$amount" },
-  //         dateTime: "$createdAt",
-  //         status: "$status",
-  //         userName:{$ifNull:["userInfo.name","user"]}
-  //       }
-  //     }
-  //   ]);
-  // }
   
   async getDailyPayoutHistory(startDate, endDate) {
     const result = await WalletHistory.aggregate([
@@ -337,7 +307,6 @@ const WalletRepository = {
   console.log ("result", result)
     return result;
   }
-  
   
 }  
 
