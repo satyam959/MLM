@@ -159,7 +159,7 @@ static async sendMembershipReceiptForUser(req, res) {
         const referrerUserId = user.referredBy;
         if (!referrerUserId) continue;
   
-        console.log(`Processing reward for referrerId: ${referrerUserId} from user: ${user._id}`);
+        console.log(`Processing Bonus for referrerId: ${referrerUserId} from user: ${user._id}`);
   
         // Fetch admin wallet
         const adminWallet = await UserWalletRepository.findWalletByUserId(adminUserId);
@@ -191,7 +191,7 @@ static async sendMembershipReceiptForUser(req, res) {
             userId: adminUserId,
             amount: 200,
             type: "debit",
-            transactionType: "referralReward",
+            transactionType: "referralBonus",
             source: "adminRewardCron",
             balanceAfter: adminWallet.balance,
             status: "completed",
@@ -207,7 +207,7 @@ static async sendMembershipReceiptForUser(req, res) {
             userId: referrerUserId,
             amount: 200,
             type: 'credit',
-            transactionType: 'referralReward',
+            transactionType: 'referralBonus',
             source: 'adminWallet',
             balanceAfter: updatedReferrerWallet.balance,
             status: 'completed',
@@ -221,11 +221,11 @@ static async sendMembershipReceiptForUser(req, res) {
       res.status(200).json({
         statusCode:200,
         success:true,
-        message: "Referral rewards distributed successfully."
+        message: "Referral Bonus distributed successfully."
       });
   
     } catch (error) {
-      console.error("Referral reward distribution failed:", error.message);
+      console.error("Referral Bonus distribution failed:", error.message);
       res.status(500).json({
         message: "Something went wrong",
         error: error.message,
