@@ -672,17 +672,19 @@ class UserController {
       res.status(200).json({
         success: true,
         statusCode: 200,
+        message: "All users retrieved successfully.",
         data: stats,
       });
     } catch (error) {
       res.status(500).json({
         success: false,
         statusCode: 500,
-        message: error.message,
+        message: "An error occurred while fetching user data.",
+        error: error.message,
       });
     }
-
   }
+  
    async getUserRankHistory(req, res) {
     try {
       const userId = req.user.userId;
@@ -734,8 +736,6 @@ class UserController {
       });
     }
   }
-  
-  
   
   async getUserTransactions(req, res) {
     try {

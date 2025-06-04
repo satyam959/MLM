@@ -150,8 +150,9 @@ class WalletController {
       });
 
       return res.status(200).json({
-        message: "Admin revenue stats fetched successfully",
         statusCode: 200,
+        success:true,
+        message: "Admin revenue stats fetched successfully",
         data: stats.data,
         total: stats.total
       });
@@ -194,6 +195,7 @@ class WalletController {
 
       return res.status(200).json({
         message: "Daily payout history fetched successfully",
+        success:true,
         statusCode: 200,
         data
       });
@@ -277,9 +279,10 @@ class WalletController {
       }
   
       return res.status(200).json({
+        success: true,
         statusCode: 200,
-        message: "Recharge successful"
-      });
+        message: `₹${transferAmount} Amount successfully transferred from admin to user wallet ${userId}.`,
+      });      
     } catch (err) {
       console.error('Error in transferFromAdminToUser:', err);
       return res.status(500).json({
@@ -328,6 +331,8 @@ static async adminRechargeUserWallet(req, res) {
     });
 
     return res.status(200).json({
+      success:true,
+      statusCode:200,
       message: "User wallet recharged successfully",
       data: {
         userId: userWallet.userId,

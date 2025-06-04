@@ -37,7 +37,16 @@ const userSchema = new mongoose.Schema(
       unique: true,
       default: generateReferralCode,
     },
-
+    royaltyIncome: {
+      type: mongoose.Schema.Types.Decimal128,
+      required: true,
+      default: mongoose.Types.Decimal128.fromString("0.00"),
+    },
+    monthlyReward: {
+      type: mongoose.Schema.Types.Decimal128,
+      required: true,
+      default: mongoose.Types.Decimal128.fromString("0.00"),
+    },
     referredBy: {
       type: Number,
       ref: "User",
