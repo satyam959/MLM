@@ -42,16 +42,15 @@ class PortfolioController {
         }
       }
 
-      // 🟢 Step 5: Extract reward and royaltyIncome correctly
-      // Check both root level and inside rechargeRecived as fallback
-      const rewardRaw = userObj.reward ?? userObj.rechargeRecived?.reward;
+      // 🟢 Step 5: Extract monthlyReward and royaltyIncome correctly
+      const monthlyRewardRaw = userObj.monthlyReward ?? userObj.rechargeRecived?.reward;
       const royaltyIncomeRaw = userObj.royaltyIncome ?? userObj.rechargeRecived?.royaltyIncome;
 
       // Parse them as numbers safely
-      const reward = rewardRaw ? Number(rewardRaw) : 0;
+      const monthlyReward = monthlyRewardRaw ? Number(monthlyRewardRaw) : 0;
       const royaltyIncome = royaltyIncomeRaw ? Number(royaltyIncomeRaw) : 0;
 
-      console.log("Parsed reward:", reward, "Parsed royaltyIncome:", royaltyIncome);
+      console.log("Parsed monthlyReward:", monthlyReward, "Parsed royaltyIncome:", royaltyIncome);
 
       // 🟢 Step 6: Return response
       return res.status(200).json({
@@ -68,7 +67,7 @@ class PortfolioController {
             isPrime: userObj?.membership?.type === 1,
           },
           rechargeRecived: userObj.rechargeRecived || { type: 0, payoutDate: null },
-          reward,
+          monthlyReward,
           royaltyIncome,
           team: {
             total: teamCount?.total || 0,

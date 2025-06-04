@@ -142,10 +142,11 @@ class RewardCron {
         userWallet.balance += amountPerUser;
         await userWallet.save();
 
-        // ✅ Update user's monthlyRewardIncome field
-        user.monthlyReward =
-          (user.monthlyReward || 0) + amountPerUser;
+        const oldMonthly = parseFloat(user.monthlyReward?.toString() || "0");
+        const newMonthly = (oldMonthly + amountPerUser).toFixed(2);
+        user.monthlyReward = mongoose.Types.Decimal128.fromString(newMonthly);
         await user.save();
+        
 
         await WalletHistories.create({
           userId: user.userId,

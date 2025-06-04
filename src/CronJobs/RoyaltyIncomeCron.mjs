@@ -12,6 +12,7 @@ class RoyaltyIncomeCron {
   constructor() {
     this.task = null;
   }
+
   startCron() {
     if (this.task) {
       console.log("⏳ RoyaltyIncomeCron is already running");
@@ -51,54 +52,43 @@ class RoyaltyIncomeCron {
 
   async processRoyaltyIncome() {
     try {
-      const now = new Date();
       const adminUserId = await userRepository.getAdminUserId();
-
       const ranks = await RankModel.find({});
       console.log(`🔍 Found ${ranks.length} ranks from DB`);
 
-      // Find users with membership.type=1 and rankId exists and not null
       const users = await UserModel.find({
         "membership.type": 1,
         rankId: { $exists: true, $ne: null },
       });
 
-      console.log(
-        `👥 Found ${users.length} users with membership.type=1 and rankId`
-      );
+      console.log(`👥 Found ${users.length} eligible users`);
 
       if (users.length === 0) {
         console.log("⚠️ No eligible users found for royalty income");
         return;
       }
 
-      // Group users by their rankId
       const usersByRank = {};
       for (const user of users) {
-        const rankKey = user.rankId?.toString() || "0"; // fallback '0' if no rankId
+        const rankKey = user.rankId?.toString() || "0";
         if (!usersByRank[rankKey]) usersByRank[rankKey] = [];
         usersByRank[rankKey].push(user);
       }
 
       const totalRanks = Object.keys(usersByRank).length;
-      const totalAmountToDeduct = totalRanks * 80; // ₹80 per rank total pool
+      const totalAmountToDeduct = totalRanks * 80;
 
-      const adminWallet = await UserWalletRepository.findWalletByUserId(
-        adminUserId
-      );
+      const adminWallet = await UserWalletRepository.findWalletByUserId(adminUserId);
       if (!adminWallet) {
         console.log("❌ Admin wallet not found");
         return;
       }
 
       if (adminWallet.balance < totalAmountToDeduct) {
-        console.log(
-          `❌ Insufficient balance: Need ₹${totalAmountToDeduct}, available ₹${adminWallet.balance}`
-        );
+        console.log(`❌ Insufficient admin balance: Need ₹${totalAmountToDeduct}, available ₹${adminWallet.balance}`);
         return;
       }
 
-      // Deduct total amount from admin wallet
       const adminOldBalance = adminWallet.balance;
       adminWallet.balance -= totalAmountToDeduct;
       await adminWallet.save();
@@ -115,24 +105,16 @@ class RoyaltyIncomeCron {
         note: `Royalty pool distributed for ${totalRanks} ranks`,
       });
 
-      // Distribute ₹80 per rank equally among users of that rank
       for (const rank in usersByRank) {
         const rankUsers = usersByRank[rank];
         const rankUserCount = rankUsers.length;
-
-        const totalRankAmount = 80; // ₹80 fixed per rank
+        const totalRankAmount = 80;
         const amountPerUser = totalRankAmount / rankUserCount;
 
-        console.log(
-          `Rank '${rank}': ${rankUserCount} users, ₹${totalRankAmount} total pool, ₹${amountPerUser.toFixed(
-            2
-          )} each`
-        );
+        console.log(`Rank '${rank}': ${rankUserCount} users, ₹${totalRankAmount} pool, ₹${amountPerUser.toFixed(2)} each`);
 
         for (const user of rankUsers) {
-          const userWallet = await UserWalletRepository.findWalletByUserId(
-            user.userId
-          );
+          const userWallet = await UserWalletRepository.findWalletByUserId(user.userId);
           if (!userWallet) {
             console.log(`⚠️ No wallet found for user ${user.userId}`);
             continue;
@@ -142,8 +124,10 @@ class RoyaltyIncomeCron {
           userWallet.balance += amountPerUser;
           await userWallet.save();
 
-          // ✅ Update user's royalty income field
-          user.royaltyIncome = (user.royaltyIncome || 0) + amountPerUser;
+          // ✅ Handle Decimal128 royaltyIncome correctly
+          const oldRoyalty = parseFloat(user.royaltyIncome?.toString() || '0');
+          const newRoyalty = (oldRoyalty + amountPerUser).toFixed(2);
+          user.royaltyIncome = mongoose.Types.Decimal128.fromString(newRoyalty);
           await user.save();
 
           await WalletHistories.create({
@@ -158,11 +142,7 @@ class RoyaltyIncomeCron {
             note: `Royalty income for rank ${rank}`,
           });
 
-          console.log(
-            `✅ ₹${amountPerUser.toFixed(2)} sent to user ${
-              user.userId
-            } (rank: ${rank})`
-          );
+          console.log(`✅ ₹${amountPerUser.toFixed(2)} sent to user ${user.userId} (rank: ${rank})`);
         }
       }
     } catch (err) {
