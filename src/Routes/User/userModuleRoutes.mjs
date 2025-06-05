@@ -8,6 +8,7 @@ import UserDirectDetails from '../../controllers/user/UserDirectDetailsControlle
 import UserRewardController from '../../controllers/user/UserRewardController.mjs';
 import MonthlyReportController from '../../controllers/user/MonthlyReportController.mjs';
 import verifyToken from '../../middelware/authMiddleware.mjs'
+import AdminAuth from '../../middelware/verifyAdminRole.mjs';  
 
 
 
@@ -28,6 +29,6 @@ router.get('/getAllUserRewards', verifyToken, UserRewardController.getAllUserRew
 
 router.post('/createRewards', verifyToken, UserRewardController.createUserReward);
 
-router.get('/MonthlyReport',verifyToken, MonthlyReportController.getMonthlyIncomeSummary);
+router.get('/MonthlyReport',AdminAuth.verifyAdminRole, MonthlyReportController.getAllUsersMonthlyReward);
 
 export default router;

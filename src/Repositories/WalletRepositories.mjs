@@ -5,6 +5,7 @@ import WalletHistory from "../Models/WalletHistory.mjs"; // singular, fix usage
 import UserModel from "../Models/UserModels.mjs";
 import Rank from "../Models/RankModels.mjs";
 import mongoose from "mongoose";
+import moment from "moment-timezone";
 
 const WalletRepository = {
   async findAll() {
@@ -137,7 +138,7 @@ const WalletRepository = {
     const pipeline = [
       {
         $match: {
-          type: { $in: ['credit', 'cridit'] }, // support typo too
+          type: { $in: ['credit', 'cridit'] },
           createdAt: { $gte: fromDate, $lte: toDate },
         }
       },
@@ -160,32 +161,31 @@ const WalletRepository = {
           _id: 0,
           amount: 1,
           createdAt: 1,
-          userName: { $ifNull: ["$userInfo.name", "Admin"] }
+          userName: { $ifNull: ["$userInfo.fullName", "Admin"] }
         }
       },
       { $sort: { createdAt: 1 } }
     ];
-
+  
     const results = await WalletHistory.aggregate(pipeline);
-
+  
     let total = 0;
-
+  
     const data = results.map(entry => {
       total += Number(entry.amount);
-      const dt = new Date(entry.createdAt);
-      const iso = dt.toISOString();
-      const dateTime = `${iso.slice(0, 10)} ${iso.slice(11, 19)}`;
-
+      const dateTime = moment(entry.createdAt)
+        .tz("Asia/Kolkata")
+        .format("YYYY-MM-DD, hh:mm:ss A"); // "2025-06-05, 10:54:00 AM"
+  
       return {
         dateTime,
         amount: Number(entry.amount),
         userName: entry.userName
       };
     });
-
+  
     return { data, total };
   },
-
   // Corrected method: Get daily reward stats with user and rank details
   async getDailyRewardStats(fromDate, toDate, transactionType) {
     return WalletHistory.aggregate([
@@ -272,41 +272,52 @@ const WalletRepository = {
       }
     ]);
   },
-  
-  async getDailyPayoutHistory(startDate, endDate) {
-    const result = await WalletHistory.aggregate([
-      {
-        $match: {
-          type: 'credit',
-          transactionType: 'dailyPayout',
-          createdAt: { $gte: startDate, $lte: endDate }
-        }
-      },
-      {
-        $lookup: {
-          from: "users",
-          localField: "userId",
-          foreignField: "userId",
-          as: "user"
-        }
-      },
-      {
-        $unwind: { path: "$user", preserveNullAndEmptyArrays: true }
-      },
-      {
-        $project: {
-          _id: 1,
-          userName: "$user.fullName",     // This ensures actual name is projected
-          amount: { $toDouble: "$amount" },
-          dateTime: "$createdAt",
-          status: "$status"
-          
-        }
+
+async getDailyPayoutHistory(startDate, endDate) {
+  const result = await WalletHistory.aggregate([
+    {
+      $match: {
+        type: 'credit',
+        transactionType: 'dailyPayout',
+        createdAt: { $gte: startDate, $lte: endDate }
       }
-    ]);
-  console.log ("result", result)
-    return result;
-  }
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "userId",
+        foreignField: "userId",
+        as: "user"
+      }
+    },
+    {
+      $unwind: { path: "$user", preserveNullAndEmptyArrays: true }
+    },
+    {
+      $project: {
+        // _id: 1,
+        userName: "$user.fullName",
+        amount: { $toDouble: "$amount" },
+        dateTime: "$createdAt",
+        status: "$status"
+      }
+    }
+  ]);
+
+  // Format dateTime
+  const formatted = result.map(entry => ({
+    // _id: entry._id,
+    userName: entry.userName || "N/A",
+    amount: entry.amount,
+    status: entry.status,
+    dateTime: moment(entry.dateTime)
+      .utcOffset("+05:30")
+      .format("YYYY-MM-DD, hh:mm:ss A")
+  }));
+
+  return formatted;
+}
+
   
 }  
 

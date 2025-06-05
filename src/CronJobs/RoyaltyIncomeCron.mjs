@@ -4,6 +4,7 @@ import UserModel from "../Models/UserModels.mjs";
 import UserWalletRepository from "../Repositories/user/userWalletRepositories.mjs";
 import WalletHistories from "../Models/WalletHistory.mjs";
 import RankModel from "../Models/RankModels.mjs";
+import RankRoyalty from "../Models/RankRoyaltyHistoriesModel.mjs"; // ✅ Add this
 import userRepository from "../Repositories/user/userRepositories.mjs";
 
 const TRANSACTION_TYPE = "royaltyIncome";
@@ -20,7 +21,7 @@ class RoyaltyIncomeCron {
     }
 
     this.task = cron.schedule(
-      "* * * * *",
+      "* * * * *", // Change as needed
       async () => {
         const now = new Date();
         const istNow = new Date(
@@ -111,6 +112,26 @@ class RoyaltyIncomeCron {
         const totalRankAmount = 80;
         const amountPerUser = totalRankAmount / rankUserCount;
 
+        // ✅ Step: Insert into RankRoyaltyHistories (only if not already created today)
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+
+        const alreadyExists = await RankRoyalty.findOne({
+          rankId: parseInt(rank),
+          createdAt: { $gte: todayStart },
+        });
+
+        if (!alreadyExists) {
+          await RankRoyalty.create({
+            rankId: parseInt(rank),
+            totalUsers: rankUserCount,
+            totalAmountPaid: totalRankAmount,
+            perUserAmount: amountPerUser,
+          });
+        } else {
+          console.log(`ℹ️ RankRoyalty record already exists for rank ${rank}`);
+        }
+
         console.log(`Rank '${rank}': ${rankUserCount} users, ₹${totalRankAmount} pool, ₹${amountPerUser.toFixed(2)} each`);
 
         for (const user of rankUsers) {
@@ -124,7 +145,6 @@ class RoyaltyIncomeCron {
           userWallet.balance += amountPerUser;
           await userWallet.save();
 
-          // ✅ Handle Decimal128 royaltyIncome correctly
           const oldRoyalty = parseFloat(user.royaltyIncome?.toString() || '0');
           const newRoyalty = (oldRoyalty + amountPerUser).toFixed(2);
           user.royaltyIncome = mongoose.Types.Decimal128.fromString(newRoyalty);

@@ -222,9 +222,6 @@ class UserRepository {
       }),
     }));
   }
-  
-
-
   // UserRepository.js
 static async getUsersByRank({ rankId }) {
   if (!rankId) {

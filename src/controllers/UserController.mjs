@@ -10,7 +10,7 @@ import WalletModel from "../Models/WalletModels.mjs";
 import RankModel from "../Models/RankModels.mjs";
 import UserRankHistoryRepo from "../Repositories/UserRankHistory.mjs";
 import UserWalletRepository from "../Repositories/user/userWalletRepositories.mjs";
-
+import RankRoyaltyRepository from "../Repositories/rankRoyaltyHistoriesRepository.mjs";
 
 class UserController {
   async registerUser(req, res) {
@@ -760,7 +760,24 @@ class UserController {
       });
     }
   }
-  
+  async getAllRankRoyalty(req, res) {
+    try {
+      const data = await RankRoyaltyRepository.getAllWithRankDetails();
+      res.status(200).json({
+        statusCode:200,
+        success: true,
+        message: "Rank Royalty history with rank details fetched successfully",
+        data,
+      });
+    } catch (error) {
+      res.status(500).json({
+        statusCode:500,
+        success: false,
+        message: "Failed to fetch data",
+        error: error.message,
+      });
+    }
+  }
 }
 
 export default new UserController();

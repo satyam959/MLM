@@ -40,4 +40,8 @@ router.post('/sendReceipt', BuyMembershipController.sendMembershipReceiptForUser
 //rewardReferrerFromAdmin
 router.post('/rewardReferrerFromAdmin', verifyToken, BuyMembershipController.rewardReferrerFromAdmin);
 
+// Admin getAllRankRoyalty
+router.get("/getAllRankRoyalty",AdminAuth.verifyAdminRole,UserController.getAllRankRoyalty);
+
+
 export default router;
