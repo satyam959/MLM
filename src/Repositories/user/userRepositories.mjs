@@ -215,6 +215,28 @@ class userRepository {
       throw new Error("Error fetching users with referrer code");
     }
   }
+  static async updateUserMembership(userId, membershipData) {
+    try {
+      return await UserModel.findOneAndUpdate(
+        { userId },
+        { $set: { membership: membershipData } },
+        { new: true }
+      );
+    } catch (error) {
+      console.error("Error updating user membership:", error.message);
+      throw new Error(`Failed to update user membership: ${error.message}`);
+    }
+  }
+  
+  
+  static async findUserById(userId) {
+    try {
+      return await UserModel.findOne({ userId });
+    } catch (error) {
+      console.error("Error finding user by ID:", error.message);
+      throw new Error(`Failed to find user by ID: ${error.message}`);
+    }
+  }
 }
 
 export default userRepository;

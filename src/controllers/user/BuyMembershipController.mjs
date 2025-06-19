@@ -1,17 +1,24 @@
 import UserRepository from '../../Repositories/user/userRepositories.mjs';
 import UserWalletRepository from '../../Repositories/user/userWalletRepositories.mjs';
 import EmailService from '../../utils/emailService.mjs';
+import { fileURLToPath } from 'url'
 import path from 'path';
 import fs from 'fs';
 
 
-const pdfPath = path.resolve('utils/eBook/dummy.pdf');
+// Get __dirname equivalent in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Path to fixed PDF file
+const pdfPath = path.join(__dirname, '../../utils/eBook/dummy.pdf');
 const pdfBuffer = fs.readFileSync(pdfPath);
 
 
 class BuyMembershipController {
     static async buyMembership(req, res) {
         try {
+         
             const userTokenData = req.user;
             const amountToAdd = req.body.amount;
 

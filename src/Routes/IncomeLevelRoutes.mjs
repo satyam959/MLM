@@ -1,5 +1,5 @@
 import express from 'express';
-import IncomeLevelController from '../Controllers/IncomeLevelController.mjs';
+import IncomeLevelController from '../controllers/IncomeLevelController.mjs';
 
 const router = express.Router();
 
