@@ -36,6 +36,7 @@ import UserBenefitsCron from './CronJobs/UserBenefitsCron.mjs';
 import RoyaltyIncomeCron from './CronJobs/RoyaltyIncomeCron.mjs';
 import rewardCron from './CronJobs/rewardCron.mjs';
 import contactus from './Routes/User/ContactUsRoutes.mjs'
+import cors from 'cors'
 
 
 //-----------------Working Code Don't Delete  ------------------
@@ -53,6 +54,13 @@ dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 8009;
+app.use(cors({
+    origin: 'http://localhost:5173',
+   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+   allowedHeaders: ['Content-Type', 'Authorization'],
+   credentials: true,
+    }));
+   
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
